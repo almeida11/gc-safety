@@ -50,7 +50,7 @@
 
         @stack('modals')
 
-        <footer> <small>&copy; Copyright 2023, Gigante Sistemas</small> </footer>
+        <!-- <footer> <small>&copy; Copyright 2023, Gigante Sistemas</small> </footer> -->
         @livewireScripts
     </body>
 </html>

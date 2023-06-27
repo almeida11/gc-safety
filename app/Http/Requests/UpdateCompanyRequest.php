@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Gate;
 
-class StoreCompanyRequest extends FormRequest
+class UpdateCompanyRequest extends FormRequest
 {
     public function rules()
     {
@@ -52,8 +52,8 @@ class StoreCompanyRequest extends FormRequest
                 'required',
             ],
             'id_manager'    => [
-                'required',
                 'integer',
+                'required',
             ],
         ];
     }

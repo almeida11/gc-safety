@@ -37,8 +37,13 @@
                                     <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Gerente
                                     </th>
+                                    @if ($editor->type == 'Administrador')
+                                    <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Status
+                                    </th>
+                                    @endif
                                     <th scope="col" width="200" class="px-6 py-3 bg-gray-50">
-
+                                        
                                     </th>
                                 </tr>
                                 </thead>
@@ -64,18 +69,21 @@
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                             {{ $company->cnpj }}
                                         </td>
-
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                             @foreach ($users as $user)
                                                 {{ $user->id == $company->id_manager ? $user->name : '' }}
                                             @endforeach
                                         </td>
-
+                                        @if ($editor->type == 'Administrador')
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                {{ $user->active ? 'Ativo' : 'Inativo' }}
+                                            </td>
+                                        @endif
                                         <td class=" py-4 whitespace-nowrap text-sm font-medium">
                                             <a href="{{ route('companies.show', $company->id) }}" class="mb-2 mr-2 bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-2 rounded">Verificar</a>
                                             
                                                 <a href="{{ route('companies.edit', $company->id) }}" class="mb-2 mr-2 bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-2 rounded">Editar</a>
-                                                <form class="inline-block" action="{{ route('companies.index') }}" method="POST" onsubmit="return confirm('Você tem certeza?');">
+                                                <form class="inline-block" action="{{ route('companies.destroy', $company->id) }}" method="POST" onsubmit="return confirm('Você tem certeza?');">
                                                     <input type="hidden" name="_method" value="DELETE">
                                                     @csrf
                                                     <input type="submit" class="mb-2 mr-2 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-2 rounded" value="Desativar">

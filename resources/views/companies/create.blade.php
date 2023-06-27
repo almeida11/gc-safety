@@ -169,6 +169,30 @@
                                     </div>
                                 </td>
                             </tr>
+                            @if ($editor->type == 'Administrador')
+                                <tr class="border-b">
+                                    <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Status da Empresa
+                                    </th>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
+                                        <div class="col-span-6 sm:col-span-4">
+                                            <select id="ativo" name="ativo"
+                                            class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-ful"
+                                            wire:model="ativo">
+                                                <option value='1' selected>
+                                                    Ativa
+                                                </option>
+                                                <option value='0'>
+                                                    Inativa
+                                                </option>
+                                            </select>
+                                            @error('ativo')
+                                                <p class="text-sm text-red-600">{{ $message }}</p>
+                                            @enderror
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endif
                         </table>
                     </div>
                     @csrf

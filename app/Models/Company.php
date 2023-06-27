@@ -20,7 +20,9 @@ class Company extends Model
         'email',
         'endereco',
         'cnpj',
+        'tipo',
         'id_manager',
+        'ativo',
     ];
 
     protected $appends = [

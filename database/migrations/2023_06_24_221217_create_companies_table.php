@@ -23,6 +23,9 @@ return new class extends Migration
             $table->string('cidade')->nullable();
             $table->string('telefone')->nullable();
             $table->string('cnpj')->nullable();
+            $table->integer('id_manager')->nullable();
+            $table->string('tipo')->default('Contratada');
+            $table->boolean('ativo')->default(1);
             $table->string('company_photo_path', 2048)->nullable();
             $table->timestamps();
         });

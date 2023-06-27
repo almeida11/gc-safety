@@ -28,6 +28,6 @@
             {{ $slot }}
         </div>
         
-        <footer> <small>&copy; Copyright 2023, Gigante Sistemas</small> </footer>
+        <!-- <footer class='z-10'> <small>&copy; Copyright 2023, Gigante Sistemas</small> </footer> -->
     </body>
 </html>

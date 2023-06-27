@@ -20,9 +20,10 @@ class User_relationFactory extends Factory
      */
     public function definition(): array
     {
+        $id = $this->faker->unique()->numberBetween(3, User::count());
         return [
-            'id_company' => 1,
-            'id_user' => $this->faker->unique()->numberBetween(3, User::count()),
+            'id_company' => $id%2 == 0 ? 2 : 1,
+            'id_user' => $id,
             'is_manager' => 0,
         ];
     }

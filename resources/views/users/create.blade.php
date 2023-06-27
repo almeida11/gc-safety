@@ -124,28 +124,30 @@
                                     </div>
                                 </td>
                             </tr>
-                            <tr class="border-b">
-                                <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Status do Usuário
-                                </th>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
-                                    <div class="col-span-6 sm:col-span-4">
-                                        <select id="active" name="active"
-                                        class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-ful"
-                                        wire:model="active">
-                                            <option value='1'>
-                                                Ativo
-                                            </option>
-                                            <option value='0' selected>
-                                                Inativo
-                                            </option>
-                                        </select>
-                                        @error('active')
-                                            <p class="text-sm text-red-600">{{ $message }}</p>
-                                        @enderror
-                                    </div>
-                                </td>
-                            </tr>
+                            @if ($editor->type == 'Administrador')
+                                <tr class="border-b">
+                                    <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Status do Usuário
+                                    </th>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
+                                        <div class="col-span-6 sm:col-span-4">
+                                            <select id="active" name="active"
+                                            class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-ful"
+                                            wire:model="active">
+                                                <option value='1' selected>
+                                                    Ativo
+                                                </option>
+                                                <option value='0'>
+                                                    Inativo
+                                                </option>
+                                            </select>
+                                            @error('active')
+                                                <p class="text-sm text-red-600">{{ $message }}</p>
+                                            @enderror
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endif
                         </table>
                     </div>
                     @csrf

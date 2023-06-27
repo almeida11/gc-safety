@@ -18,18 +18,25 @@ class UsersController extends Controller
     public function index()
     {
         $editor = DB::table('users')
-                ->where('users.id', Auth::user()->id)
-                ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
-                ->join('companies', 'companies.id', '=', 'user_relations.id_company')
-                ->select('users.*', 'companies.nome_fantasia AS company', 'user_relations.is_manager AS is_manager')
-                ->first();
+            ->where('users.id', Auth::user()->id)
+            ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
+            ->join('companies', 'companies.id', '=', 'user_relations.id_company')
+            ->select('users.*', 'companies.nome_fantasia AS company', 'user_relations.is_manager AS is_manager')
+            ->first();
         $users = DB::table('users')
-                ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
-                ->join('companies', 'companies.id', '=', 'user_relations.id_company')
-                ->where('companies.nome_fantasia', $editor->company)
-                ->select('users.*', 'companies.nome_fantasia AS company', 'user_relations.is_manager AS is_manager')
-                ->orderBy('type')
-                ->paginate(9);
+            ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
+            ->join('companies', 'companies.id', '=', 'user_relations.id_company')
+            ->where('companies.nome_fantasia', $editor->company)
+            ->where('users.active', 1)
+            ->select('users.*', 'companies.nome_fantasia AS company', 'user_relations.is_manager AS is_manager')
+            ->orderBy('type')
+            ->paginate(9);
+        $editor = DB::table('users')
+            ->where('users.id', Auth::user()->id)
+            ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
+            ->join('companies', 'companies.id', '=', 'user_relations.id_company')
+            ->select('users.*', 'companies.nome_fantasia AS company', 'user_relations.is_manager AS is_manager')
+            ->first();
         // abort_if(Gate::denies('user_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         // $users = User::where('company', Auth::user()->company)->paginate(9);
         if (Auth::user()->type == 'Administrador'){
@@ -41,7 +48,7 @@ class UsersController extends Controller
                 ->paginate(9);
         }
 
-        return view('users.index', compact('users'));
+        return view('users.index', compact('users', 'editor'));
     }
 
     public function create()
@@ -51,11 +58,11 @@ class UsersController extends Controller
         }
         $companies = Company::all();
         $editor = DB::table('users')
-                ->where('users.id', Auth::user()->id)
-                ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
-                ->join('companies', 'companies.id', '=', 'user_relations.id_company')
-                ->select('users.*', 'companies.nome_fantasia AS company', 'user_relations.is_manager AS is_manager')
-                ->first();
+            ->where('users.id', Auth::user()->id)
+            ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
+            ->join('companies', 'companies.id', '=', 'user_relations.id_company')
+            ->select('users.*', 'companies.nome_fantasia AS company', 'user_relations.is_manager AS is_manager')
+            ->first();
         // abort_if(Gate::denies('user_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         
@@ -108,14 +115,20 @@ class UsersController extends Controller
     public function show(User $user)
     {
         $user = DB::table('users')
-                ->where('users.id', $user->id)
-                ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
-                ->join('companies', 'companies.id', '=', 'user_relations.id_company')
-                ->select('users.*', 'companies.nome_fantasia AS company', 'user_relations.is_manager AS is_manager')
-                ->first();
+            ->where('users.id', $user->id)
+            ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
+            ->join('companies', 'companies.id', '=', 'user_relations.id_company')
+            ->select('users.*', 'companies.nome_fantasia AS company', 'user_relations.is_manager AS is_manager')
+            ->first();
+        $editor = DB::table('users')
+            ->where('users.id', Auth::user()->id)
+            ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
+            ->join('companies', 'companies.id', '=', 'user_relations.id_company')
+            ->select('users.*', 'companies.nome_fantasia AS company', 'user_relations.is_manager AS is_manager')
+            ->first();
         // abort_if(Gate::denies('user_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        return view('users.show', compact('user'));
+        return view('users.show', compact('user', 'editor'));
     }
 
     public function edit(User $user)
@@ -125,17 +138,17 @@ class UsersController extends Controller
         }
         $companies = Company::all();
         $user = DB::table('users')
-                ->where('users.id', $user->id)
-                ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
-                ->join('companies', 'companies.id', '=', 'user_relations.id_company')
-                ->select('users.*', 'companies.nome_fantasia AS company', 'user_relations.is_manager AS is_manager')
-                ->first();
+            ->where('users.id', $user->id)
+            ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
+            ->join('companies', 'companies.id', '=', 'user_relations.id_company')
+            ->select('users.*', 'companies.nome_fantasia AS company', 'user_relations.is_manager AS is_manager')
+            ->first();
         $editor = DB::table('users')
-                ->where('users.id', Auth::user()->id)
-                ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
-                ->join('companies', 'companies.id', '=', 'user_relations.id_company')
-                ->select('users.*', 'companies.nome_fantasia AS company', 'user_relations.is_manager AS is_manager')
-                ->first();
+            ->where('users.id', Auth::user()->id)
+            ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
+            ->join('companies', 'companies.id', '=', 'user_relations.id_company')
+            ->select('users.*', 'companies.nome_fantasia AS company', 'user_relations.is_manager AS is_manager')
+            ->first();
         // abort_if(Gate::denies('user_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         // $roles = Role::pluck('title', 'id');
 
@@ -169,9 +182,9 @@ class UsersController extends Controller
                 ->where('users.id', Auth::user()->id)
                 ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
                 ->join('companies', 'companies.id', '=', 'user_relations.id_company')
-                ->select('users.*', 'companies.nome_fantasia AS company', 'user_relations.is_manager AS is_manager', 'companies.id')
+                ->select('users.*', 'companies.nome_fantasia AS company', 'user_relations.is_manager AS is_manager', 'companies.id AS id_company')
                 ->first();
-            if($editor->companies->id !== $req['company']){
+            if($editor->id_company !== (int) $req['company']){
                 throw ValidationException::withMessages(['erro' => 'Você não tem permissão para isso!']);
             }
             // end - checa se o usuário a ser editado faz parte da empresa do editor
@@ -183,10 +196,10 @@ class UsersController extends Controller
 
         // init - altera empresa do usuario
         $relations = DB::table('user_relations')
-                ->where('user_relations.id_user', $user->id)
-                ->join('users', 'users.id', '=', 'user_relations.id_user')
-                ->select('user_relations.*')
-                ->first();
+            ->where('user_relations.id_user', $user->id)
+            ->join('users', 'users.id', '=', 'user_relations.id_user')
+            ->select('user_relations.*')
+            ->first();
         // $relations->id_company = $req['company'];
         
         $relations = User_relation::findOrFail($relations->id);

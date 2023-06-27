@@ -18,10 +18,6 @@ class StoreUserRequest extends FormRequest
                 'required',
                 'unique:users,email'
             ],
-            'active'    => [
-                'boolean',
-                'required',
-            ],
             'type'    => [
                 'string',
                 'required',

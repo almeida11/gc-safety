@@ -30,6 +30,10 @@ class DatabaseSeeder extends Seeder
             [
                 'razao_social' => 'Gigante Sistemas S/A',
                 'nome_fantasia' => 'Gigante Sistemas',
+            ],
+            [
+                'razao_social' => 'Mateus Sistemas S/A',
+                'nome_fantasia' => 'Mateus Sistemas',
             ]
         ]);
         \DB::table('users')->insert([
@@ -55,7 +59,7 @@ class DatabaseSeeder extends Seeder
                 'is_manager' => 1,
             ],
             [
-                'id_company' => 1,
+                'id_company' => 2,
                 'id_user' => 2,
                 'is_manager' => 0,
             ]
