@@ -11,7 +11,6 @@ class StoreUserRequest extends FormRequest
     {
         return [
             'name'    => [
-                'string',
                 'required',
             ],
             'email'   => [
@@ -19,7 +18,6 @@ class StoreUserRequest extends FormRequest
                 'unique:users,email'
             ],
             'type'    => [
-                'string',
                 'required',
             ],
             'company'    => [

@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\Rule;
 
 class UpdateCompanyRequest extends FormRequest
 {
@@ -11,49 +12,38 @@ class UpdateCompanyRequest extends FormRequest
     {
         return [
             'razao_social'    => [
-                'string',
-                'unique:companies',
+                Rule::unique('companies')->ignore($this->company),
                 'required',
             ],
             'nome_fantasia'   => [
-                'string',
                 'required',
             ],
             'atividade_principal'    => [
-                'string',
                 'required',
             ],
             'cnae'    => [
-                'string',
                 'required',
             ],
             'endereco'    => [
-                'string',
                 'required',
             ],
             'bairro'    => [
-                'string',
                 'required',
             ],
             'cep'    => [
-                'string',
                 'required',
             ],
             'cidade'    => [
-                'string',
                 'required',
             ],
             'telefone'    => [
-                'string',
                 'required',
             ],
             'cnpj'    => [
-                'string',
                 'required',
             ],
             'id_manager'    => [
-                'integer',
-                'required',
+                'nullable',
             ],
         ];
     }

@@ -193,6 +193,30 @@
                                     </td>
                                 </tr>
                             @endif
+                            @if ($editor->type == 'Administrador')
+                                <tr class="border-b">
+                                    <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Tipo de Empresa
+                                    </th>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
+                                        <div class="col-span-6 sm:col-span-4">
+                                            <select id="tipo" name="tipo"
+                                            class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-ful"
+                                            wire:model="tipo">
+                                                <option value='Contratante' selected>
+                                                    Contratante
+                                                </option>
+                                                <option value='Contratada'>
+                                                    Contratada
+                                                </option>
+                                            </select>
+                                            @error('tipo')
+                                                <p class="text-sm text-red-600">{{ $message }}</p>
+                                            @enderror
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endif
                         </table>
                     </div>
                     @csrf

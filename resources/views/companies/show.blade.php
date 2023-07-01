@@ -12,14 +12,16 @@
             </div>
             <div class="flex flex-col">
                 <table class="min-w-full divide-y divide-gray-200 w-full">
-                    <tr class="border-b">
-                        <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            ID
-                        </th>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
-                            {{ $company->id }}
-                        </td>
-                    </tr>
+                    @if ($editor->type == 'Administrador')
+                        <tr class="border-b">
+                            <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                ID
+                            </th>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
+                                {{ $company->id }}
+                            </td>
+                        </tr>
+                    @endif
                     <tr class="border-b">
                         <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Razão Social
@@ -50,6 +52,14 @@
                         </th>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
                             {{ $company->cnae }}
+                        </td>
+                    </tr>
+                    <tr class="border-b">
+                        <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            CNPJ
+                        </th>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
+                            {{ $company->cnpj }}
                         </td>
                     </tr>
                     <tr class="border-b">
@@ -92,6 +102,26 @@
                             {{ $company->telefone }}
                         </td>
                     </tr>
+                    @if ($editor->type == 'Administrador')
+                        <tr class="border-b">
+                            <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Status da Empresa
+                            </th>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
+                                {{ $company->ativo ? 'Ativa' : 'Inativa' }}
+                            </td>
+                        </tr>
+                    @endif
+                    @if ($editor->type == 'Administrador' or $editor->type == 'Moderador')
+                        <tr class="border-b">
+                            <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Tipo de Empresa
+                            </th>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
+                                {{ $company->tipo }}
+                            </td>
+                        </tr>
+                    @endif
                     @foreach ($users as $user)
                         @if($user->id == $company->id_manager)
                             <tr class="border-b">

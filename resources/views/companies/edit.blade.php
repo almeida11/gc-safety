@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            Editar Usuário
+            Editar Empresa
         </h2>
     </x-slot>
 
@@ -10,6 +10,10 @@
             <div class="block mb-8 mb-4">
                 <a href="{{ route('companies.index') }}" class="bg-gray-200 hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">Voltar a Lista</a>
             </div>
+            <?php  
+                dump($company);
+                exit;
+            ?>
             <div class="mt-5 md:mt-0 md:col-span-2">
                 <form method="post" action="{{ route('companies.update', $company->id) }}">
                     <div class="flex flex-col">
@@ -22,6 +26,7 @@
                                     {{ $company->id }}
                                 </td>
                             </tr>
+                            
                             <tr class="border-b">
                                 <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Razão Social
@@ -73,7 +78,20 @@
                                     <input type="text" name="cnae" id="cnae" 
                                     class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full"
                                     wire:model.defer="state.cnae" autocomplete="cnae" value="{{ old('cnae', $company->cnae) }}" />
-                                    @error('company')
+                                    @error('cnae')
+                                        <p class="text-sm text-red-600">{{ $message }}</p>
+                                    @enderror
+                                </td>
+                            </tr>
+                            <tr class="border-b">
+                                <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    CNPJ
+                                </th>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
+                                    <input type="text" name="cnpj" id="cnpj" 
+                                    class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full"
+                                    wire:model.defer="state.cnpj" autocomplete="cnpj" value="{{ old('cnpj', $company->cnpj) }}" />
+                                    @error('cnpj')
                                         <p class="text-sm text-red-600">{{ $message }}</p>
                                     @enderror
                                 </td>
@@ -99,7 +117,7 @@
                                     <input type="text" name="bairro" id="bairro" 
                                     class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full"
                                     wire:model.defer="state.bairro" autocomplete="bairro" value="{{ old('bairro', $company->bairro) }}" />
-                                    @error('endereco')
+                                    @error('bairro')
                                         <p class="text-sm text-red-600">{{ $message }}</p>
                                     @enderror
                                 </td>
@@ -143,19 +161,52 @@
                                     @enderror
                                 </td>
                             </tr>
+                            @if ($editor->type == 'Administrador')
                             <tr class="border-b">
-                                <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    CNPJ
-                                </th>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
-                                    <input type="text" name="cnpj" id="cnpj" 
-                                    class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full"
-                                    wire:model.defer="state.cnpj" autocomplete="cnpj" value="{{ old('cnpj', $company->cnpj) }}" />
-                                    @error('cnpj')
-                                        <p class="text-sm text-red-600">{{ $message }}</p>
-                                    @enderror
-                                </td>
-                            </tr>
+                                    <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Status da Empresa
+                                    </th>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
+                                        <div class="col-span-6 sm:col-span-4">
+                                            <select id="active" name="active"
+                                            class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-ful"
+                                            wire:model="active">
+                                                <option value='1'>
+                                                    Ativa
+                                                </option>
+                                                <option value='0' {{ $company->ativo ? '' : 'selected' }}>
+                                                    Inativa
+                                                </option>
+                                            </select>
+                                            @error('active')
+                                                <p class="text-sm text-red-600">{{ $message }}</p>
+                                            @enderror
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr class="border-b">
+                                    <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Tipo da Empresa
+                                    </th>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
+                                        <div class="col-span-6 sm:col-span-4">
+                                            <select id="active" name="active"
+                                            class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-ful"
+                                            wire:model="active">
+                                                <option value='1'>
+                                                    Contratante
+                                                </option>
+                                                <option value='0' {{ $company->tipo == 'Contratada' ? 'selected' : '' }}>
+                                                    Contratada
+                                                </option>
+                                            </select>
+                                            @error('active')
+                                                <p class="text-sm text-red-600">{{ $message }}</p>
+                                            @enderror
+                                        </div>
+                                    </td>
+                                </tr>
+                                
                             <tr class="border-b">
                                 <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Gerente
@@ -165,6 +216,7 @@
                                         <select id="id_manager" name="id_manager"
                                         class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-ful"
                                         wire:model="id_manager">
+                                        
                                                 <option hidden>
                                                     Selecione um Gerente!
                                                 </option>
@@ -180,6 +232,33 @@
                                     </div>
                                 </td>
                             </tr>
+                            @endif
+                            @if ($editor->is_manager == 1)
+                                <tr class="border-b">
+                                    <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Gerente
+                                    </th>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
+                                        <div class="col-span-6 sm:col-span-4">
+                                            <select id="id_manager" name="id_manager"
+                                            class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-ful"
+                                            wire:model="id_manager">
+                                                    <option hidden>
+                                                        Selecione um Gerente!
+                                                    </option>
+                                                @foreach ($users as $user)
+                                                    <option value="{{ $user->id }}" {{ $company->id_manager == $user->id ? 'selected' : '' }}>
+                                                        {{ $user->name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                            @error('id_manager')
+                                                <p class="text-sm text-red-600">{{ $message }}</p>
+                                            @enderror
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endif
                         </table>
                     </div>
                     @csrf

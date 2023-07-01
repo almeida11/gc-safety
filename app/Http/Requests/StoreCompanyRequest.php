@@ -11,49 +11,38 @@ class StoreCompanyRequest extends FormRequest
     {
         return [
             'razao_social'    => [
-                'string',
                 'unique:companies',
                 'required',
             ],
             'nome_fantasia'   => [
-                'string',
                 'required',
             ],
             'atividade_principal'    => [
-                'string',
                 'required',
             ],
             'cnae'    => [
-                'string',
                 'required',
             ],
             'endereco'    => [
-                'string',
                 'required',
             ],
             'bairro'    => [
-                'string',
                 'required',
             ],
             'cep'    => [
-                'string',
                 'required',
             ],
             'cidade'    => [
-                'string',
                 'required',
             ],
             'telefone'    => [
-                'string',
                 'required',
             ],
             'cnpj'    => [
-                'string',
                 'required',
             ],
             'id_manager'    => [
-                'required',
-                'integer',
+                'nullable',
             ],
         ];
     }

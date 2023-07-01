@@ -19,17 +19,13 @@
                             <table class="min-w-full divide-y divide-gray-200 w-full">
                                 <thead>
                                 <tr>
-                                <th scope="col" width="50" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        ID
-                                    </th>
-                                    <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Razao Social
-                                    </th>
+                                    @if ($editor->type == 'Administrador')
+                                        <th scope="col" width="50" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            ID
+                                        </th>
+                                    @endif
                                     <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Nome Fantasia
-                                    </th>
-                                    <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Atividade Principal
                                     </th>
                                     <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         CNPJ
@@ -37,10 +33,15 @@
                                     <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Gerente
                                     </th>
+                                    @if ($editor->type == 'Administrador' or $editor->type == 'Moderador')
+                                        <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Tipo de Empresa
+                                        </th>
+                                    @endif
                                     @if ($editor->type == 'Administrador')
-                                    <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Status
-                                    </th>
+                                        <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Status da Empresa
+                                        </th>
                                     @endif
                                     <th scope="col" width="200" class="px-6 py-3 bg-gray-50">
                                         
@@ -50,20 +51,14 @@
                                 <tbody class="bg-white divide-y divide-gray-200">
                                 @foreach ($companies as $company)
                                     <tr>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                            {{ $company->id }}
-                                        </td>
-
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                            {{ $company->razao_social }}
-                                        </td>
+                                        @if ($editor->type == 'Administrador')
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                {{ $company->id }}
+                                            </td>
+                                        @endif
 
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                             {{ $company->nome_fantasia }}
-                                        </td>
-
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                            {{ $company->atividade_principal }}
                                         </td>
 
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -71,12 +66,21 @@
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                             @foreach ($users as $user)
-                                                {{ $user->id == $company->id_manager ? $user->name : '' }}
+                                                <?php 
+                                                    if ($user->id == $company->id_manager) {
+                                                        echo mb_strimwidth($user->name, 0, 20, "...");
+                                                    }
+                                                ?>
                                             @endforeach
                                         </td>
+                                        @if ($editor->type == 'Administrador' or $editor->type == 'Moderador')
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                {{ $company->tipo }}
+                                            </td>
+                                        @endif
                                         @if ($editor->type == 'Administrador')
                                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                {{ $user->active ? 'Ativo' : 'Inativo' }}
+                                                {{ $company->ativo ? 'Ativo' : 'Inativo' }}
                                             </td>
                                         @endif
                                         <td class=" py-4 whitespace-nowrap text-sm font-medium">

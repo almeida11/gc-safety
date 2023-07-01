@@ -23,6 +23,7 @@ class Company extends Model
         'tipo',
         'id_manager',
         'ativo',
+        'tipo',
     ];
 
     protected $appends = [

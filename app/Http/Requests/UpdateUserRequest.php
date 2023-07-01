@@ -11,7 +11,6 @@ class UpdateUserRequest extends FormRequest
     {
         return [
             'name'    => [
-                'string',
                 'required',
             ],
             'email'   => [
@@ -19,7 +18,6 @@ class UpdateUserRequest extends FormRequest
                 'unique:users,email,' . request()->route('user')->id,
             ],
             'type'    => [
-                'string',
                 'required',
             ],
             'company'    => [
