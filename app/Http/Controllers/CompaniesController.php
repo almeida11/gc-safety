@@ -6,11 +6,12 @@ use Illuminate\Http\Request;
 use App\Http\Requests\StoreCompanyRequest;
 use App\Http\Requests\UpdateCompanyRequest;
 use App\Models\Company;
+use App\Models\Company_relation;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User_relation;
 use App\Models\User;
-
+use App\Helpers\PaginationHelper;
 class CompaniesController extends Controller
 {
     /**
@@ -37,13 +38,26 @@ class CompaniesController extends Controller
             ->join('users', 'user_relations.id_user', '=', 'users.id')
             ->where('user_relations.is_manager', 1)
             ->select('companies.*', 'users.id AS id_manager')
-            ->paginate(9);
+            ->first();
         $users = DB::table('users')
             ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
             ->join('companies', 'companies.id', '=', 'user_relations.id_company')
             ->select('users.*', 'companies.nome_fantasia AS company', 'user_relations.is_manager AS is_manager')
             ->orderBy('type')
             ->get();
+        $company_relations = DB::table('company_relations')
+            ->where('id_contratante', $companies->id)
+            ->first();
+        $companies = DB::table('companies')
+            ->join('company_relations', function($join) {
+                $join->on('companies.id', '=', 'company_relations.id_contratada')->orOn('companies.id', '=', 'company_relations.id_contratante');
+            })
+            ->where('user_relations.is_manager', 1)
+            ->join('user_relations', 'user_relations.id_company', '=', 'companies.id')
+            ->join('users', 'user_relations.id_user', '=', 'users.id')
+            ->select('companies.*', 'users.id AS id_manager')
+            ->paginate(9)->unique();
+        $companies = PaginationHelper::paginate($companies, 9);
         if (Auth::user()->type == 'Administrador'){
             $companies = DB::table('companies')
                 ->join('user_relations', 'user_relations.id_company', '=', 'companies.id')
@@ -99,10 +113,43 @@ class CompaniesController extends Controller
         }
 
         $req = $request->validated();
-        
-        $company = Company::create($req);
-        // $user->roles()->sync($request->input('roles', []));
+        if(Auth::user()->type == 'Moderador'){
+            $req['tipo'] = 'Contratada';
+        }
+        $manager = (int) $req['id_manager'];
+        unset($req['id_manager']);
+        $editor = DB::table('users')
+            ->where('users.id', Auth::user()->id)
+            ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
+            ->join('companies', 'companies.id', '=', 'user_relations.id_company')
+            ->select('users.*', 'companies.nome_fantasia AS company', 'user_relations.is_manager AS is_manager')
+            ->first();
+        $company = DB::table('companies')
+            ->where('user_relations.id_user', $editor->id)
+            ->join('user_relations', 'user_relations.id_company', '=', 'companies.id')
+            ->join('users', 'user_relations.id_user', '=', 'users.id')
+            ->where('user_relations.is_manager', 1)
+            ->select('companies.*', 'users.id AS id_manager')
+            ->first();
+        $manager = DB::table('user_relations')
+            ->where('user_relations.id_user', $manager)
+            ->join('users', 'users.id', '=', 'user_relations.id_user')
+            ->select('user_relations.*')
+            ->first();
+        $manager = User_relation::findOrFail($manager->id);
+        $manager->is_manager = 1;
 
+        $new_company = Company::create($req);
+
+        $relation_model = array(
+            'id_contratante' => $company->id,
+            'id_contratada' => $new_company->id,
+        );
+
+        $new_relation = Company_relation::create($relation_model);
+        $manager->id_company = $new_company->id;
+        $manager->update();
+        // $user->roles()->sync($request->input('roles', []));
         return redirect()->route('companies.index');
     }
 

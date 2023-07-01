@@ -35,7 +35,7 @@ class DatabaseSeeder extends Seeder
             [
                 'razao_social' => 'Mateus Sistemas S/A',
                 'nome_fantasia' => 'Mateus Sistemas',
-                'tipo' => 'Contratante',
+                'tipo' => 'Contratada',
             ]
         ]);
         \DB::table('users')->insert([
@@ -64,6 +64,12 @@ class DatabaseSeeder extends Seeder
                 'id_company' => 2,
                 'id_user' => 2,
                 'is_manager' => 1,
+            ]
+        ]);
+        \DB::table('company_relations')->insert([
+            [
+                'id_contratante' => 1,
+                'id_contratada' => 2,
             ]
         ]);
         User::factory()->count(50)->create();

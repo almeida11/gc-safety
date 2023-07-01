@@ -13,6 +13,10 @@ return new class extends Migration
     {
         Schema::create('company_relations', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('id_contratante')->nullable();
+            $table->foreign('id_contratante')->references('id')->on('companies')->onDelete('cascade')->nullable();
+            $table->unsignedBigInteger('id_contratada')->nullable();
+            $table->foreign('id_contratada')->references('id')->on('companies')->onDelete('cascade')->nullable();
             $table->timestamps();
         });
     }

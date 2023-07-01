@@ -45,6 +45,12 @@ class UpdateCompanyRequest extends FormRequest
             'id_manager'    => [
                 'nullable',
             ],
+            'tipo'    => [
+                'nullable',
+            ],
+            'ativo'    => [
+                'nullable',
+            ],
         ];
     }
 
