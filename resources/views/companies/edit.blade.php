@@ -10,10 +10,6 @@
             <div class="block mb-8 mb-4">
                 <a href="{{ route('companies.index') }}" class="bg-gray-200 hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">Voltar a Lista</a>
             </div>
-            <?php  
-                dump($company);
-                exit;
-            ?>
             <div class="mt-5 md:mt-0 md:col-span-2">
                 <form method="post" action="{{ route('companies.update', $company->id) }}">
                     <div class="flex flex-col">
@@ -232,32 +228,33 @@
                                     </div>
                                 </td>
                             </tr>
-                            @endif
-                            @if ($editor->is_manager == 1)
-                                <tr class="border-b">
-                                    <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Gerente
-                                    </th>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
-                                        <div class="col-span-6 sm:col-span-4">
-                                            <select id="id_manager" name="id_manager"
-                                            class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-ful"
-                                            wire:model="id_manager">
-                                                    <option hidden>
-                                                        Selecione um Gerente!
-                                                    </option>
-                                                @foreach ($users as $user)
-                                                    <option value="{{ $user->id }}" {{ $company->id_manager == $user->id ? 'selected' : '' }}>
-                                                        {{ $user->name }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                            @error('id_manager')
-                                                <p class="text-sm text-red-600">{{ $message }}</p>
-                                            @enderror
-                                        </div>
-                                    </td>
-                                </tr>
+                            @else
+                                @if ($editor->is_manager == 1)
+                                    <tr class="border-b">
+                                        <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Gerente
+                                        </th>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
+                                            <div class="col-span-6 sm:col-span-4">
+                                                <select id="id_manager" name="id_manager"
+                                                class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-ful"
+                                                wire:model="id_manager">
+                                                        <option hidden>
+                                                            Selecione um Gerente!
+                                                        </option>
+                                                    @foreach ($users as $user)
+                                                        <option value="{{ $user->id }}" {{ $company->id_manager == $user->id ? 'selected' : '' }}>
+                                                            {{ $user->name }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                                @error('id_manager')
+                                                    <p class="text-sm text-red-600">{{ $message }}</p>
+                                                @enderror
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endif
                             @endif
                         </table>
                     </div>

@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\User_relation;
 use App\Models\User;
 use App\Helpers\PaginationHelper;
+use Illuminate\Validation\ValidationException;
 class CompaniesController extends Controller
 {
     /**
@@ -60,9 +61,11 @@ class CompaniesController extends Controller
         $companies = PaginationHelper::paginate($companies, 9);
         if (Auth::user()->type == 'Administrador'){
             $companies = DB::table('companies')
-                ->join('user_relations', 'user_relations.id_company', '=', 'companies.id')
-                ->join('users', 'user_relations.id_user', '=', 'users.id')
-                ->where('user_relations.is_manager', 1)
+                ->leftJoin('user_relations', function($join) {
+                    $join->on('user_relations.id_company', '=', 'companies.id')
+                    ->where('user_relations.is_manager', 1);
+                })
+                ->leftJoin('users', 'user_relations.id_user', '=', 'users.id')
                 ->select('companies.*', 'users.id AS id_manager')
                 ->paginate(9);
         }
@@ -165,13 +168,26 @@ class CompaniesController extends Controller
             ->select('users.*', 'companies.nome_fantasia AS company', 'user_relations.is_manager AS is_manager')
             ->first();
         $users = User::all();
-        $company = DB::table('companies')
-            ->where('companies.id', $company->id)
-            ->join('user_relations', 'user_relations.id_company', '=', 'companies.id')
-            ->join('users', 'user_relations.id_user', '=', 'users.id')
-            ->where('user_relations.is_manager', 1)
-            ->select('companies.*', 'users.id AS id_manager')
-            ->first();
+        
+        if (Auth::user()->type == 'Administrador'){
+            $company = DB::table('companies')
+                ->where('companies.id', $company->id)
+                ->leftJoin('user_relations', function($join) {
+                    $join->on('user_relations.id_company', '=', 'companies.id')
+                    ->where('user_relations.is_manager', 1);
+                })
+                ->leftJoin('users', 'user_relations.id_user', '=', 'users.id')
+                ->select('companies.*', 'users.id AS id_manager')
+                ->first();
+        } else {
+            $company = DB::table('companies')
+                ->where('companies.id', $company->id)
+                ->join('user_relations', 'user_relations.id_company', '=', 'companies.id')
+                ->join('users', 'user_relations.id_user', '=', 'users.id')
+                ->where('user_relations.is_manager', 1)
+                ->select('companies.*', 'users.id AS id_manager')
+                ->first();
+        }
         return view('companies.show', compact('company', 'users', 'editor'));
     }
 
@@ -199,15 +215,26 @@ class CompaniesController extends Controller
             ->join('companies', 'companies.id', '=', 'user_relations.id_company')
             ->select('users.*', 'companies.nome_fantasia AS company', 'user_relations.is_manager AS is_manager')
             ->get();
-        $company = DB::table('companies')
-            ->where('companies.id', $company->id)
-            ->join('user_relations', 'user_relations.id_company', '=', 'companies.id')
-            ->join('users', 'user_relations.id_user', '=', 'users.id')
-            ->where('user_relations.is_manager', 1)
-            ->select('companies.*', 'users.id AS id_manager')
-            ->first();
-        dump(isset($company));
-        exit;
+        
+        if (Auth::user()->type == 'Administrador'){
+            $company = DB::table('companies')
+                ->where('companies.id', $company->id)
+                ->leftJoin('user_relations', function($join) {
+                    $join->on('user_relations.id_company', '=', 'companies.id')
+                    ->where('user_relations.is_manager', 1);
+                })
+                ->leftJoin('users', 'user_relations.id_user', '=', 'users.id')
+                ->select('companies.*', 'users.id AS id_manager')
+                ->first();
+        } else {
+            $company = DB::table('companies')
+                ->where('companies.id', $company->id)
+                ->join('user_relations', 'user_relations.id_company', '=', 'companies.id')
+                ->join('users', 'user_relations.id_user', '=', 'users.id')
+                ->where('user_relations.is_manager', 1)
+                ->select('companies.*', 'users.id AS id_manager')
+                ->first();
+        }
         return view('companies.edit', compact('company', 'users', 'editor'));
         //
     }
@@ -217,16 +244,18 @@ class CompaniesController extends Controller
      */
     public function update(UpdateCompanyRequest $request, Company $company)
     {
-        $editor = DB::table('users')
-            ->where('users.id', Auth::user()->id)
-            ->where('user_relations.id_company', $company->id)
-            ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
-            ->join('companies', 'companies.id', '=', 'user_relations.id_company')
-            ->select('users.*', 'companies.nome_fantasia AS company', 'user_relations.is_manager AS is_manager', 'companies.id AS id_company')
-            ->get();
-        if(!(isset($editor->id))){ abort(403, 'Access denied');}
-        if(!($editor->is_manager == 1 || Auth::user()->type == 'Administrador')){
-            abort(403, 'Access denied');
+        if(!(Auth::user()->type == 'Administrador')){
+            $editor = DB::table('users')
+                ->where('users.id', Auth::user()->id)
+                ->where('user_relations.id_company', $company->id)
+                ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
+                ->join('companies', 'companies.id', '=', 'user_relations.id_company')
+                ->select('users.*', 'companies.nome_fantasia AS company', 'user_relations.is_manager AS is_manager', 'companies.id AS id_company')
+                ->get();
+            if(!(isset($editor->id))){ abort(403, 'Access denied');}
+            if(!($editor->is_manager == 1)){
+                abort(403, 'Access denied');
+            }
         }
         $req = $request->validated();
         /* if(Auth::user()->type == 'Moderador'){
@@ -268,9 +297,9 @@ class CompaniesController extends Controller
         unset($req['company']);
         }*/
 
-        if(isset($req['id_manager'])) {
-            $manager = (int) $req['id_manager'];
-            unset($req['id_manager']);
+        $manager = (int) $req['id_manager'];
+        unset($req['id_manager']);
+        if(isset($manager) && !(Auth::user()->type == 'Administrador')) {
             $new_manager = DB::table('user_relations')
                 ->where('user_relations.id_user', $manager)
                 ->where('user_relations.id_company', $company->id)
@@ -300,13 +329,13 @@ class CompaniesController extends Controller
         } else {
             $new_manager = DB::table('user_relations')
                 ->where('user_relations.id_user', $manager)
-                ->where('user_relations.id_company', $company->id)
                 ->join('users', 'users.id', '=', 'user_relations.id_user')
                 ->select('user_relations.*')
                 ->first();
             if(isset($new_manager)){
                 $new_manager = User_relation::findOrFail($new_manager->id);
                 $new_manager->is_manager = 1;
+                $new_manager->id_company = $company->id;
                 $new_manager->update();
             }
         }

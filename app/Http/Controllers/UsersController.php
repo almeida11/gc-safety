@@ -189,11 +189,30 @@ class UsersController extends Controller
             }
             // end - checa se o usuário a ser editado faz parte da empresa do editor
         }
-
+        
         // init - checa se a senha nao foi alterada
         $req["password"] = $req["password"] == null ? $user->password : Hash::make($req["password"]);
         // end - checa se a senha nao foi alterada
 
+        // init - checa se a empresa foi alterada
+        $user_check = DB::table('users')
+            ->where('users.id', $user->id)
+            ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
+            ->join('companies', 'companies.id', '=', 'user_relations.id_company')
+            ->select('users.*', 'companies.nome_fantasia AS company', 'user_relations.is_manager AS is_manager')
+            ->first();
+        $company = DB::table('companies')
+            ->where('companies.nome_fantasia', $user_check->company)
+            ->join('user_relations', 'user_relations.id_company', '=', 'companies.id')
+            ->join('users', 'user_relations.id_user', '=', 'users.id')
+            ->where('user_relations.is_manager', 1)
+            ->select('companies.*', 'users.id AS id_manager')
+            ->first();
+        if((int) $req['company'] != $company->id){
+            throw ValidationException::withMessages(['erro' => 'Você não tem permissão para isso!']);
+        }
+        // end - checa se a empresa foi alterada
+    
         // init - altera empresa do usuario
         $relations = DB::table('user_relations')
             ->where('user_relations.id_user', $user->id)

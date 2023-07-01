@@ -122,14 +122,16 @@
                             </td>
                         </tr>
                     @endif
-                    @foreach ($users as $user)
-                        @if($user->id == $company->id_manager)
                             <tr class="border-b">
                                 <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Gerente
                                 </th>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
-                                    {{ ($user->name) }}
+                                    @foreach ($users as $user)
+                                        @if($user->id == $company->id_manager)
+                                            {{ ($user->name) }}
+                                        @endif
+                                    @endforeach
                                 </td>
                             </tr>
                         
@@ -138,11 +140,13 @@
                                     E-mail do Gerente
                                 </th>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
-                                    {{ ($user->email) }}
+                                    @foreach ($users as $user)
+                                        @if($user->id == $company->id_manager)
+                                            {{ ($user->email) }}
+                                        @endif
+                                    @endforeach
                                 </td>
                             </tr>
-                        @endif
-                    @endforeach
                     <tr class="border-b">
                         <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Empresa Criado Em
