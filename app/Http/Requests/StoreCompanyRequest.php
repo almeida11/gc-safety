@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Requests;
-
+use App\Http\Requests\Request;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Gate;
 
@@ -31,15 +31,18 @@ class StoreCompanyRequest extends FormRequest
             ],
             'cep'    => [
                 'required',
+                'regex:/^[0-9]{2}.[0-9]{3}-[0-9]{3}$/'
             ],
             'cidade'    => [
                 'required',
             ],
             'telefone'    => [
                 'required',
+                'regex:/^[(][0-9]{2}[)]aa [0-9]{4}-[0-9]{5}$/'
             ],
             'cnpj'    => [
                 'required',
+                'regex:/[0-9]{2}\.?[0-9]{3}\.?[0-9]{3}\/?[0-9]{4}\-?[0-9]{2}/'
             ],
             'id_manager'    => [
                 'nullable',

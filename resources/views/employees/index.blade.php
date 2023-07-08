@@ -7,11 +7,9 @@
 
     <div>
         <div class="max-w-7xl mx-auto py-10 sm:px-6 lg:px-8">
-            @if(Auth::user()->type != 'Usuário')
-                <div class="block mb-8 sm:px-6 lg:px-8 mb-4">
-                    <a href="{{ route('users.create') }}" class="bg-gray-200 hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">Cadastrar Usuário</a>
-                </div>
-            @endif
+            <div class="block mb-8 sm:px-6 lg:px-8 mb-4">
+                <a href="{{ route('dashboard') }}" class="bg-gray-200 hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">Cadastrar Funcionário</a>
+            </div>
             </form>
                 <!--Search Bar-->
                 <!-- <div class="relative">
@@ -28,87 +26,63 @@
                             <table class="min-w-full divide-y divide-gray-200 w-full">
                                 <thead>
                                 <tr>
-                                    @if ($editor->type == 'Administrador')
-                                        <th scope="col" width="50" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            ID
-                                        </th>
-                                    @endif
-                                    <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Nome
+                                    <th scope="col" width="50" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        ID
                                     </th>
                                     <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        E-mail
+                                        Nome Completo
+                                    </th>
+                                    <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Admissão
+                                    </th>
+                                    <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Cargo
+                                    </th>
+                                    <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Setor
                                     </th>
                                     <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Empresa
                                     </th>
                                     <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Tipo do Usuário
+                                        Status
                                     </th>
-                                    
-                                    @if ($editor->type == 'Administrador')
-                                        <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Status
-                                        </th>
-                                    @else
-                                        @if ($editor->type == 'Moderador')
-                                            <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                Status
-                                            </th>
-                                        @endif
-                                    @endif
                                     <th scope="col" width="200" class="px-6 py-3 bg-gray-50">
 
                                     </th>
                                 </tr>
                                 </thead>
                                 <tbody class="bg-white divide-y divide-gray-200">
-                                @foreach ($users as $user)
+                                @foreach ($employees as $employee)
                                     <tr>
-                                        @if ($editor->type == 'Administrador')
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                {{ $user->id }}
-                                            </td>
-                                        @endif
-
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                        <?php 
-                                            echo mb_strimwidth($user->name, 0, 20, "...");
-                                        ?>
+                                            {{ $employee->name }}
                                         </td>
-
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                            {{ $user->email }}
+                                            {{ $employee->admission }}
                                         </td>
-
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                            {{ is_null($user->company) ? 'Não Configurado' : $user->company }}
+                                            {{ $employee->responsibility }}
                                         </td>
-
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                            {{ $user->type }}
+                                            {{ $employee->sector }}
                                         </td>
-
-                                        @if ($editor->type == 'Administrador')
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                {{ $user->active ? 'Ativo' : 'Inativo' }}
-                                            </td>
-                                        @else
-                                            @if ($editor->type == 'Moderador')
-                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                    {{ $user->active ? 'Ativo' : 'Inativo' }}
-                                                </td>
-                                            @endif
-                                        @endif
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                            {{ $employee->company }}
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                            {{ $employee->active }}
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                         <td class=" py-4 whitespace-nowrap text-sm font-medium">
-                                            <a href="{{ route('users.show', $user->id) }}" class="mb-2 mr-2 bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-2 rounded">Verificar</a>
+                                            <a href="{{ route('dashboard') }}" class="mb-2 mr-2 bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-2 rounded">Verificar</a>
                                             @if(Auth::user()->type != 'Usuário')
-                                                <a href="{{ route('users.edit', $user->id) }}" class="mb-2 mr-2 bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-2 rounded">Editar</a>
+                                                <a href="{{ route('dashboard') }}" class="mb-2 mr-2 bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-2 rounded">Editar</a>
                                                 
-                                                    <form class="inline-block" action="{{ route('users.destroy', $user->id) }}" method="POST" onsubmit="return confirm('Você tem certeza?');">
+                                                    <form class="inline-block" action="{{ route('dashboard') }}" method="POST" onsubmit="return confirm('Você tem certeza?');">
                                                         <input type="hidden" name="_method" value="DELETE" >
                                                         @csrf
-                                                        <input @if(Auth::user()->id == $user->id) disabled="disabled" @endif type="submit" class="mb-2 mr-2 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-2 rounded" value="Desativar">
+                                                        <input type="submit" class="mb-2 mr-2 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-2 rounded" value="Desativar">
                                                     </form>
                                                 
                                             @endif
@@ -118,7 +92,6 @@
                                 </tbody>
                             </table>
                         </div>
-                {{ $users->links() }}
                     </div>
                 </div>
             </div>

@@ -86,7 +86,8 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
                                     <input type="text" name="cnpj" id="cnpj" 
                                     class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full"
-                                    wire:model.defer="state.cnpj" autocomplete="cnpj" value="{{ old('cnpj', $company->cnpj) }}" />
+                                    wire:model.defer="state.cnpj" autocomplete="cnpj" value="{{ old('cnpj', $company->cnpj) }}" onkeypress="$(this).mask('00.000.000/0000-00')"
+                                    onkeypress="return onlyNumberKey(event)" pattern="[0-9]{2}.[0-9]{3}.[0-9]{3}\/[0-9]{4}-[0-9]{2}$" />
                                     @error('cnpj')
                                         <p class="text-sm text-red-600">{{ $message }}</p>
                                     @enderror
@@ -125,7 +126,8 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
                                     <input type="text" name="cep" id="cep" 
                                     class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full"
-                                    wire:model.defer="state.cep" autocomplete="cep" value="{{ old('cep', $company->cep) }}" />
+                                    wire:model.defer="state.cep" autocomplete="cep" value="{{ old('cep', $company->cep) }}" onkeypress="$(this).mask('00.000-000')"
+                                    onkeypress="return onlyNumberKey(event)" pattern="[0-9]{2}.[0-9]{3}-[0-9]{3}" />
                                     @error('cep')
                                         <p class="text-sm text-red-600">{{ $message }}</p>
                                     @enderror
@@ -151,7 +153,8 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
                                     <input type="text" name="telefone" id="telefone" 
                                     class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full"
-                                    wire:model.defer="state.telefone" autocomplete="telefone" value="{{ old('telefone', $company->telefone) }}" />
+                                    wire:model.defer="state.telefone" autocomplete="telefone" value="{{ old('telefone', $company->telefone) }}" onkeypress="$(this).mask('(00)0000-00009')"
+                                    onkeypress="return onlyNumberKey(event)" pattern="\([0-9]{2}\)[0-9]{4}-[0-9]{4,5}" />
                                     @error('telefone')
                                         <p class="text-sm text-red-600">{{ $message }}</p>
                                     @enderror

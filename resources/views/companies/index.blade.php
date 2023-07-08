@@ -8,9 +8,11 @@
     <div>
         <div class="max-w-7xl mx-auto py-10 sm:px-6 lg:px-8">
             @if(Auth::user()->type != 'Usuário')
+                @if ($editor->tipo == 'Contratante')
                 <div class="block mb-8 sm:px-6 lg:px-8 mb-4">
                     <a href="{{ route('companies.create') }}" class="bg-gray-200 hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">Cadastrar Empresa</a>
                 </div>
+                @endif
             @endif
             <div class="flex flex-col">
                 <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
@@ -33,11 +35,9 @@
                                     <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Gerente
                                     </th>
-                                    @if ($editor->type == 'Administrador' or $editor->type == 'Moderador')
-                                        <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Tipo de Empresa
-                                        </th>
-                                    @endif
+                                    <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Tipo de Empresa
+                                    </th>
                                     @if ($editor->type == 'Administrador')
                                         <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             Status da Empresa
@@ -73,11 +73,9 @@
                                                 ?>
                                             @endforeach
                                         </td>
-                                        @if ($editor->type == 'Administrador' or $editor->type == 'Moderador')
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                {{ $company->tipo }}
-                                            </td>
-                                        @endif
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                            {{ $company->tipo }}
+                                        </td>
                                         @if ($editor->type == 'Administrador')
                                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                                 {{ $company->ativo ? 'Ativo' : 'Inativo' }}
@@ -85,13 +83,16 @@
                                         @endif
                                         <td class=" py-4 whitespace-nowrap text-sm font-medium">
                                             <a href="{{ route('companies.show', $company->id) }}" class="mb-2 mr-2 bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-2 rounded">Verificar</a>
-                                            
+                                            @if(Auth::user()->type != 'Usuário')
                                                 <a href="{{ route('companies.edit', $company->id) }}" class="mb-2 mr-2 bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-2 rounded">Editar</a>
-                                                <form class="inline-block" action="{{ route('companies.destroy', $company->id) }}" method="POST" onsubmit="return confirm('Você tem certeza?');">
-                                                    <input type="hidden" name="_method" value="DELETE">
-                                                    @csrf
-                                                    <input type="submit" class="mb-2 mr-2 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-2 rounded" value="Desativar">
-                                                </form>
+                                                @if ($editor->tipo == 'Contratante')
+                                                    <form class="inline-block" action="{{ route('companies.destroy', $company->id) }}" method="POST" onsubmit="return confirm('Você tem certeza?');">
+                                                        <input type="hidden" name="_method" value="DELETE">
+                                                        @csrf
+                                                        <input type="submit" class="mb-2 mr-2 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-2 rounded" value="Desativar">
+                                                    </form>
+                                                @endif
+                                            @endif
                                         </td>
                                     </tr>
                                 @endforeach

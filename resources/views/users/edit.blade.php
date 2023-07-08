@@ -78,17 +78,9 @@
                                         class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-ful"
                                         wire:model="company">
                                             @foreach($companies as $company)
-                                                @if ($editor->type == 'Administrador')
-                                                        <option value="{{ $company->id }}" {{ $user->company == $company->nome_fantasia ? 'selected' : '' }}>
-                                                            {{ $company->nome_fantasia }}
-                                                        </option>
-                                                @else
-                                                    @if ($editor->company == $company->nome_fantasia)
-                                                        <option value="{{ $company->id }}" {{ $user->company == $company->nome_fantasia ? 'selected' : '' }}>
-                                                            {{ $company->nome_fantasia }}
-                                                        </option>
-                                                    @endif
-                                                @endif
+                                                <option value="{{ $company->id }}" {{ $user->company == $company->nome_fantasia ? 'selected' : '' }}>
+                                                    {{ $company->nome_fantasia }}
+                                                </option>
                                             @endforeach
                                            
                                         </select>
@@ -170,7 +162,33 @@
                                         </div>
                                     </td>
                                 </tr>
+                            @else
+                                @if ($editor->type == 'Moderador')
+                                    <tr class="border-b">
+                                        <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Status do Usuário
+                                        </th>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
+                                            <div class="col-span-6 sm:col-span-4">
+                                                <select id="active" name="active"
+                                                class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-ful"
+                                                wire:model="active">
+                                                    <option value='1'>
+                                                        Ativo
+                                                    </option>
+                                                    <option value='0' {{ $user->active ? '' : 'selected' }}>
+                                                        Inativo
+                                                    </option>
+                                                </select>
+                                                @error('active')
+                                                    <p class="text-sm text-red-600">{{ $message }}</p>
+                                                @enderror
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endif
                             @endif
+
                             <tr class="border-b">
                                 <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Usuário Criado Em

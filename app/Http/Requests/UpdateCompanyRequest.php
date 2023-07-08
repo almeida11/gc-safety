@@ -32,15 +32,18 @@ class UpdateCompanyRequest extends FormRequest
             ],
             'cep'    => [
                 'required',
+                'regex:/^[0-9]{2}.[0-9]{3}-[0-9]{3}$/'
             ],
             'cidade'    => [
                 'required',
             ],
             'telefone'    => [
                 'required',
+                'regex:/^[(][0-9]{2}[)][0-9]{4}-[0-9]{4}$|[(][0-9]{2}[)][0-9]{4}-[0-9]{5}$/'
             ],
             'cnpj'    => [
                 'required',
+                'regex:/^[0-9]{2}\.?[0-9]{3}\.?[0-9]{3}\/?[0-9]{4}\-?[0-9]{2}$/'
             ],
             'id_manager'    => [
                 'nullable',
