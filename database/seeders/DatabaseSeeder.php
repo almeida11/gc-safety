@@ -6,6 +6,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use App\Models\User;
 use App\Models\User_relation;
+use App\Models\Employee;
 
 class DatabaseSeeder extends Seeder
 {
@@ -74,6 +75,6 @@ class DatabaseSeeder extends Seeder
         ]);
         User::factory()->count(50)->create();
         User_relation::factory()->count(50)->create();
-
+        // Employee::factory()->count(50)->create();
     }
 }

@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('companies', function (Blueprint $table) {
             $table->id();
-            $table->string('razao_social')->unique();
+            $table->string('razao_social')->nullable();
             $table->string('nome_fantasia')->nullable();
             $table->string('atividade_principal')->nullable();
             $table->string('cnae')->nullable();

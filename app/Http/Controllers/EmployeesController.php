@@ -2,68 +2,70 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
+use App\Http\Requests\UpdateEmployeeRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use App\Models\Company_relation;
+use Illuminate\Http\Request;
+use App\Models\Employee;
+use App\Models\Company;
 
 
-class EmployeesController extends Controller
-{
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
+class EmployeesController extends Controller {
+    public function index() {
         $employees = DB::table('employees')
+            ->join('companies', 'companies.id', '=', 'employees.id_company')
+            ->select('employees.*', 'companies.nome_fantasia AS company')
             ->paginate(9);
+
         return view('employees.index', compact('employees'));
     }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        return view('employees.create');
+    
+    public function create() {
+        $companies = Company::all();
+        return view('employees.create', compact('companies'));
+    }
+    
+    public function store(UpdateEmployeeRequest $request) {
+        $req = $request->validated();
+        $new_employee = Employee::create($req);
+        return redirect()->route('employees.index');
+    }
+    
+    public function show(Employee $employee) {
+        $employee = DB::table('employees')
+            ->where('employees.id', $employee->id)
+            ->join('companies', 'companies.id', '=', 'employees.id_company')
+            ->select('employees.*', 'companies.nome_fantasia AS company')
+            ->first();
+        
+        return view('employees.show', compact('employee'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        return view('employees.index');
+    public function edit(Employee $employee) {
+        $employee = DB::table('employees')
+            ->where('employees.id', $employee->id)
+            ->join('companies', 'companies.id', '=', 'employees.id_company')
+            ->select('employees.*', 'companies.nome_fantasia AS company')
+            ->first();
+            
+        $companies = Company::all();
+
+        return view('employees.edit', compact('employee', 'companies'));
     }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        return view('employees.index');
-    } 
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        return view('employees.index');
+    
+    public function update(UpdateEmployeeRequest $request, Employee $employee) {
+        $req = $request->validated();
+        $employee->update($req);
+        return redirect()->route('employees.index');
     }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        return view('employees.index');
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        return view('employees.index');
+    
+    public function destroy(Employee $employee) {
+        $employee->active = 0;
+        
+        $employee->save();
+        
+        return redirect()->route('employees.index');
     }
 }

@@ -8,10 +8,10 @@
     <div>
         <div class="max-w-7xl mx-auto py-10 sm:px-6 lg:px-8">
             <div class="block mb-8 mb-4">
-                <a href="{{ route('users.index') }}" class="bg-gray-200 hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">Voltar a Lista</a>
+                <a href="{{ route('employees.index') }}" class="bg-gray-200 hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">Voltar a Lista</a>
             </div>
             <div class="mt-5 md:mt-0 md:col-span-2">
-                <form method="post" action="{{ route('users.store')}}">
+                <form method="post" action="{{ route('employees.store')}}">
                     <div class="flex flex-col">
                         <table class="min-w-full divide-y divide-gray-200 w-full">
                             <tr class="border-b">
@@ -30,39 +30,52 @@
                             </tr>
                             <tr class="border-b">
                                 <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    E-mail
+                                CPF
                                 </th>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
-                                    <input type="email" name="email" id="email"
+                                    <input type="text" name="cpf" id="cpf"
                                     class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full"
-                                    wire:model.defer="state.email" autocomplete="username"/>
-                                    @error('email')
+                                    wire:model.defer="state.cpf" autocomplete="username"/>
+                                    @error('cpf')
                                         <p class="text-sm text-red-600">{{ $message }}</p>
                                     @enderror
                                 </td>
                             </tr>
                             <tr class="border-b">
                                 <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Senha
+                                    Admissão
                                 </th>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
-                                    <input type="password" name="password" id="password" 
+                                    <input type="date" name="admission" id="admission" 
                                     class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full"
-                                    wire:model.defer="state.password" autocomplete="new-password" />
-                                    @error('password')
+                                    wire:model.defer="state.admission" autocomplete="new-admission" />
+                                    @error('admission')
                                         <p class="text-sm text-red-600">{{ $message }}</p>
                                     @enderror
                                 </td>
                             </tr>
                             <tr class="border-b">
                                 <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Confirmar Senha
+                                    Cargo
                                 </th>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
-                                    <input type="password" name="password_confirmation" id="password_confirmation" 
+                                    <input type="text" name="responsibility" id="responsibility" 
                                     class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full"
-                                    wire:model.defer="state.password" autocomplete="new-password" />
-                                    @error('password')
+                                    wire:model.defer="state.responsibility" autocomplete="new-responsibility" />
+                                    @error('responsibility')
+                                        <p class="text-sm text-red-600">{{ $message }}</p>
+                                    @enderror
+                                </td>
+                            </tr>
+                            <tr class="border-b">
+                                <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Setor
+                                </th>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
+                                    <input type="text" name="sector" id="sector" 
+                                    class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full"
+                                    wire:model.defer="state.sector" autocomplete="new-sector" />
+                                    @error('sector')
                                         <p class="text-sm text-red-600">{{ $message }}</p>
                                     @enderror
                                 </td>
@@ -73,17 +86,17 @@
                                 </th>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
                                     <div class="col-span-6 sm:col-span-4">
-                                        <select id="company" name="company"
+                                        <select id="id_company" name="id_company"
                                         class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-ful"
-                                        wire:model="company">
+                                        wire:model="id_company">
                                             @foreach($companies as $company)
-                                                <option value="{{ $company->id }}" @if ($editor->company == $company->nome_fantasia) selected @endif>
+                                                <option value="{{ $company->id }}">
                                                     {{ $company->nome_fantasia }}
                                                 </option>
                                             @endforeach
                                            
                                         </select>
-                                        @error('company')
+                                        @error('id_company')
                                             <p class="text-sm text-red-600">{{ $message }}</p>
                                         @enderror
                                     </div>
@@ -91,55 +104,26 @@
                             </tr>
                             <tr class="border-b">
                                 <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Tipo de Usuário
+                                    Status do Funcionário
                                 </th>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
                                     <div class="col-span-6 sm:col-span-4">
-                                        <select id="type" name="type"
+                                        <select id="active" name="active"
                                         class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-ful"
-                                        wire:model="type">
-                                            @if (Auth::user()->type == 'Administrador')
-                                                <option value="Administrador">
-                                                    Administrador
-                                                </option>
-                                            @endif
-                                            <option value="Moderador">
-                                                Moderador
+                                        wire:model="active">
+                                            <option value='1' selected>
+                                                Ativo
                                             </option>
-                                            <option value="Usuário" selected>
-                                                Usuário
+                                            <option value='0'>
+                                                Inativo
                                             </option>
                                         </select>
-                                        @error('type')
+                                        @error('active')
                                             <p class="text-sm text-red-600">{{ $message }}</p>
                                         @enderror
                                     </div>
                                 </td>
                             </tr>
-                            @if ($editor->type == 'Administrador')
-                                <tr class="border-b">
-                                    <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Status do Usuário
-                                    </th>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
-                                        <div class="col-span-6 sm:col-span-4">
-                                            <select id="active" name="active"
-                                            class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-ful"
-                                            wire:model="active">
-                                                <option value='1' selected>
-                                                    Ativo
-                                                </option>
-                                                <option value='0'>
-                                                    Inativo
-                                                </option>
-                                            </select>
-                                            @error('active')
-                                                <p class="text-sm text-red-600">{{ $message }}</p>
-                                            @enderror
-                                        </div>
-                                    </td>
-                                </tr>
-                            @endif
                         </table>
                     </div>
                     @csrf

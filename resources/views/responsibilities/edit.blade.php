@@ -40,39 +40,18 @@
                             </tr>
                             <tr class="border-b">
                                 <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    CPF
+                                    Admission
                                 </th>
-                                
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
-                                    <input type="text" name="cpf" id="cpf"
-                                    class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full"
-                                    wire:model.defer="state.cpf" autocomplete="cpf"
-                                        value="{{ old('cpf', $employee->cpf) }}" />
-                                    @error('cpf')
-                                        <p class="text-sm text-red-600">{{ $message }}</p>
-                                    @enderror
+                                    {{ $employee->admission }}
                                 </td>
                             </tr>
                             <tr class="border-b">
                                 <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Admissão
+                                    Responsibility
                                 </th>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
-                                    <input type="date" name="admission" id="admission" 
-                                    class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full"
-                                    wire:model.defer="state.admission" autocomplete="new-admission"
-                                        value="{{ old('admission', $employee->admission) }}"/>
-                                    @error('admission')
-                                        <p class="text-sm text-red-600">{{ $message }}</p>
-                                    @enderror
-                                </td>
-                            </tr>
-                            <tr class="border-b">
-                                <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Cargo
-                                </th>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
-                                    <input type="text" name="responsibility" id="responsibility" 
+                                    <input type="responsibility" name="responsibility" id="responsibility" 
                                     class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full"
                                     wire:model.defer="state.responsibility" autocomplete="new-responsibility"
                                         value="{{ old('responsibility', $employee->responsibility) }}"/>
@@ -83,10 +62,10 @@
                             </tr>
                             <tr class="border-b">
                                 <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Setor
+                                    Sector
                                 </th>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
-                                    <input type="text" name="sector" id="sector" 
+                                    <input type="sector" name="sector" id="sector" 
                                     class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full"
                                     wire:model.defer="state.sector" autocomplete="new-sector"
                                         value="{{ old('sector', $employee->sector) }}"/>
@@ -101,9 +80,9 @@
                                 </th>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
                                     <div class="col-span-6 sm:col-span-4">
-                                        <select id="id_company" name="id_company"
+                                        <select id="company" name="company"
                                         class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-ful"
-                                        wire:model="id_company">
+                                        wire:model="company">
                                             @foreach($companies as $company)
                                                 <option value="{{ $company->id }}" {{ $employee->company == $company->nome_fantasia ? 'selected' : '' }}>
                                                     {{ $company->nome_fantasia }}
@@ -111,7 +90,7 @@
                                             @endforeach
                                            
                                         </select>
-                                        @error('id_company')
+                                        @error('company')
                                             <p class="text-sm text-red-600">{{ $message }}</p>
                                         @enderror
                                     </div>

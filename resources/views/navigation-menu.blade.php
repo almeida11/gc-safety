@@ -41,6 +41,20 @@
                         </x-nav-link>
                     </div>
                 @endif
+                @if (Route::has('responsibilities.index'))
+                    <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
+                        <x-nav-link href="{{ route('responsibilities.index') }}" :active="request()->routeIs('responsibilities.*')">
+                            Cargos
+                        </x-nav-link>
+                    </div>
+                @endif
+                @if (Route::has('sectors.index'))
+                    <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
+                        <x-nav-link href="{{ route('sectors.index') }}" :active="request()->routeIs('sectors.*')">
+                            Setores
+                        </x-nav-link>
+                    </div>
+                @endif
             </div>
 
             <div class="hidden sm:flex sm:items-center sm:ml-6">

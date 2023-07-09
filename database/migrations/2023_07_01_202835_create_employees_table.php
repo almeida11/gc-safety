@@ -14,11 +14,12 @@ return new class extends Migration
         Schema::create('employees', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->timestamp('admission');
+            $table->string('cpf');
+            $table->date('admission');
             $table->string('responsibility');
             $table->string('sector');
-            $table->unsignedBigInteger('company')->nullable();
-            $table->foreign('company')->references('id')->on('companies')->onDelete('cascade')->nullable();
+            $table->unsignedBigInteger('id_company')->nullable();
+            $table->foreign('id_company')->references('id')->on('companies')->onDelete('cascade')->nullable();
             $table->boolean('active')->default(1);
             $table->timestamps();
         });

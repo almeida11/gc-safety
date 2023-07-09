@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\CompaniesController;
 use App\Http\Controllers\EmployeesController;
+use App\Http\Controllers\ResponsibilitiesController;
+use App\Http\Controllers\SectorsController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -34,6 +36,10 @@ Route::middleware([
     Route::resource('companies', \App\Http\Controllers\CompaniesController::class);
 
     Route::resource('employees', \App\Http\Controllers\EmployeesController::class);
+
+    Route::resource('responsibilities', \App\Http\Controllers\ResponsibilitiesController::class);
+
+    Route::resource('sectors', \App\Http\Controllers\SectorsController::class);
 
     Route::group([
         'middleware' => 'moders'
