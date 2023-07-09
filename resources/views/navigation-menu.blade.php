@@ -55,6 +55,13 @@
                         </x-nav-link>
                     </div>
                 @endif
+                @if (Route::has('documents.index'))
+                    <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
+                        <x-nav-link href="{{ route('documents.index') }}" :active="request()->routeIs('documents.*')">
+                            Documentos
+                        </x-nav-link>
+                    </div>
+                @endif
             </div>
 
             <div class="hidden sm:flex sm:items-center sm:ml-6">

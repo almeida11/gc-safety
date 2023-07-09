@@ -6,6 +6,7 @@ use App\Http\Controllers\CompaniesController;
 use App\Http\Controllers\EmployeesController;
 use App\Http\Controllers\ResponsibilitiesController;
 use App\Http\Controllers\SectorsController;
+use App\Http\Controllers\DocumentsController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -40,6 +41,8 @@ Route::middleware([
     Route::resource('responsibilities', \App\Http\Controllers\ResponsibilitiesController::class);
 
     Route::resource('sectors', \App\Http\Controllers\SectorsController::class);
+
+    Route::resource('documents', \App\Http\Controllers\DocumentsController::class);
 
     Route::group([
         'middleware' => 'moders'

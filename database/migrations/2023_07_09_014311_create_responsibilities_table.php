@@ -11,16 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('employees', function (Blueprint $table) {
+        Schema::create('responsibilities', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('cpf');
-            $table->date('admission');
-            $table->string('responsibility');
-            $table->string('sector');
             $table->unsignedBigInteger('id_company')->nullable();
             $table->foreign('id_company')->references('id')->on('companies')->onDelete('cascade')->nullable();
-            $table->boolean('active')->default(1);
             $table->timestamps();
         });
     }
@@ -30,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('employees');
+        Schema::dropIfExists('responsibilities');
     }
 };

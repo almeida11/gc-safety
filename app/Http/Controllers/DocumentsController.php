@@ -2,47 +2,44 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Validation\ValidationException;
-use App\Http\Requests\UpdateSectorRequest;
-use App\Http\Requests\StoreSectorRequest;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use App\Models\Company_relation;
 use Illuminate\Http\Request;
-use App\Models\Employee;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Requests\StoreDocumentRequest;
+use App\Models\Document;
 use App\Models\Company;
-use App\Models\Sector;
 
-class SectorsController extends Controller {
-    public function index() {
+class DocumentsController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
+    {
+        $documents = DB::table('documents')
+            ->join('companies', 'companies.id', '=', 'documents.id_company')
+            ->join('company_relations', function($join) {
+                $join
+                    ->on('companies.id', '=', 'company_relations.id_contratada')
+                    ->orOn('companies.id', '=', 'company_relations.id_contratante');
+            })
+            ->select('documents.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo')
+            ->paginate(9);
+
         $editor = DB::table('users')
             ->where('users.id', Auth::user()->id)
             ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
             ->join('companies', 'companies.id', '=', 'user_relations.id_company')
             ->select('users.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
             ->first();
-        
-        $sectors = DB::table('sectors')
-            ->join('companies', 'companies.id', '=', 'sectors.id_company')
-            ->join('company_relations', function($join) {
-                $join
-                    ->on('companies.id', '=', 'company_relations.id_contratada')
-                    ->orOn('companies.id', '=', 'company_relations.id_contratante');
-            })
-            ->select('sectors.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo')
-            ->paginate(9);
-        
-        if (Auth::user()->type == 'Administrador') {
-            $sectors = DB::table('sectors')
-                ->join('companies', 'companies.id', '=', 'sectors.id_company')
-                ->select('sectors.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo')
-                ->paginate(9);
-        }
-        return view('sectors.index', compact('sectors', 'editor'));
+        return view('documents.index', compact('editor', 'documents'));
     }
-    
-    public function create() {
-        $editor = DB::table('users')
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+        { $editor = DB::table('users')
             ->where('users.id', Auth::user()->id)
             ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
             ->join('companies', 'companies.id', '=', 'user_relations.id_company')
@@ -83,50 +80,56 @@ class SectorsController extends Controller {
                     ->paginate(9)->unique();              
             }
         }
-        return view('sectors.create', compact('companies'));
+        return view('documents.create', compact('companies'));
+
     }
-    
-    public function store(StoreSectorRequest $request) {
-        
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(StoreDocumentRequest $request)
+    {
+        //
         $req = $request->validated();
 
-        $new_sector = Sector::create($req);
+        $new_document = Document::create($req);
 
-        return redirect()->route('sectors.index');
+        return redirect()->route('documents.index');
     }
-    
-    public function show(Sector $sector) {
-        $sector = DB::table('sectors')
-            ->where('sectors.id', $sector->id)
-            ->first();
-    
-        return view('sectors.show', compact('sector'));
-    }
-    
-    public function edit(Sector $sector) {
-        $sector = DB::table('sectors')
-            ->where('sectors.id', $sector->id)
-            ->first();
 
-        return view('sectors.edit', compact('sector'));
+    /**
+     * Display the specified resource.
+     */
+    public function show(string $id)
+    {
+        //
+        return view('documents.show');
     }
-    
-    public function update(UpdateSectorRequest $request, Sector $sector) {
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(string $id)
+    {
+        //
+        return view('documents.edit');
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(StoreDocumentRequest $request, Document $document)
+    {
         $req = $request->validated();
-        $sector->update($req);
-        return redirect()->route('sectors.index');
+        $document->update($req);
+        return redirect()->route('documents.index');
     }
-    
-    public function destroy(Sector $sector) {
 
-        $employees = Employee::all();
-
-        foreach ($employees as $employee) {
-            if ($employee->id_sector == $sector->id) throw ValidationException::withMessages(['cnpj' => 'O campo cnpj tem um formato inválido.!']);
-        }
-
-        Sector::where('id', $sector->id)->delete();
-        
-        return redirect()->route('sectors.index');
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(string $id)
+    {
+        //
     }
 }

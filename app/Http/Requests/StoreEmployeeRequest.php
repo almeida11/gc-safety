@@ -16,14 +16,15 @@ class StoreEmployeeRequest extends FormRequest
             ],
             'cpf'   => [
                 'required',
+                'regex:/^[0-9]{3}.[0-9]{3}.[0-9]{3}-[0-9]{2}$/'
             ],
             'admission'    => [
                 'date',
             ],
-            'responsibility'    => [
+            'id_responsibility'    => [
                 'required',
             ],
-            'sector'    => [
+            'id_sector'    => [
                 'required',
             ],
             'id_company'    => [

@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            Cadastrar Usuário
+            Cadastrar Funcionário
         </h2>
     </x-slot>
 
@@ -35,7 +35,8 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
                                     <input type="text" name="cpf" id="cpf"
                                     class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full"
-                                    wire:model.defer="state.cpf" autocomplete="username"/>
+                                    wire:model.defer="state.cpf" autocomplete="username" onkeypress="$(this).mask('000.000.000-00')"
+                                    onkeypress="return onlyNumberKey(event)" pattern="[0-9]{3}.[0-9]{3}.[0-9]{3}-[0-9]{2}$"/>
                                     @error('cpf')
                                         <p class="text-sm text-red-600">{{ $message }}</p>
                                     @enderror
@@ -59,12 +60,21 @@
                                     Cargo
                                 </th>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
-                                    <input type="text" name="responsibility" id="responsibility" 
-                                    class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full"
-                                    wire:model.defer="state.responsibility" autocomplete="new-responsibility" />
-                                    @error('responsibility')
-                                        <p class="text-sm text-red-600">{{ $message }}</p>
-                                    @enderror
+                                    <div class="col-span-6 sm:col-span-4">
+                                        <select id="id_responsibility" name="id_responsibility"
+                                        class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-ful"
+                                        wire:model="id_responsibility">
+                                            @foreach($responsibilities as $responsibility)
+                                                <option value="{{ $responsibility->id }}">
+                                                    {{ $responsibility->name }}
+                                                </option>
+                                            @endforeach
+                                           
+                                        </select>
+                                        @error('id_responsibility')
+                                            <p class="text-sm text-red-600">{{ $message }}</p>
+                                        @enderror
+                                    </div>
                                 </td>
                             </tr>
                             <tr class="border-b">
@@ -72,12 +82,21 @@
                                     Setor
                                 </th>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
-                                    <input type="text" name="sector" id="sector" 
-                                    class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full"
-                                    wire:model.defer="state.sector" autocomplete="new-sector" />
-                                    @error('sector')
-                                        <p class="text-sm text-red-600">{{ $message }}</p>
-                                    @enderror
+                                    <div class="col-span-6 sm:col-span-4">
+                                        <select id="id_sector" name="id_sector"
+                                        class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-ful"
+                                        wire:model="id_sector">
+                                            @foreach($sectors as $sector)
+                                                <option value="{{ $sector->id }}">
+                                                    {{ $sector->name }}
+                                                </option>
+                                            @endforeach
+                                           
+                                        </select>
+                                        @error('id_sector')
+                                            <p class="text-sm text-red-600">{{ $message }}</p>
+                                        @enderror
+                                    </div>
                                 </td>
                             </tr>
                             <tr class="border-b">

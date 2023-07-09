@@ -1,15 +1,19 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            Lista de Usuários
+            Lista de Setores
         </h2>
     </x-slot>
 
     <div>
         <div class="max-w-7xl mx-auto py-10 sm:px-6 lg:px-8">
-            <div class="block mb-8 sm:px-6 lg:px-8 mb-4">
-                <a href="{{ route('dashboard') }}" class="bg-gray-200 hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">Cadastrar Funcionário</a>
-            </div>
+            @if(Auth::user()->type != 'Usuário')
+                @if ($editor->tipo == 'Contratante')
+                    <div class="block mb-8 sm:px-6 lg:px-8 mb-4">
+                        <a href="{{ route('sectors.create') }}" class="bg-gray-200 hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">Cadastrar Setor</a>
+                    </div>
+                @endif
+            @endif
             </form>
                 <!--Search Bar-->
                 <!-- <div class="relative">
@@ -30,22 +34,10 @@
                                         ID
                                     </th>
                                     <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Nome Completo
-                                    </th>
-                                    <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Admissão
-                                    </th>
-                                    <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Cargo
-                                    </th>
-                                    <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Setor
+                                        Nome
                                     </th>
                                     <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Empresa
-                                    </th>
-                                    <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Status
                                     </th>
                                     <th scope="col" width="200" class="px-6 py-3 bg-gray-50">
 
@@ -53,36 +45,23 @@
                                 </tr>
                                 </thead>
                                 <tbody class="bg-white divide-y divide-gray-200">
-                                @foreach ($employees as $employee)
+                                @foreach ($sectors as $sector)
                                     <tr>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                            {{ $employee->id }}
+                                            {{ $sector->id }}
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                            {{ $employee->name }}
+                                            {{ $sector->name }}
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                            {{ $employee->admission }}
+                                            {{ $sector->company }}
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                            {{ $employee->responsibility }}
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                            {{ $employee->sector }}
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                            {{ $employee->company }}
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                            {{ $employee->active ? 'Ativo' : 'Inativo' }}
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                         <td class=" py-4 whitespace-nowrap text-sm font-medium">
-                                            <a href="{{ route('employees.show', $employee->id) }}" class="mb-2 mr-2 bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-2 rounded">Verificar</a>
+                                            <a href="{{ route('sectors.show', $sector->id) }}" class="mb-2 mr-2 bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-2 rounded">Verificar</a>
                                             @if(Auth::user()->type != 'Usuário')
-                                                <a href="{{ route('employees.edit', $employee->id) }}" class="mb-2 mr-2 bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-2 rounded">Editar</a>
+                                                <a href="{{ route('sectors.edit', $sector->id) }}" class="mb-2 mr-2 bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-2 rounded">Editar</a>
                                                 
-                                                    <form class="inline-block" action="{{ route('employees.destroy', $employee->id) }}" method="POST" onsubmit="return confirm('Você tem certeza?');">
+                                                    <form class="inline-block" action="{{ route('sectors.destroy', $sector->id) }}" method="POST" onsubmit="return confirm('Você tem certeza?');">
                                                         <input type="hidden" name="_method" value="DELETE" >
                                                         @csrf
                                                         <input type="submit" class="mb-2 mr-2 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-2 rounded" value="Desativar">
@@ -95,7 +74,7 @@
                                 </tbody>
                             </table>
                         </div>
-                {{ $employees->links() }}
+                {{ $sectors->links() }}
                     </div>
                 </div>
             </div>

@@ -25,6 +25,7 @@ class UsersController extends Controller {
         if(Auth::user()->type == 'Moderador') {
             if($editor->tipo == 'Contratante') {
                 $users = DB::table('users')
+                    ->where('users.type', '!=', 'Administrador')
                     ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
                     ->join('companies', 'companies.id', '=', 'user_relations.id_company')
                     ->join('company_relations', function($join) {
@@ -39,6 +40,7 @@ class UsersController extends Controller {
                     ->paginate(9);
             } else {
                 $users = DB::table('users')
+                    ->where('users.type', '!=', 'Administrador')
                     ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
                     ->join('companies', 'companies.id', '=', 'user_relations.id_company')
                     ->join('company_relations', function($join) {
@@ -54,6 +56,7 @@ class UsersController extends Controller {
         } else {
             if($editor->tipo == 'Contratante') {
                 $users = DB::table('users')
+                    ->where('users.type', '!=', 'Administrador')
                     ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
                     ->join('companies', 'companies.id', '=', 'user_relations.id_company')
                     ->join('company_relations', function($join) {
@@ -69,6 +72,7 @@ class UsersController extends Controller {
                     ->paginate(9);
             } else {
                 $users = DB::table('users')
+                    ->where('users.type', '!=', 'Administrador')
                     ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
                     ->join('companies', 'companies.id', '=', 'user_relations.id_company')
                     ->join('company_relations', function($join) {
@@ -98,7 +102,6 @@ class UsersController extends Controller {
                 ->orderBy('type')
                 ->paginate(9);
         }
-
         return view('users.index', compact('users', 'editor'));
     }
 
@@ -309,9 +312,11 @@ class UsersController extends Controller {
 
         $req = $request->validated();
 
-        if($editor->id == $user_check->id) {
-            if((int) $req['active'] != $user_check->active) throw ValidationException::withMessages(['erro' => 'Você não tem permissão para isso!']);
-            if((int) $req['company'] != $user_check->id_company) throw ValidationException::withMessages(['erro' => 'Você não tem permissão para isso!']);
+        if(!(Auth::user()->type == 'Administrador')) {
+            if($editor->id == $user_check->id) {
+                if((int) $req['active'] != $user_check->active) throw ValidationException::withMessages(['erro' => 'Você não tem permissão para isso!']);
+                if((int) $req['company'] != $user_check->id_company) throw ValidationException::withMessages(['erro' => 'Você não tem permissão para isso!']);
+            }
         }
 
         if(Auth::user()->type == 'Moderador') {
@@ -354,7 +359,7 @@ class UsersController extends Controller {
                 ->select('companies.*', 'users.id AS id_manager', 'company_relations.id_contratante')
                 ->paginate(9)->unique();
         }
-        $company_validated = false;
+        /*($company_validated = false;
 
         foreach ($companies as $company) {
             if((int) $req['company'] == $company->id) {
@@ -363,7 +368,7 @@ class UsersController extends Controller {
             }
         }
 
-        if(!($company_validated)) throw ValidationException::withMessages(['erro' => 'Você não tem permissão para isso!']);
+        if(!($company_validated)) throw ValidationException::withMessages(['erro' => 'Você não tem permissão para isso!']); */
         
         $relations = DB::table('user_relations')
             ->where('user_relations.id_user', $user->id)
