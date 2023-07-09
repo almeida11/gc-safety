@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->unsignedBigInteger('id_company')->nullable();
             $table->foreign('id_company')->references('id')->on('companies')->onDelete('cascade')->nullable();
+            $table->json('documents')->nullable();
             $table->timestamps();
         });
     }

@@ -12,5 +12,6 @@ class Responsibility extends Model
     protected $fillable = [
         'name',
         'id_company',
+        'documents',
     ];
 }

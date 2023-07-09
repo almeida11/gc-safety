@@ -20,13 +20,6 @@
                         {{ __('Dashboard') }}
                     </x-nav-link>
                 </div>
-                @if (Route::has('users.index'))
-                    <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                        <x-nav-link href="{{ route('users.index') }}" :active="request()->routeIs('users.*')">
-                            Usuários
-                        </x-nav-link>
-                    </div>
-                @endif
                 @if (Route::has('companies.index'))
                     <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
                         <x-nav-link href="{{ route('companies.index') }}" :active="request()->routeIs('companies.*')">
@@ -34,10 +27,10 @@
                         </x-nav-link>
                     </div>
                 @endif
-                @if (Route::has('employees.index'))
+                @if (Route::has('users.index'))
                     <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                        <x-nav-link href="{{ route('employees.index') }}" :active="request()->routeIs('employees.*')">
-                            Funcionários
+                        <x-nav-link href="{{ route('users.index') }}" :active="request()->routeIs('users.*')">
+                            Usuários
                         </x-nav-link>
                     </div>
                 @endif
@@ -52,6 +45,13 @@
                     <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
                         <x-nav-link href="{{ route('sectors.index') }}" :active="request()->routeIs('sectors.*')">
                             Setores
+                        </x-nav-link>
+                    </div>
+                @endif
+                @if (Route::has('employees.index'))
+                    <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
+                        <x-nav-link href="{{ route('employees.index') }}" :active="request()->routeIs('employees.*')">
+                            Funcionários
                         </x-nav-link>
                     </div>
                 @endif

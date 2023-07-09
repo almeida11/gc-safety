@@ -38,6 +38,27 @@
                                     @enderror
                                 </td>
                             </tr>
+                            <tr class="border-b">
+                                <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Empresa
+                                </th>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
+                                    <div class="col-span-6 sm:col-span-4">
+                                        <select id="id_company" name="id_company"
+                                        class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-ful"
+                                        wire:model="id_company">
+                                            @foreach($companies as $company)
+                                                <option value="{{ $company->id }}">
+                                                    {{ $company->nome_fantasia }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        @error('id_company')
+                                            <p class="text-sm text-red-600">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+                                </td>
+                            </tr>
                         </table>
                     </div>
                     @csrf

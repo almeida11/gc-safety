@@ -319,6 +319,7 @@ class UsersController extends Controller {
             }
         }
 
+
         if(Auth::user()->type == 'Moderador') {
             if($req["type"] == 'Administrador') throw ValidationException::withMessages(['erro' => 'Você não tem permissão para isso!']);
             
@@ -379,6 +380,10 @@ class UsersController extends Controller {
         $relations = User_relation::findOrFail($relations->id);
         $relations->id_company = (int) $req['company'];
         
+        if((Auth::user()->type == 'Administrador') && ($user_check->is_manager == 1)){
+            $relations->is_manager = 0;
+        } 
+
         $relations->update();
 
         unset($req['company']);

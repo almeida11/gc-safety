@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            Lista de Setores
+            Lista de Documentos
         </h2>
     </x-slot>
 
@@ -10,7 +10,7 @@
             @if(Auth::user()->type != 'Usuário')
                 @if ($editor->tipo == 'Contratante')
                     <div class="block mb-8 sm:px-6 lg:px-8 mb-4">
-                        <a href="{{ route('documents.create') }}" class="bg-gray-200 hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">Cadastrar Setor</a>
+                        <a href="{{ route('documents.create') }}" class="bg-gray-200 hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">Cadastrar Documentos</a>
                     </div>
                 @endif
             @endif

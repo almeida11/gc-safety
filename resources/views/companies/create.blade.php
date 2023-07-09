@@ -69,6 +69,19 @@
                             </tr>
                             <tr class="border-b">
                                 <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    CNPJ
+                                </th>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
+                                    <input type="text" name="cnpj" id="cnpj" 
+                                    class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full"
+                                    wire:model.defer="state.cnpj" autocomplete="new-cnpj"/>
+                                    @error('cnpj')
+                                        <p class="text-sm text-red-600">{{ $message }}</p>
+                                    @enderror
+                                </td>
+                            </tr>
+                            <tr class="border-b">
+                                <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Endereço
                                 </th>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
@@ -132,19 +145,7 @@
                                     @enderror
                                 </td>
                             </tr>
-                            <tr class="border-b">
-                                <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    CNPJ
-                                </th>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
-                                    <input type="text" name="cnpj" id="cnpj" 
-                                    class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full"
-                                    wire:model.defer="state.cnpj" autocomplete="new-cnpj"/>
-                                    @error('cnpj')
-                                        <p class="text-sm text-red-600">{{ $message }}</p>
-                                    @enderror
-                                </td>
-                            </tr>
+                            
                             <tr class="border-b">
                                 <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Gerente

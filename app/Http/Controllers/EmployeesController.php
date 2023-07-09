@@ -23,7 +23,8 @@ class EmployeesController extends Controller {
             ->join('companies', 'companies.id', '=', 'user_relations.id_company')
             ->select('users.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
             ->first();
-        
+
+            
         $employees = DB::table('employees')
             ->where('responsibilities.id_company', $editor->id_company)
             ->join('companies', 'companies.id', '=', 'employees.id_company')
@@ -130,7 +131,6 @@ class EmployeesController extends Controller {
                     ->paginate(9);
             }
         }
-        
         return view('employees.create', compact('companies', 'sectors', 'responsibilities'));
     }
     
@@ -159,15 +159,24 @@ class EmployeesController extends Controller {
             ->join('companies', 'companies.id', '=', 'employees.id_company')
             ->join('responsibilities', 'responsibilities.id', '=', 'employees.id_responsibility')
             ->join('sectors', 'sectors.id', '=', 'employees.id_sector')
-            ->select('employees.*', 'companies.nome_fantasia AS company', 'responsibilities.name AS responsibility', 'sectors.name AS sector')
+            ->select('employees.*', 'companies.nome_fantasia AS company', 'responsibilities.name AS responsibility', 'sectors.name AS sector', 'responsibilities.documents AS documents')
             ->first();
+        $documents = DB::table('documents')
+            ->join('companies', 'companies.id', '=', 'documents.id_company')
+            ->join('company_relations', function($join) {
+                $join
+                    ->on('companies.id', '=', 'company_relations.id_contratada')
+                    ->orOn('companies.id', '=', 'company_relations.id_contratante');
+            })
+            ->select('documents.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo')
+            ->get();
         $companies = Company::all();
 
         $sectors = Sector::all();
         
         $responsibilities = Responsibility::all();
-        
-        return view('employees.create', compact('employee','companies', 'sectors', 'responsibilities'));
+
+        return view('employees.edit', compact('employee', 'documents', 'companies', 'sectors', 'responsibilities'));
     }
     
     public function update(UpdateEmployeeRequest $request, Employee $employee) {

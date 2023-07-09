@@ -27,7 +27,6 @@
                                 <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Nome
                                 </th>
-                                
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
                                     <input type="text" name="name" id="name"
                                     class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full"
@@ -89,6 +88,29 @@
                                     </div>
                                 </td>
                             </tr>
+                            
+                            @if(isset($responsibility->documents))
+                                @foreach(json_decode($responsibility->documents) as $document)
+                                    <tr class="border-b">
+                                        <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            @foreach(json_decode($documents) as $db_document)
+                                                @if($db_document->id == $document)
+                                                    {{ $db_document->name }}
+                                                @endif
+                                            @endforeach
+                                        </th>
+                                        
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
+                                                <input type="file"
+                                                class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-ful"
+                                                />
+                                            @error('document')
+                                                <p class="text-sm text-red-600">{{ $message }}</p>
+                                            @enderror
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            @endif
                             <tr class="border-b">
                                 <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Setor

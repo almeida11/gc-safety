@@ -9,10 +9,10 @@
     <div>
         <div class="max-w-7xl mx-auto py-10 sm:px-6 lg:px-8">
             <div class="block mb-8 mb-4">
-                <a href="{{ route('sectors.index') }}" class="bg-gray-200 hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">Voltar a Lista</a>
+                <a href="{{ route('documents.index') }}" class="bg-gray-200 hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">Voltar a Lista</a>
             </div>
             <div class="mt-5 md:mt-0 md:col-span-2">
-                <form method="post" action="{{ route('sectors.update', $sector->id) }}">
+                <form method="post" action="{{ route('documents.update', $document->id) }}">
                     <div class="flex flex-col">
                         <table class="min-w-full divide-y divide-gray-200 w-full">
                             <tr class="border-b">
@@ -20,7 +20,7 @@
                                     ID
                                 </th>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
-                                    {{ $sector->id }}
+                                    {{ $document->id }}
                                 </td>
                             </tr>
                             <tr class="border-b">
@@ -32,10 +32,31 @@
                                     <input type="text" name="name" id="name"
                                     class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full"
                                     wire:model.defer="state.name" autocomplete="name"
-                                        value="{{ old('name', $sector->name) }}" />
+                                        value="{{ old('name', $document->name) }}" />
                                     @error('name')
                                         <p class="text-sm text-red-600">{{ $message }}</p>
                                     @enderror
+                                </td>
+                            </tr>
+                            <tr class="border-b">
+                                <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Empresa
+                                </th>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
+                                    <div class="col-span-6 sm:col-span-4">
+                                        <select id="id_company" name="id_company"
+                                        class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-ful"
+                                        wire:model="id_company">
+                                            @foreach($companies as $company)
+                                                <option value="{{ $company->id }}">
+                                                    {{ $company->nome_fantasia }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        @error('id_company')
+                                            <p class="text-sm text-red-600">{{ $message }}</p>
+                                        @enderror
+                                    </div>
                                 </td>
                             </tr>
                         </table>

@@ -6,19 +6,16 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 
-class UpdateResponsibilityRequest extends FormRequest
+class UpdateDocumentRequest extends FormRequest
 {
     public function rules()
     {
         return [
-            'name'    => [
+            'name' => [
                 'required',
             ],
             'id_company' => [
                 'required',
-            ],
-            'documents' => [
-                'nullable'
             ],
         ];
     }

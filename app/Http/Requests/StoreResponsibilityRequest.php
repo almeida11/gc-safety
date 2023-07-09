@@ -17,6 +17,9 @@ class StoreResponsibilityRequest extends FormRequest
             'id_company' => [
                 'required',
             ],
+            'documents' => [
+                'nullable'
+            ],
         ];
     }
 
