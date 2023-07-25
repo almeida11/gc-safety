@@ -179,7 +179,7 @@ class ResponsibilitiesController extends Controller {
     
     public function update(UpdateResponsibilityRequest $request, Responsibility $responsibility) {
         $req = $request->validated();
-
+        if(!(isset($req['documents']))) $req['documents'] = [];
         $responsibility->update($req);
 
         return redirect()->route('responsibilities.index');
