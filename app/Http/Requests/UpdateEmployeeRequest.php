@@ -19,11 +19,12 @@ class UpdateEmployeeRequest extends FormRequest
             ],
             'admission'    => [
                 'date',
-            ],
-            'responsibility'    => [
                 'required',
             ],
-            'sector'    => [
+            'id_responsibility'    => [
+                'required',
+            ],
+            'id_sector'    => [
                 'required',
             ],
             'id_company'    => [

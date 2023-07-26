@@ -59,7 +59,6 @@
                                     </div>
                                 </td>
                             </tr>
-
                             <tr class="border-b">
                                 <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Documentos
@@ -69,7 +68,7 @@
                                     <fieldset>
                                         @foreach($documents as $document)
                                             <div>
-                                                <input type = "checkbox" id = "{{ $document->id }}" name = "documents[]" value = "{{ $document->id }}" @foreach(json_decode($responsibility->documents) as $old_document) @if($document->id == $old_document) checked @endif @endforeach>
+                                                <input type = "checkbox" id = "{{ $document->id }}" name = "documents[]" value = "{{ $document->id }}" @if($responsibility->documents) @foreach(json_decode($responsibility->documents) as $old_document) @if($document->id == $old_document) checked @endif @endforeach @endif>
                                                 <label for = "{{ $document->id }}" > {{ $document->name }} </label>
                                             </div>
                                         @endforeach

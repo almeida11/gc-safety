@@ -139,7 +139,6 @@ class ResponsibilitiesController extends Controller {
             })
             ->select('documents.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo')
             ->paginate(9);
-        
         if(Auth::user()->type == 'Administrador') {
             $companies = Company::all();
         } else {

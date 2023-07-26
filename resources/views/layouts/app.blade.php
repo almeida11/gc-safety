@@ -31,12 +31,21 @@
         </style>
         <script>
             function onlyNumberKey(evt) {
-                
-                // Only ASCII character in that range allowed
                 var ASCIICode = (evt.which) ? evt.which : evt.keyCode
                 if (ASCIICode > 31 && (ASCIICode < 48 || ASCIICode > 57))
                     return false;
                 return true;
+            }
+
+            function getDocument(btn, fl) {
+                let file = document.getElementById(fl);
+                file.click();
+            }
+
+            function changeName(evt, btn, fl) {
+                var url = evt.value;
+                let button = document.getElementById(btn);
+                button.innerText =url.split(/(\\|\/)/g).pop();
             }
         </script>
     </head>

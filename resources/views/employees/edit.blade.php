@@ -1,4 +1,10 @@
+<?php
 
+function limpaString($string) {
+    return $document_name = preg_replace('/[ -]+/' , '_' , strtolower( preg_replace("[^a-zA-Z0-9-]", "-", strtr(utf8_decode(trim($string)), utf8_decode("áàãâéêíóôõúüñçÁÀÃÂÉÊÍÓÔÕÚÜÑÇ"), "aaaaeeiooouuncAAAAEEIOOOUUNC-")) ));
+}
+
+?>
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
@@ -12,7 +18,7 @@
                 <a href="{{ route('employees.index') }}" class="bg-gray-200 hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">Voltar a Lista</a>
             </div>
             <div class="mt-5 md:mt-0 md:col-span-2">
-                <form method="post" action="{{ route('employees.update', $employee->id) }}">
+                <form method="post" action="{{ route('employees.update', $employee->id) }}" enctype="multipart/form-data">
                     <div class="flex flex-col">
                         <table class="min-w-full divide-y divide-gray-200 w-full">
                             <tr class="border-b">
@@ -89,19 +95,33 @@
                                 </td>
                             </tr>
                             
-                            @if(isset($responsibility->documents))
+                            @if($responsibility->documents)
                                 @foreach(json_decode($responsibility->documents) as $document)
+                                    @foreach(json_decode($documents) as $db_document)
+                                        @if($db_document->id == $document)
+                                            <?php $document_name = $db_document->name ?>
+                                        @endif
+                                    @endforeach
                                     <tr class="border-b">
                                         <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            @foreach(json_decode($documents) as $db_document)
-                                                @if($db_document->id == $document)
-                                                    {{ $db_document->name }}
-                                                @endif
-                                            @endforeach
+                                            {{ $document_name }}
                                         </th>
-                                        
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
-                                                <input type="file"
+                                        <button type="button" id="{{ limpaString($document_name).'btn' }}" class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150 mt-2 mr-2"
+                                            onclick="getDocument('{{ limpaString($document_name).'btn' }}', '{{ limpaString($document_name).'fl' }}')">
+
+                                            @if($document_paths->first())
+                                                @foreach($document_paths as $document_path)
+                                                    @if(limpaString($document_path->type))
+                                                        {{ $document_path->name }}
+                                                    @endif
+                                                @endforeach
+                                            @else
+                                                Enviar!
+                                            @endif
+                                        </button>
+                                                <input type="file" name="{{ $document_name }}" id="{{ limpaString($document_name).'fl' }}" class="hidden" onchange="changeName(this, '{{ limpaString($document_name).'btn' }}', '{{ limpaString($document_name).'fl' }}')"
+                                                {{ $document_name }}
                                                 class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-ful"
                                                 />
                                             @error('document')

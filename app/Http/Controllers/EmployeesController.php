@@ -5,10 +5,12 @@ namespace App\Http\Controllers;
 use Illuminate\Validation\ValidationException;
 use App\Http\Requests\UpdateEmployeeRequest;
 use App\Http\Requests\StoreEmployeeRequest;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Models\Company_relation;
 use App\Models\Responsibility;
+use App\Models\Document_path;
 use Illuminate\Http\Request;
 use App\Models\Employee;
 use App\Models\Company;
@@ -149,8 +151,12 @@ class EmployeesController extends Controller {
             ->join('sectors', 'sectors.id', '=', 'employees.id_sector')
             ->select('employees.*', 'companies.nome_fantasia AS company', 'responsibilities.name AS responsibility', 'sectors.name AS sector')
             ->first();
-        
-        return view('employees.show', compact('employee'));
+
+        $document_paths = DB::table('document_paths')
+            ->where('id_employee', $employee->id)
+            ->get();
+            
+        return view('employees.show', compact('employee', 'document_paths'));
     }
 
     public function edit(Employee $employee) {
@@ -170,16 +176,71 @@ class EmployeesController extends Controller {
             })
             ->select('documents.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo')
             ->get();
+        
+        $document_paths = DB::table('document_paths')
+            ->where('id_employee', $employee->id)
+            ->get();
+        
         $companies = Company::all();
 
         $sectors = Sector::all();
         
         $responsibilities = Responsibility::all();
 
-        return view('employees.edit', compact('employee', 'documents', 'companies', 'sectors', 'responsibilities'));
+        return view('employees.edit', compact('employee', 'documents', 'companies', 'sectors', 'responsibilities', 'document_paths'));
     }
     
     public function update(UpdateEmployeeRequest $request, Employee $employee) {
+
+        if($request->NR35) {
+            $old_document = DB::table('document_paths')
+                ->where('id_employee', $employee->id)
+                ->first();
+
+            $company = DB::table('companies')
+                ->where('companies.id', $employee->id_company)
+                ->leftJoin('company_relations', function($join) {
+                    $join->on('companies.id', '=', 'company_relations.id_contratada')->orOn('companies.id', '=', 'company_relations.id_contratante');
+                })
+                ->leftJoin('user_relations', function($join) {
+                    $join->on('user_relations.id_company', '=', 'companies.id')
+                    ->where('user_relations.is_manager', 1);
+                })
+                ->leftJoin('users', 'user_relations.id_user', '=', 'users.id')
+                ->select('companies.*', 'users.id AS id_manager', 'company_relations.id_contratante as id_contratante')
+                ->first();
+
+            $extension = $request->NR35->getClientOriginalExtension();
+
+            $path = 'documentos/'.$company->nome_fantasia.'/'.$employee->name;
+            $path = preg_replace('/[ -]+/' , '_' , strtolower( preg_replace("[^a-zA-Z0-9-]", "-", strtr(utf8_decode(trim($path)), utf8_decode("áàãâéêíóôõúüñçÁÀÃÂÉÊÍÓÔÕÚÜÑÇ"), "aaaaeeiooouuncAAAAEEIOOOUUNC-")) ));
+
+            $document_name = 'NR35_' . $employee->id. "_" . $employee->name . ".{$extension}";
+            $document_name = preg_replace('/[ -]+/' , '_' , strtolower( preg_replace("[^a-zA-Z0-9-]", "-", strtr(utf8_decode(trim($document_name)), utf8_decode("áàãâéêíóôõúüñçÁÀÃÂÉÊÍÓÔÕÚÜÑÇ"), "aaaaeeiooouuncAAAAEEIOOOUUNC-")) ));
+
+            if($old_document){
+                if (Storage::exists($old_document->name)) {
+                    Storage::delete($old_document->name);
+                }
+                $request->NR35->storeAs($path, $document_name);
+
+                $old_document = Document_path::findOrFail($old_document->id);
+                
+                $old_document->name = $document_name;
+                $old_document->path = $path;
+
+                $old_document->update();
+            } else {
+                $request->NR35->storeAs($path, $document_name);
+                $document_path_model = array(
+                    'path' => $path,
+                    'name' => $document_name,
+                    'type' => 'NR35',
+                    'id_employee' => $employee->id,
+                );
+                $document_path = Document_path::create($document_path_model);
+            }
+        }
         $req = $request->validated();
         $employee->update($req);
         return redirect()->route('employees.index');
