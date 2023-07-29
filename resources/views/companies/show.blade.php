@@ -9,6 +9,7 @@
         <div class="max-w-7xl mx-auto py-10 sm:px-6 lg:px-8">
             <div class="block mb-8 mb-4">
                 <a href="{{ route('companies.index') }}" class="bg-gray-200 hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">Voltar a Lista</a>
+                <a href="{{ route('employees.index', $company->id) }}" class="bg-gray-200 hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">Funcionários</a>
             </div>
             <div class="flex flex-col">
                 <table class="min-w-full divide-y divide-gray-200 w-full">

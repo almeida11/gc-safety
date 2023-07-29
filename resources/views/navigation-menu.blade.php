@@ -48,13 +48,6 @@
                         </x-nav-link>
                     </div>
                 @endif
-                @if (Route::has('employees.index'))
-                    <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                        <x-nav-link href="{{ route('employees.index') }}" :active="request()->routeIs('employees.*')">
-                            Funcionários
-                        </x-nav-link>
-                    </div>
-                @endif
                 @if (Route::has('documents.index'))
                     <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
                         <x-nav-link href="{{ route('documents.index') }}" :active="request()->routeIs('documents.*')">

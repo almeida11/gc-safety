@@ -36,7 +36,7 @@ Route::middleware([
     
     Route::resource('companies', \App\Http\Controllers\CompaniesController::class);
 
-    Route::resource('employees', \App\Http\Controllers\EmployeesController::class);
+    Route::resource('{company_id}/employees', \App\Http\Controllers\EmployeesController::class);
 
     Route::resource('responsibilities', \App\Http\Controllers\ResponsibilitiesController::class);
 

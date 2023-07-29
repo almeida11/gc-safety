@@ -18,7 +18,7 @@ use App\Models\Sector;
 
 
 class EmployeesController extends Controller {
-    public function index() {
+    public function index(Int $company_id) {
         $editor = DB::table('users')
             ->where('users.id', Auth::user()->id)
             ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
@@ -30,6 +30,7 @@ class EmployeesController extends Controller {
         $employees = DB::table('employees')
             ->where('responsibilities.id_company', $editor->id_company)
             ->join('companies', 'companies.id', '=', 'employees.id_company')
+            ->where('companies.id', $company_id)
             ->join('responsibilities', 'responsibilities.id', '=', 'employees.id_responsibility')
             ->join('sectors', 'sectors.id', '=', 'employees.id_sector')
             ->select('employees.*', 'companies.nome_fantasia AS company', 'responsibilities.name AS responsibility', 'sectors.name AS sector')
@@ -40,18 +41,10 @@ class EmployeesController extends Controller {
         $responsibilities = DB::table('employees')
             ->get();
 
-        if (Auth::user()->type == 'Administrador') {
-            $employees = DB::table('employees')
-                ->join('companies', 'companies.id', '=', 'employees.id_company')
-                ->join('responsibilities', 'responsibilities.id', '=', 'employees.id_responsibility')
-                ->join('sectors', 'sectors.id', '=', 'employees.id_sector')
-                ->select('employees.*', 'companies.nome_fantasia AS company', 'responsibilities.name AS responsibility', 'sectors.name AS sector')
-                ->paginate(9);
-        }
-        return view('employees.index', compact('employees', 'sectors', 'responsibilities'));
+        return view('employees.index', compact('employees', 'sectors', 'responsibilities', 'company_id'));
     }
     
-    public function create() {
+    public function create(Int $company_id) {
         $editor = DB::table('users')
             ->where('users.id', Auth::user()->id)
             ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
@@ -59,91 +52,72 @@ class EmployeesController extends Controller {
             ->select('users.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
             ->first();
         
-        if(Auth::user()->type == 'Administrador') {
-            $companies = Company::all();
-            $sectors = Sector::all();
-            $responsibilities = Responsibility::all();
-        } else {
-            if($editor->tipo == 'Contratante') {
-                $companies = DB::table('companies')
-                    ->where('company_relations.id_contratante', $editor->id_company)
-                    ->join('company_relations', function($join) {
-                        $join
-                            ->on('companies.id', '=', 'company_relations.id_contratada')
-                            ->orOn('companies.id', '=', 'company_relations.id_contratante');
-                    })
-                    ->leftJoin('user_relations', function($join) {
-                        $join->on('user_relations.id_company', '=', 'companies.id')
-                        ->where('user_relations.is_manager', 1);
-                    })
-                    ->leftJoin('users', 'user_relations.id_user', '=', 'users.id')
-                    ->select('companies.*', 'users.id AS id_manager', 'company_relations.id_contratante')
-                    ->paginate(9)->unique();
+        $companies = DB::table('companies')
+            ->where('company_relations.id_contratante', $editor->id_company)
+            ->where('companies.id', $company_id)
+            ->join('company_relations', function($join) {
+                $join
+                    ->on('companies.id', '=', 'company_relations.id_contratada')
+                    ->orOn('companies.id', '=', 'company_relations.id_contratante');
+            })
+            ->leftJoin('user_relations', function($join) {
+                $join->on('user_relations.id_company', '=', 'companies.id')
+                ->where('user_relations.is_manager', 1);
+            })
+            ->leftJoin('users', 'user_relations.id_user', '=', 'users.id')
+            ->select('companies.*', 'users.id AS id_manager', 'company_relations.id_contratante')
+            ->paginate(9)->unique();
 
-                $sectors = DB::table('sectors')
-                    ->join('companies', 'companies.id', '=', 'sectors.id_company')
-                    ->join('company_relations', function($join) {
-                        $join
-                            ->on('companies.id', '=', 'company_relations.id_contratada')
-                            ->orOn('companies.id', '=', 'company_relations.id_contratante');
-                    })
-                    ->select('sectors.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo')
-                    ->paginate(9);
-                $responsibilities = DB::table('responsibilities')
-                    ->join('companies', 'companies.id', '=', 'responsibilities.id_company')
-                    ->join('company_relations', function($join) {
-                        $join
-                            ->on('companies.id', '=', 'company_relations.id_contratada')
-                            ->orOn('companies.id', '=', 'company_relations.id_contratante');
-                    })
-                    ->select('responsibilities.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo')
-                    ->paginate(9);
-            } else {
-                $companies = DB::table('companies')
-                    ->Where('company_relations.id_contratada', $editor->id_company)
-                    ->join('company_relations', function($join) {
-                        $join
-                            ->on('companies.id', '=', 'company_relations.id_contratada');
-                    })
-                    ->leftJoin('user_relations', function($join) {
-                        $join->on('user_relations.id_company', '=', 'companies.id')
-                        ->where('user_relations.is_manager', 1);
-                    })
-                    ->leftJoin('users', 'user_relations.id_user', '=', 'users.id')
-                    ->select('companies.*', 'users.id AS id_manager', 'company_relations.id_contratante')
-                    ->paginate(9)->unique();
-                    
-                $responsibilities = DB::table('responsibilities')
-                    ->join('companies', 'companies.id', '=', 'responsibilities.id_company')
-                    ->join('company_relations', function($join) {
-                        $join
-                            ->on('companies.id', '=', 'company_relations.id_contratada')
-                            ->orOn('companies.id', '=', 'company_relations.id_contratante');
-                    })
-                    ->select('responsibilities.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo')
-                    ->paginate(9);
-                $sectors = DB::table('sectors')
-                    ->join('companies', 'companies.id', '=', 'sectors.id_company')
-                    ->join('company_relations', function($join) {
-                        $join
-                            ->on('companies.id', '=', 'company_relations.id_contratada')
-                            ->orOn('companies.id', '=', 'company_relations.id_contratante');
-                    })
-                    ->select('sectors.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo')
-                    ->paginate(9);
-            }
-        }
-        return view('employees.create', compact('companies', 'sectors', 'responsibilities'));
+        $sectors = DB::table('sectors')
+            ->join('companies', 'companies.id', '=', 'sectors.id_company')
+            ->where('companies.id', $company_id)
+            ->join('company_relations', function($join) {
+                $join
+                    ->on('companies.id', '=', 'company_relations.id_contratada')
+                    ->orOn('companies.id', '=', 'company_relations.id_contratante');
+            })
+            ->select('sectors.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo')
+            ->paginate(9);
+        
+        $responsibilities = DB::table('responsibilities')
+            ->join('companies', 'companies.id', '=', 'responsibilities.id_company')
+            ->where('companies.id', $company_id)
+            ->join('company_relations', function($join) {
+                $join
+                    ->on('companies.id', '=', 'company_relations.id_contratada')
+                    ->orOn('companies.id', '=', 'company_relations.id_contratante');
+            })
+            ->select('responsibilities.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo')
+            ->paginate(9);
+    
+        return view('employees.create', compact('companies', 'sectors', 'responsibilities', 'company_id'));
     }
     
-    public function store(StoreEmployeeRequest $request) {
+    public function store(Int $company_id, StoreEmployeeRequest $request) {
+        $editor = DB::table('users')
+            ->where('users.id', Auth::user()->id)
+            ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
+            ->join('companies', 'companies.id', '=', 'user_relations.id_company')
+            ->select('users.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
+            ->first();
+
         $req = $request->validated();
+
+        if($editor->id_company != (Int) $req['id_company']) abort(403, 'Access denied');
+
         $new_employee = Employee::create($req);
 
-        return redirect()->route('employees.index');
+        return redirect()->route('employees.index', $company_id);
     }
     
-    public function show(Employee $employee) {
+    public function show(Int $company_id, Employee $employee) {
+        $editor = DB::table('users')
+            ->where('users.id', Auth::user()->id)
+            ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
+            ->join('companies', 'companies.id', '=', 'user_relations.id_company')
+            ->select('users.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
+            ->first();
+
         $employee = DB::table('employees')
             ->where('employees.id', $employee->id)
             ->join('companies', 'companies.id', '=', 'employees.id_company')
@@ -152,14 +126,42 @@ class EmployeesController extends Controller {
             ->select('employees.*', 'companies.nome_fantasia AS company', 'responsibilities.name AS responsibility', 'sectors.name AS sector')
             ->first();
 
+        $responsibilities = DB::table('responsibilities')
+            ->join('companies', 'companies.id', '=', 'responsibilities.id_company')
+            ->where('companies.id', $company_id)
+            ->join('company_relations', function($join) {
+                $join
+                    ->on('companies.id', '=', 'company_relations.id_contratada')
+                    ->orOn('companies.id', '=', 'company_relations.id_contratante');
+            })
+            ->select('responsibilities.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo')
+            ->paginate(9);
+        if($editor->company != $employee->company) abort(403, 'Access denied');
+        $documents = DB::table('documents')
+            ->join('companies', 'companies.id', '=', 'documents.id_company')
+            ->join('company_relations', function($join) {
+                $join
+                    ->on('companies.id', '=', 'company_relations.id_contratada')
+                    ->orOn('companies.id', '=', 'company_relations.id_contratante');
+            })
+            ->select('documents.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo')
+            ->get();
+
         $document_paths = DB::table('document_paths')
             ->where('id_employee', $employee->id)
             ->get();
             
-        return view('employees.show', compact('employee', 'document_paths'));
+        return view('employees.show', compact('employee', 'documents', 'document_paths', 'company_id', 'responsibilities'));
     }
 
-    public function edit(Employee $employee) {
+    public function edit(Int $company_id, Employee $employee) {
+        $editor = DB::table('users')
+            ->where('users.id', Auth::user()->id)
+            ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
+            ->join('companies', 'companies.id', '=', 'user_relations.id_company')
+            ->select('users.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
+            ->first();
+        
         $employee = DB::table('employees')
             ->where('employees.id', $employee->id)
             ->join('companies', 'companies.id', '=', 'employees.id_company')
@@ -167,6 +169,9 @@ class EmployeesController extends Controller {
             ->join('sectors', 'sectors.id', '=', 'employees.id_sector')
             ->select('employees.*', 'companies.nome_fantasia AS company', 'responsibilities.name AS responsibility', 'sectors.name AS sector', 'responsibilities.documents AS documents')
             ->first();
+
+        if($editor->company != $employee->company) abort(403, 'Access denied');
+
         $documents = DB::table('documents')
             ->join('companies', 'companies.id', '=', 'documents.id_company')
             ->join('company_relations', function($join) {
@@ -181,16 +186,57 @@ class EmployeesController extends Controller {
             ->where('id_employee', $employee->id)
             ->get();
         
-        $companies = Company::all();
-
-        $sectors = Sector::all();
         
-        $responsibilities = Responsibility::all();
+        $companies = DB::table('companies')
+            ->where('company_relations.id_contratante', $editor->id_company)
+            ->where('companies.id', $company_id)
+            ->join('company_relations', function($join) {
+                $join
+                    ->on('companies.id', '=', 'company_relations.id_contratada')
+                    ->orOn('companies.id', '=', 'company_relations.id_contratante');
+            })
+            ->leftJoin('user_relations', function($join) {
+                $join->on('user_relations.id_company', '=', 'companies.id')
+                ->where('user_relations.is_manager', 1);
+            })
+            ->leftJoin('users', 'user_relations.id_user', '=', 'users.id')
+            ->select('companies.*', 'users.id AS id_manager', 'company_relations.id_contratante')
+            ->paginate(9)->unique();
 
-        return view('employees.edit', compact('employee', 'documents', 'companies', 'sectors', 'responsibilities', 'document_paths'));
+        $sectors = DB::table('sectors')
+            ->join('companies', 'companies.id', '=', 'sectors.id_company')
+            ->where('companies.id', $company_id)
+            ->join('company_relations', function($join) {
+                $join
+                    ->on('companies.id', '=', 'company_relations.id_contratada')
+                    ->orOn('companies.id', '=', 'company_relations.id_contratante');
+            })
+            ->select('sectors.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo')
+            ->paginate(9);
+        
+        $responsibilities = DB::table('responsibilities')
+            ->join('companies', 'companies.id', '=', 'responsibilities.id_company')
+            ->where('companies.id', $company_id)
+            ->join('company_relations', function($join) {
+                $join
+                    ->on('companies.id', '=', 'company_relations.id_contratada')
+                    ->orOn('companies.id', '=', 'company_relations.id_contratante');
+            })
+            ->select('responsibilities.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo')
+            ->paginate(9);
+
+        return view('employees.edit', compact('employee', 'documents', 'companies', 'sectors', 'responsibilities', 'document_paths', 'company_id'));
     }
     
-    public function update(UpdateEmployeeRequest $request, Employee $employee) {
+    public function update(Int $company_id, UpdateEmployeeRequest $request, Employee $employee) {
+        $editor = DB::table('users')
+            ->where('users.id', Auth::user()->id)
+            ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
+            ->join('companies', 'companies.id', '=', 'user_relations.id_company')
+            ->select('users.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
+            ->first();
+
+        if($editor->id_company != $employee->id_company) abort(403, 'Access denied');
 
         if($request->NR35) {
             $old_document = DB::table('document_paths')
@@ -243,14 +289,23 @@ class EmployeesController extends Controller {
         }
         $req = $request->validated();
         $employee->update($req);
-        return redirect()->route('employees.index');
+        return redirect()->route('employees.index', $company_id);
     }
     
-    public function destroy(Employee $employee) {
+    public function destroy(Int $company_id, Employee $employee) {
+        $editor = DB::table('users')
+            ->where('users.id', Auth::user()->id)
+            ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
+            ->join('companies', 'companies.id', '=', 'user_relations.id_company')
+            ->select('users.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
+            ->first();
+            
+        if($editor->id_company != $employee->id_company) abort(403, 'Access denied');
+
         $employee->active = 0;
         
         $employee->save();
         
-        return redirect()->route('employees.index');
+        return redirect()->route('employees.index', $company_id);
     }
 }
