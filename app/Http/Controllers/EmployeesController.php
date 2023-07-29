@@ -257,6 +257,7 @@ class EmployeesController extends Controller {
                 ->first();
 
             $extension = $request->NR35->getClientOriginalExtension();
+            if($extension != 'pdf') throw ValidationException::withMessages(['document' => 'Você deve enviar somente arquivos do tipo pdf.']);
 
             $path = 'documentos/'.$company->nome_fantasia.'/'.$employee->name;
             $path = preg_replace('/[ -]+/' , '_' , strtolower( preg_replace("[^a-zA-Z0-9-]", "-", strtr(utf8_decode(trim($path)), utf8_decode("áàãâéêíóôõúüñçÁÀÃÂÉÊÍÓÔÕÚÜÑÇ"), "aaaaeeiooouuncAAAAEEIOOOUUNC-")) ));
