@@ -10,15 +10,11 @@ use Illuminate\Http\Request;
 use App\Models\Document;
 use App\Models\Company;
 
-class DocumentsController extends Controller
-{
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
+class DocumentsController extends Controller {
+    public function index(Int $company_id) {
         $documents = DB::table('documents')
             ->join('companies', 'companies.id', '=', 'documents.id_company')
+            ->where('companies.id', $company_id)
             ->join('company_relations', function($join) {
                 $join
                     ->on('companies.id', '=', 'company_relations.id_contratada')
@@ -33,14 +29,11 @@ class DocumentsController extends Controller
             ->join('companies', 'companies.id', '=', 'user_relations.id_company')
             ->select('users.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
             ->first();
-        return view('documents.index', compact('editor', 'documents'));
+        return view('documents.index', compact('editor', 'documents', 'company_id'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-        { $editor = DB::table('users')
+    public function create(Int $company_id) {
+        $editor = DB::table('users')
             ->where('users.id', Auth::user()->id)
             ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
             ->join('companies', 'companies.id', '=', 'user_relations.id_company')
@@ -49,6 +42,7 @@ class DocumentsController extends Controller
         
         $documents = DB::table('documents')
             ->join('companies', 'companies.id', '=', 'documents.id_company')
+            ->where('companies.id', $company_id)
             ->join('company_relations', function($join) {
                 $join
                     ->on('companies.id', '=', 'company_relations.id_contratada')
@@ -57,72 +51,43 @@ class DocumentsController extends Controller
             ->select('documents.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo')
             ->paginate(9);
 
-        if(Auth::user()->type == 'Administrador') {
-            $companies = Company::all();
-        } else {
-            if($editor->tipo == 'Contratante') {
-                $companies = DB::table('companies')
-                    ->where('company_relations.id_contratante', $editor->id_company)
-                    ->join('company_relations', function($join) {
-                        $join
-                            ->on('companies.id', '=', 'company_relations.id_contratada')
-                            ->orOn('companies.id', '=', 'company_relations.id_contratante');
-                    })
-                    ->leftJoin('user_relations', function($join) {
-                        $join->on('user_relations.id_company', '=', 'companies.id')
-                        ->where('user_relations.is_manager', 1);
-                    })
-                    ->leftJoin('users', 'user_relations.id_user', '=', 'users.id')
-                    ->select('companies.*', 'users.id AS id_manager', 'company_relations.id_contratante')
-                    ->paginate(9)->unique();
-            } else {
-                $companies = DB::table('companies')
-                    ->Where('company_relations.id_contratada', $editor->id_company)
-                    ->join('company_relations', function($join) {
-                        $join
-                            ->on('companies.id', '=', 'company_relations.id_contratada');
-                    })
-                    ->leftJoin('user_relations', function($join) {
-                        $join->on('user_relations.id_company', '=', 'companies.id')
-                        ->where('user_relations.is_manager', 1);
-                    })
-                    ->leftJoin('users', 'user_relations.id_user', '=', 'users.id')
-                    ->select('companies.*', 'users.id AS id_manager', 'company_relations.id_contratante')
-                    ->paginate(9)->unique();              
-            }
-        }
-        return view('documents.create', compact('companies', 'documents'));
+        $companies = DB::table('companies')
+            ->where('company_relations.id_contratante', $editor->id_company)
+            ->where('companies.id', $company_id)
+            ->join('company_relations', function($join) {
+                $join
+                    ->on('companies.id', '=', 'company_relations.id_contratada')
+                    ->orOn('companies.id', '=', 'company_relations.id_contratante');
+            })
+            ->leftJoin('user_relations', function($join) {
+                $join->on('user_relations.id_company', '=', 'companies.id')
+                ->where('user_relations.is_manager', 1);
+            })
+            ->leftJoin('users', 'user_relations.id_user', '=', 'users.id')
+            ->select('companies.*', 'users.id AS id_manager', 'company_relations.id_contratante')
+            ->paginate(9)->unique();
+        return view('documents.create', compact('companies', 'documents', 'company_id'));
 
     }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StoreDocumentRequest $request)
-    {
+    
+    public function store(Int $company_id, StoreDocumentRequest $request) {
         //
         $req = $request->validated();
 
         $new_document = Document::create($req);
 
-        return redirect()->route('documents.index');
+        return redirect()->route('documents.index', $company_id);
     }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(Document $document) {
+    
+    public function show(Int $company_id, Document $document) {
         $document = DB::table('documents')
             ->where('documents.id', $document->id)
             ->first();
 
-        return view('documents.show', compact('document'));
+        return view('documents.show', compact('document', 'company_id'));
     }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Document $document) {
+    
+    public function edit(Int $company_id, Document $document) {
         $document = DB::table('documents')
             ->where('documents.id', $document->id)
             ->first();
@@ -133,57 +98,31 @@ class DocumentsController extends Controller
         ->select('users.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
         ->first();
         
-        if(Auth::user()->type == 'Administrador') {
-            $companies = Company::all();
-        } else {
-            if($editor->tipo == 'Contratante') {
-                $companies = DB::table('companies')
-                    ->where('company_relations.id_contratante', $editor->id_company)
-                    ->join('company_relations', function($join) {
-                        $join
-                            ->on('companies.id', '=', 'company_relations.id_contratada')
-                            ->orOn('companies.id', '=', 'company_relations.id_contratante');
-                    })
-                    ->leftJoin('user_relations', function($join) {
-                        $join->on('user_relations.id_company', '=', 'companies.id')
-                        ->where('user_relations.is_manager', 1);
-                    })
-                    ->leftJoin('users', 'user_relations.id_user', '=', 'users.id')
-                    ->select('companies.*', 'users.id AS id_manager', 'company_relations.id_contratante')
-                    ->paginate(9)->unique();
-            } else {
-                $companies = DB::table('companies')
-                    ->Where('company_relations.id_contratada', $editor->id_company)
-                    ->join('company_relations', function($join) {
-                        $join
-                            ->on('companies.id', '=', 'company_relations.id_contratada');
-                    })
-                    ->leftJoin('user_relations', function($join) {
-                        $join->on('user_relations.id_company', '=', 'companies.id')
-                        ->where('user_relations.is_manager', 1);
-                    })
-                    ->leftJoin('users', 'user_relations.id_user', '=', 'users.id')
-                    ->select('companies.*', 'users.id AS id_manager', 'company_relations.id_contratante')
-                    ->paginate(9)->unique();              
-            }
-        }
-        return view('documents.edit', compact('document', 'companies'));
+        $companies = DB::table('companies')
+            ->where('company_relations.id_contratante', $editor->id_company)
+            ->where('companies.id', $company_id)
+            ->join('company_relations', function($join) {
+                $join
+                    ->on('companies.id', '=', 'company_relations.id_contratada')
+                    ->orOn('companies.id', '=', 'company_relations.id_contratante');
+            })
+            ->leftJoin('user_relations', function($join) {
+                $join->on('user_relations.id_company', '=', 'companies.id')
+                ->where('user_relations.is_manager', 1);
+            })
+            ->leftJoin('users', 'user_relations.id_user', '=', 'users.id')
+            ->select('companies.*', 'users.id AS id_manager', 'company_relations.id_contratante')
+            ->paginate(9)->unique();
+        return view('documents.edit', compact('document', 'companies', 'company_id'));
     }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdateDocumentRequest $request, Document $document)
-    {
+    
+    public function update(Int $company_id, UpdateDocumentRequest $request, Document $document) {
         $req = $request->validated();
         $document->update($req);
-        return redirect()->route('documents.index');
+        return redirect()->route('documents.index', $company_id);
     }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Document $document) {
+    
+    public function destroy(Int $company_id, Document $document) {
         /*$employees = Employee::all();
 
         foreach ($employees as $employee) {
@@ -192,6 +131,6 @@ class DocumentsController extends Controller
 
         Responsibility::where('id', $responsibility->id)->delete();*/
         
-        return redirect()->route('documents.index');
+        return redirect()->route('documents.index', $company_id);
     }
 }

@@ -28,13 +28,13 @@ class EmployeesController extends Controller {
 
             
         $employees = DB::table('employees')
-            ->where('responsibilities.id_company', $editor->id_company)
             ->join('companies', 'companies.id', '=', 'employees.id_company')
             ->where('companies.id', $company_id)
             ->join('responsibilities', 'responsibilities.id', '=', 'employees.id_responsibility')
             ->join('sectors', 'sectors.id', '=', 'employees.id_sector')
             ->select('employees.*', 'companies.nome_fantasia AS company', 'responsibilities.name AS responsibility', 'sectors.name AS sector')
             ->paginate(9);
+
         $sectors = DB::table('employees')
             ->get();
         
@@ -103,7 +103,7 @@ class EmployeesController extends Controller {
 
         $req = $request->validated();
 
-        if($editor->id_company != (Int) $req['id_company']) abort(403, 'Access denied');
+        // if($editor->id_company != (Int) $req['id_company']) abort(403, 'Access denied');
 
         $new_employee = Employee::create($req);
 
@@ -236,7 +236,7 @@ class EmployeesController extends Controller {
             ->select('users.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
             ->first();
 
-        if($editor->id_company != $employee->id_company) abort(403, 'Access denied');
+        // if($editor->id_company != $employee->id_company) abort(403, 'Access denied');
 
         if($request->NR35) {
             $old_document = DB::table('document_paths')
@@ -301,7 +301,7 @@ class EmployeesController extends Controller {
             ->select('users.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
             ->first();
             
-        if($editor->id_company != $employee->id_company) abort(403, 'Access denied');
+        // if($editor->id_company != $employee->id_company) abort(403, 'Access denied');
 
         $employee->active = 0;
         

@@ -10,7 +10,8 @@
             @if(Auth::user()->type != 'Usuário')
                 @if ($editor->tipo == 'Contratante')
                     <div class="block mb-8 sm:px-6 lg:px-8 mb-4">
-                        <a href="{{ route('documents.create') }}" class="bg-gray-200 hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">Cadastrar Documentos</a>
+                        <a href="{{ route('employees.index', $company_id) }}" class="bg-gray-200 hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">Voltar aos Funcionários</a>
+                        <a href="{{ route('documents.create', $company_id) }}" class="bg-gray-200 hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">Cadastrar Documentos</a>
                     </div>
                 @endif
             @endif
@@ -57,11 +58,11 @@
                                             {{ $document->company }}
                                         </td>
                                         <td class=" py-4 whitespace-nowrap text-sm font-medium">
-                                            <a href="{{ route('documents.show', $document->id) }}" class="mb-2 mr-2 bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-2 rounded">Verificar</a>
+                                            <a href="{{ route('documents.show', [$company_id, $document->id]) }}" class="mb-2 mr-2 bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-2 rounded">Verificar</a>
                                             @if(Auth::user()->type != 'Usuário')
-                                                <a href="{{ route('documents.edit', $document->id) }}" class="mb-2 mr-2 bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-2 rounded">Editar</a>
+                                                <a href="{{ route('documents.edit', [$company_id, $document->id]) }}" class="mb-2 mr-2 bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-2 rounded">Editar</a>
                                                 
-                                                    <form class="inline-block" action="{{ route('documents.destroy', $document->id) }}" method="POST" onsubmit="return confirm('Você tem certeza?');">
+                                                    <form class="inline-block" action="{{ route('documents.destroy', [$company_id, $document->id]) }}" method="POST" onsubmit="return confirm('Você tem certeza?');">
                                                         <input type="hidden" name="_method" value="DELETE" >
                                                         @csrf
                                                         <input type="submit" class="mb-2 mr-2 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-2 rounded" value="Desativar">

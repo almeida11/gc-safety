@@ -10,7 +10,8 @@
             @if(Auth::user()->type != 'Usuário')
                 @if ($editor->tipo == 'Contratante')
                     <div class="block mb-8 sm:px-6 lg:px-8 mb-4">
-                        <a href="{{ route('sectors.create') }}" class="bg-gray-200 hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">Cadastrar Setor</a>
+                        <a href="{{ route('employees.index', $company_id) }}" class="bg-gray-200 hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">Voltar aos Funcionários</a>
+                        <a href="{{ route('sectors.create', $company_id) }}" class="bg-gray-200 hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">Cadastrar Setor</a>
                     </div>
                 @endif
             @endif
@@ -57,11 +58,11 @@
                                             {{ $sector->company }}
                                         </td>
                                         <td class=" py-4 whitespace-nowrap text-sm font-medium">
-                                            <a href="{{ route('sectors.show', $sector->id) }}" class="mb-2 mr-2 bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-2 rounded">Verificar</a>
+                                            <a href="{{ route('sectors.show', [$company_id, $sector->id]) }}" class="mb-2 mr-2 bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-2 rounded">Verificar</a>
                                             @if(Auth::user()->type != 'Usuário')
-                                                <a href="{{ route('sectors.edit', $sector->id) }}" class="mb-2 mr-2 bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-2 rounded">Editar</a>
+                                                <a href="{{ route('sectors.edit', [$company_id, $sector->id]) }}" class="mb-2 mr-2 bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-2 rounded">Editar</a>
                                                 
-                                                    <form class="inline-block" action="{{ route('sectors.destroy', $sector->id) }}" method="POST" onsubmit="return confirm('Você tem certeza?');">
+                                                    <form class="inline-block" action="{{ route('sectors.destroy', [$company_id, $sector->id]) }}" method="POST" onsubmit="return confirm('Você tem certeza?');">
                                                         <input type="hidden" name="_method" value="DELETE" >
                                                         @csrf
                                                         <input type="submit" class="mb-2 mr-2 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-2 rounded" value="Desativar">

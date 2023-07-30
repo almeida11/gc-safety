@@ -38,11 +38,11 @@ Route::middleware([
 
     Route::resource('{company_id}/employees', \App\Http\Controllers\EmployeesController::class);
 
-    Route::resource('responsibilities', \App\Http\Controllers\ResponsibilitiesController::class);
+    Route::resource('{company_id}/responsibilities', \App\Http\Controllers\ResponsibilitiesController::class);
 
-    Route::resource('sectors', \App\Http\Controllers\SectorsController::class);
+    Route::resource('{company_id}/sectors', \App\Http\Controllers\SectorsController::class);
 
-    Route::resource('documents', \App\Http\Controllers\DocumentsController::class);
+    Route::resource('{company_id}/documents', \App\Http\Controllers\DocumentsController::class);
 
     Route::group([
         'middleware' => 'moders'

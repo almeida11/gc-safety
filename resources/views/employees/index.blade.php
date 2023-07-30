@@ -10,6 +10,9 @@
             <div class="block mb-8 sm:px-6 lg:px-8 mb-4">
                 <a href="{{ route('companies.show', $company_id) }}" class="bg-gray-200 hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">Voltar a Empresa</a>
                 <a href="{{ route('employees.create', $company_id) }}" class="bg-gray-200 hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">Cadastrar Funcionário</a>
+                <a href="{{ route('responsibilities.index', $company_id) }}" class="bg-gray-200 hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">Cargos</a>
+                <a href="{{ route('sectors.index', $company_id) }}" class="bg-gray-200 hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">Setores</a>
+                <a href="{{ route('documents.index', $company_id) }}" class="bg-gray-200 hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">Tipos de Documentos</a>
             </div>
             </form>
                 <!--Search Bar-->
