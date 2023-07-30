@@ -49,25 +49,27 @@
                                     </div>
                                 </td>
                             </tr>
-                            <tr class="border-b">
-                                <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Documentos
-                                </th>
-                                
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
-                                    <fieldset>
-                                        @foreach($documents as $document)
-                                            <div>
-                                                <input type = "checkbox" id = "{{ $document->id }}" name = "documents" value = "{{ $document->id }}" >
-                                                <label for = "{{ $document->id }}" > {{ $document->name }} </label>
-                                            </div>
-                                        @endforeach
-                                    </fieldset>
-                                    @error('document')
-                                        <p class="text-sm text-red-600">{{ $message }}</p>
-                                    @enderror
-                                </td>
-                            </tr>
+                            @if( false )
+                                <tr class="border-b">
+                                    <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Documentos
+                                    </th>
+                                    
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
+                                        <fieldset>
+                                            @foreach($documents as $document)
+                                                <div>
+                                                    <input type = "checkbox" id = "{{ $document->id }}" name = "documents" value = "{{ $document->id }}" >
+                                                    <label for = "{{ $document->id }}" > {{ $document->name }} </label>
+                                                </div>
+                                            @endforeach
+                                        </fieldset>
+                                        @error('document')
+                                            <p class="text-sm text-red-600">{{ $message }}</p>
+                                        @enderror
+                                    </td>
+                                </tr>
+                            @endif
                         </table>
                     </div>
                     @csrf

@@ -38,6 +38,8 @@ Route::middleware([
 
     Route::resource('{company_id}/employees', \App\Http\Controllers\EmployeesController::class);
 
+    Route::post('{company_id}/employees/editdoc/{employee_id}', [\App\Http\Controllers\EmployeesController::class, 'editdoc'])->name('editdoc');
+
     Route::resource('{company_id}/responsibilities', \App\Http\Controllers\ResponsibilitiesController::class);
 
     Route::resource('{company_id}/sectors', \App\Http\Controllers\SectorsController::class);

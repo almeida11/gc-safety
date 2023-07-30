@@ -13,10 +13,158 @@ function limpaString($string) {
     </x-slot>
 
     <div>
+        
         <div class="max-w-7xl mx-auto py-10 sm:px-6 lg:px-8">
             <div class="block mb-8 mb-4">
                 <a href="{{ route('employees.index', $company_id) }}" class="bg-gray-200 hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">Voltar a Lista</a>
+                <a href="#" onclick="openModal()" class="bg-gray-200 hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">Gerir Documentos</a>
             </div>
+            <style>
+                .animated {
+                    -webkit-animation-duration: 1s;
+                    animation-duration: 1s;
+                    -webkit-animation-fill-mode: both;
+                    animation-fill-mode: both;
+                }
+
+                .animated.faster {
+                    -webkit-animation-duration: 500ms;
+                    animation-duration: 500ms;
+                }
+
+                .fadeIn {
+                    -webkit-animation-name: fadeIn;
+                    animation-name: fadeIn;
+                }
+
+                .fadeOut {
+                    -webkit-animation-name: fadeOut;
+                    animation-name: fadeOut;
+                }
+
+                @keyframes fadeIn {
+                    from {
+                        opacity: 0;
+                    }
+
+                    to {
+                        opacity: 1;
+                    }
+                }
+
+                @keyframes fadeOut {
+                    from {
+                        opacity: 1;
+                    }
+
+                    to {
+                        opacity: 0;
+                    }
+                }
+                
+                .td200 {
+                    width:200px;
+                }
+
+                .div500 {
+                    width:500px;
+                }
+            </style>
+
+            <div class="main-modal fixed w-full h-100 inset-0 z-50 overflow-hidden flex justify-center items-center animated fadeIn faster"
+                style="background: rgba(0,0,0,.7);">
+                <div
+                    class="border border-teal-500 shadow-lg modal-container bg-white w-11/12 md:max-w-md mx-auto rounded shadow-lg z-50 overflow-y-auto">
+                    <div class="div500 modal-content py-4 text-left px-6">
+                        <!--Title-->
+                        <div class="flex justify-between items-center pb-3">
+                            <p class="text-2xl font-bold mr-3">Gerenciar Documentos</p>
+                            <div class="modal-close cursor-pointer z-50 ml-3">
+                                <svg class="fill-current text-black" xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                                    viewBox="0 0 18 18">
+                                    <path
+                                        d="M14.53 4.53l-1.06-1.06L9 7.94 4.53 3.47 3.47 4.53 7.94 9l-4.47 4.47 1.06 1.06L9 10.06l4.47 4.47 1.06-1.06L10.06 9z">
+                                    </path>
+                                </svg>
+                            </div>
+                        </div>
+                        <!--Body-->
+                        <div class="my-5">
+                            <form method="post" action="{{ route('editdoc', [$company_id, $employee->id]) }}">
+                                @csrf
+                                <table class="min-w-full divide-y divide-gray-200 w-full">
+                                    @foreach($documents as $document)
+                                        <tr class="border-b">
+                                            <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                {{ $document->name }}
+                                            </th> 
+                                            <td class="td200 px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
+                                                <button type="button" id="1" class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150 mt-2 mr-2"
+                                                onclick="selecionarBox(this, '{{ $document->name }}')" >
+                                                @if($employee->documents)
+                                                    @foreach(json_decode($employee->documents) as $document2)
+                                                        @if($document->name == $document2)
+                                                            NÃO 
+                                                        @endif
+                                                    @endforeach
+                                                @endif
+                                                EXIGIR!
+                                                </button>
+                                                <div>
+                                                    <input type="checkbox" id="{{ $document->name }}" name="documents[]" value = "{{ $document->name }}" class="hidden" @if($employee->documents)
+                                                    @foreach(json_decode($employee->documents) as $document2) @if($document->name == $document2) checked @endif @endforeach @endif >
+                                                    <label for = "{{ $document->name }}" class="hidden"> {{ $document->name }} </label>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </table>
+                            </div>
+                            <!--Footer-->
+                            <div class="flex justify-end pt-2">
+                                @error('document_manager')
+                                    <p class="text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                                <button
+                                    class="focus:outline-none modal-close px-4 bg-gray-400 p-3 rounded-lg text-black hover:bg-gray-300 inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:shadow-outline-gray disabled:opacity-25 transition ease-in-out duration-150">Salvar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                const modal = document.querySelector('.main-modal');
+                const closeButton = document.querySelectorAll('.modal-close');
+
+                const modalClose = () => {
+                    modal.classList.remove('fadeIn');
+                    modal.classList.add('fadeOut');
+                    setTimeout(() => {
+                        modal.style.display = 'none';
+                    }, 500);
+                }
+
+                const openModal = () => {
+                    modal.classList.remove('fadeOut');
+                    modal.classList.add('fadeIn');
+                    modal.style.display = 'flex';
+                }
+
+                for (let i = 0; i < closeButton.length; i++) {
+
+                    const elements = closeButton[i];
+
+                    elements.onclick = (e) => modalClose();
+
+                    modal.style.display = 'none';
+
+                    window.onclick = function (event) {
+                        if (event.target == modal) modalClose();
+                    }
+                }
+                @error('document_manager') openModal() @enderror
+            </script>
             <div class="mt-5 md:mt-0 md:col-span-2">
                 <form method="post" action="{{ route('employees.update', [$company_id, $employee->id]) }}" enctype="multipart/form-data">
                     <div class="flex flex-col">
@@ -94,10 +242,10 @@ function limpaString($string) {
                                     </div>
                                 </td>
                             </tr>
-                            @if($responsibility->documents)
-                                @foreach(json_decode($responsibility->documents) as $document)
+                            @if($employee->documents)
+                                @foreach(json_decode($employee->documents) as $document)
                                     @foreach(json_decode($documents) as $db_document)
-                                        @if($db_document->id == $document)
+                                        @if($db_document->name == $document)
                                             <?php $document_name = $db_document->name ?>
                                         @endif
                                     @endforeach
@@ -108,22 +256,24 @@ function limpaString($string) {
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
                                         <button type="button" id="{{ limpaString($document_name).'btn' }}" class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150 mt-2 mr-2"
                                             onclick="getDocument('{{ limpaString($document_name).'btn' }}', '{{ limpaString($document_name).'fl' }}')">
-
+                                            <?php $document_name_display = 'Enviar!' ?>
                                             @if($document_paths->first())
                                                 @foreach($document_paths as $document_path)
                                                     @if(limpaString($document_path->type))
-                                                        {{ $document_path->name }}
+                                                        @if(limpaString($document_path->type) == limpaString($document_name))
+                                                            <?php $document_name_display = $document_path->name ?>
+                                                            @break
+                                                        @endif
                                                     @endif
                                                 @endforeach
-                                            @else
-                                                Enviar!
                                             @endif
+                                            {{ $document_name_display }}
                                         </button>
                                                 <input type="file" name="{{ $document_name }}" id="{{ limpaString($document_name).'fl' }}" class="hidden" onchange="changeName(this, '{{ limpaString($document_name).'btn' }}', '{{ limpaString($document_name).'fl' }}')"
                                                 {{ $document_name }}
                                                 class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-ful"
                                                 />
-                                            @error('document')
+                                            @error('document'.$document_name)
                                                 <p class="text-sm text-red-600">{{ $message }}</p>
                                             @enderror
                                         </td>

@@ -23,6 +23,7 @@ return new class extends Migration
             $table->unsignedBigInteger('id_company')->nullable();
             $table->foreign('id_company')->references('id')->on('companies')->onDelete('cascade')->nullable();
             $table->boolean('active')->default(1);
+            $table->json('documents')->nullable();
             $table->timestamps();
         });
     }

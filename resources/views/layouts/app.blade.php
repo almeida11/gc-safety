@@ -47,6 +47,17 @@
                 let button = document.getElementById(btn);
                 button.innerText =url.split(/(\\|\/)/g).pop();
             }
+
+            function selecionarBox(evt, chkbox) {
+                let chkBox = document.getElementById(chkbox);
+                chkBox.click();
+                if(chkBox.checked) {
+                    evt.innerText = 'NÃO EXIGIR!';
+                } else {
+                    evt.innerText = 'EXIGIR!';
+                }
+            }
+            
         </script>
     </head>
     <body class="font-sans antialiased">

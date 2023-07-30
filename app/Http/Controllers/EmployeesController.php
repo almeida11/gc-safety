@@ -66,7 +66,7 @@ class EmployeesController extends Controller {
             })
             ->leftJoin('users', 'user_relations.id_user', '=', 'users.id')
             ->select('companies.*', 'users.id AS id_manager', 'company_relations.id_contratante')
-            ->paginate(9)->unique();
+            ->get()->unique();
 
         $sectors = DB::table('sectors')
             ->join('companies', 'companies.id', '=', 'sectors.id_company')
@@ -77,7 +77,7 @@ class EmployeesController extends Controller {
                     ->orOn('companies.id', '=', 'company_relations.id_contratante');
             })
             ->select('sectors.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo')
-            ->paginate(9);
+            ->get();
         
         $responsibilities = DB::table('responsibilities')
             ->join('companies', 'companies.id', '=', 'responsibilities.id_company')
@@ -88,7 +88,7 @@ class EmployeesController extends Controller {
                     ->orOn('companies.id', '=', 'company_relations.id_contratante');
             })
             ->select('responsibilities.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo')
-            ->paginate(9);
+            ->get();
     
         return view('employees.create', compact('companies', 'sectors', 'responsibilities', 'company_id'));
     }
@@ -167,7 +167,7 @@ class EmployeesController extends Controller {
             ->join('companies', 'companies.id', '=', 'employees.id_company')
             ->join('responsibilities', 'responsibilities.id', '=', 'employees.id_responsibility')
             ->join('sectors', 'sectors.id', '=', 'employees.id_sector')
-            ->select('employees.*', 'companies.nome_fantasia AS company', 'responsibilities.name AS responsibility', 'sectors.name AS sector', 'responsibilities.documents AS documents')
+            ->select('employees.*', 'companies.nome_fantasia AS company', 'responsibilities.name AS responsibility', 'sectors.name AS sector')
             ->first();
 
         if($editor->company != $employee->company) abort(403, 'Access denied');
@@ -201,7 +201,7 @@ class EmployeesController extends Controller {
             })
             ->leftJoin('users', 'user_relations.id_user', '=', 'users.id')
             ->select('companies.*', 'users.id AS id_manager', 'company_relations.id_contratante')
-            ->paginate(9)->unique();
+            ->get()->unique();
 
         $sectors = DB::table('sectors')
             ->join('companies', 'companies.id', '=', 'sectors.id_company')
@@ -212,7 +212,7 @@ class EmployeesController extends Controller {
                     ->orOn('companies.id', '=', 'company_relations.id_contratante');
             })
             ->select('sectors.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo')
-            ->paginate(9);
+            ->get();
         
         $responsibilities = DB::table('responsibilities')
             ->join('companies', 'companies.id', '=', 'responsibilities.id_company')
@@ -223,8 +223,9 @@ class EmployeesController extends Controller {
                     ->orOn('companies.id', '=', 'company_relations.id_contratante');
             })
             ->select('responsibilities.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo')
-            ->paginate(9);
+            ->get();
 
+        
         return view('employees.edit', compact('employee', 'documents', 'companies', 'sectors', 'responsibilities', 'document_paths', 'company_id'));
     }
     
@@ -235,62 +236,78 @@ class EmployeesController extends Controller {
             ->join('companies', 'companies.id', '=', 'user_relations.id_company')
             ->select('users.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
             ->first();
-
         // if($editor->id_company != $employee->id_company) abort(403, 'Access denied');
+        if($employee->documents){
+            foreach (json_decode($employee->documents) as $document) {
+                if($request->{$document}) {
+                    $old_document = DB::table('document_paths')
+                        ->where('id_employee', $employee->id)
+                        ->where('type', $document)
+                        ->first();
 
-        if($request->NR35) {
-            $old_document = DB::table('document_paths')
-                ->where('id_employee', $employee->id)
-                ->first();
+                    $company = DB::table('companies')
+                        ->where('companies.id', $employee->id_company)
+                        ->leftJoin('company_relations', function($join) {
+                            $join->on('companies.id', '=', 'company_relations.id_contratada')->orOn('companies.id', '=', 'company_relations.id_contratante');
+                        })
+                        ->leftJoin('user_relations', function($join) {
+                            $join->on('user_relations.id_company', '=', 'companies.id')
+                            ->where('user_relations.is_manager', 1);
+                        })
+                        ->leftJoin('users', 'user_relations.id_user', '=', 'users.id')
+                        ->select('companies.*', 'users.id AS id_manager', 'company_relations.id_contratante as id_contratante')
+                        ->first();
 
-            $company = DB::table('companies')
-                ->where('companies.id', $employee->id_company)
-                ->leftJoin('company_relations', function($join) {
-                    $join->on('companies.id', '=', 'company_relations.id_contratada')->orOn('companies.id', '=', 'company_relations.id_contratante');
-                })
-                ->leftJoin('user_relations', function($join) {
-                    $join->on('user_relations.id_company', '=', 'companies.id')
-                    ->where('user_relations.is_manager', 1);
-                })
-                ->leftJoin('users', 'user_relations.id_user', '=', 'users.id')
-                ->select('companies.*', 'users.id AS id_manager', 'company_relations.id_contratante as id_contratante')
-                ->first();
+                    $extension = $request->{$document}->getClientOriginalExtension();
+                    if($extension != 'pdf') throw ValidationException::withMessages(['document'.$document => 'Você deve enviar somente arquivos do tipo pdf.']);
 
-            $extension = $request->NR35->getClientOriginalExtension();
-            if($extension != 'pdf') throw ValidationException::withMessages(['document' => 'Você deve enviar somente arquivos do tipo pdf.']);
+                    $path = 'documentos/'.$company->nome_fantasia.'/'.$employee->name;
+                    $path = preg_replace('/[ -]+/' , '_' , strtolower( preg_replace("[^a-zA-Z0-9-]", "-", strtr(utf8_decode(trim($path)), utf8_decode("áàãâéêíóôõúüñçÁÀÃÂÉÊÍÓÔÕÚÜÑÇ"), "aaaaeeiooouuncAAAAEEIOOOUUNC-")) ));
 
-            $path = 'documentos/'.$company->nome_fantasia.'/'.$employee->name;
-            $path = preg_replace('/[ -]+/' , '_' , strtolower( preg_replace("[^a-zA-Z0-9-]", "-", strtr(utf8_decode(trim($path)), utf8_decode("áàãâéêíóôõúüñçÁÀÃÂÉÊÍÓÔÕÚÜÑÇ"), "aaaaeeiooouuncAAAAEEIOOOUUNC-")) ));
+                    $document_name = $document . '_' . $employee->id. "_" . $employee->name . ".{$extension}";
+                    $document_name = preg_replace('/[ -]+/' , '_' , strtolower( preg_replace("[^a-zA-Z0-9-]", "-", strtr(utf8_decode(trim($document_name)), utf8_decode("áàãâéêíóôõúüñçÁÀÃÂÉÊÍÓÔÕÚÜÑÇ"), "aaaaeeiooouuncAAAAEEIOOOUUNC-")) ));
+                    
+                    if($old_document){
+                        if (Storage::exists($old_document->name)) {
+                            Storage::delete($old_document->name);
+                        }
+                        $request->{$document}->storeAs($path, $document_name);
 
-            $document_name = 'NR35_' . $employee->id. "_" . $employee->name . ".{$extension}";
-            $document_name = preg_replace('/[ -]+/' , '_' , strtolower( preg_replace("[^a-zA-Z0-9-]", "-", strtr(utf8_decode(trim($document_name)), utf8_decode("áàãâéêíóôõúüñçÁÀÃÂÉÊÍÓÔÕÚÜÑÇ"), "aaaaeeiooouuncAAAAEEIOOOUUNC-")) ));
+                        $old_document = Document_path::findOrFail($old_document->id);
+                        
+                        $old_document->name = $document_name;
+                        $old_document->path = $path;
 
-            if($old_document){
-                if (Storage::exists($old_document->name)) {
-                    Storage::delete($old_document->name);
+                        $old_document->update();
+                    } else {
+                        $request->{$document}->storeAs($path, $document_name);
+                        $document_path_model = array(
+                            'path' => $path,
+                            'name' => $document_name,
+                            'type' => $document,
+                            'id_employee' => $employee->id,
+                        );
+                        $document_path = Document_path::create($document_path_model);
+                    }
                 }
-                $request->NR35->storeAs($path, $document_name);
-
-                $old_document = Document_path::findOrFail($old_document->id);
-                
-                $old_document->name = $document_name;
-                $old_document->path = $path;
-
-                $old_document->update();
-            } else {
-                $request->NR35->storeAs($path, $document_name);
-                $document_path_model = array(
-                    'path' => $path,
-                    'name' => $document_name,
-                    'type' => 'NR35',
-                    'id_employee' => $employee->id,
-                );
-                $document_path = Document_path::create($document_path_model);
             }
         }
+        // $responsibilities = DB::table('responsibilities')
+        //     ->join('companies', 'companies.id', '=', 'responsibilities.id_company')
+        //     ->where('responsibilities.id', $employee->id_responsibility)
+        //     ->where('companies.id', $company_id)
+        //     ->join('company_relations', function($join) {
+        //         $join
+        //             ->on('companies.id', '=', 'company_relations.id_contratada')
+        //             ->orOn('companies.id', '=', 'company_relations.id_contratante');
+        //     })
+        //     ->select('responsibilities.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo')
+        //     ->first();
+            
         $req = $request->validated();
+        //$employee->documents = $responsibilities->documents;
         $employee->update($req);
-        return redirect()->route('employees.index', $company_id);
+        return redirect()->route('employees.edit', [$company_id, $employee->id]);
     }
     
     public function destroy(Int $company_id, Employee $employee) {
@@ -308,5 +325,26 @@ class EmployeesController extends Controller {
         $employee->save();
         
         return redirect()->route('employees.index', $company_id);
+    }
+
+    public function editdoc(Int $company_id, Int $employee_id, Request $request) { // document_manager
+        $employee = Employee::findOrFail($employee_id);
+
+        foreach (json_decode($employee->documents) as $old_type_document) {
+            $old_document = DB::table('document_paths')
+                ->where('id_employee', $employee_id)
+                ->where('type', $old_type_document)
+                ->first();
+            if($old_document){
+                if(in_array($old_document->type, $request->documents)) {
+                    throw ValidationException::withMessages(['document_manager' => 'Já existe documento enviado, favor excluir documento primeiro!']);
+                }
+            }
+        }
+        dd($this);
+        
+        $employee->documents = $request->documents;
+        $employee->save();
+        return redirect()->route('employees.edit', [$company_id, $employee_id]);
     }
 }
