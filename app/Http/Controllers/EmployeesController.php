@@ -41,7 +41,38 @@ class EmployeesController extends Controller {
         $responsibilities = DB::table('employees')
             ->get();
 
-        return view('employees.index', compact('employees', 'sectors', 'responsibilities', 'company_id'));
+        $documents = DB::table('document_paths')
+            ->get()->unique();
+
+        $employees_doc_status = array();
+
+        foreach ($employees as $employee) {
+            if(json_decode($employee->documents)) {
+                foreach (json_decode($employee->documents) as $document) {
+                    $hasntDoc = true;
+                    foreach ($documents as $document_name) {
+                        if($document) {
+                            if(($document_name->id_employee == $employee->id && $document_name->type == $document)) {
+                                $hasntDoc = false;
+                            }
+                        }
+                    }
+                    if(($hasntDoc)) {
+                        $check_test = true;
+                        foreach ($employees_doc_status as $value) {
+                            if($value['id'] == $employee->id) {
+                                $check_test = false;
+                            }
+                        }
+                        if($check_test) {
+                            array_push($employees_doc_status, array ( 'id' => $employee->id, 'status' => false ));
+                        }
+                    }
+                }
+            }
+        }
+
+        return view('employees.index', compact('employees', 'sectors', 'responsibilities', 'company_id', 'employees_doc_status'));
     }
     
     public function create(Int $company_id) {
@@ -292,20 +323,8 @@ class EmployeesController extends Controller {
                 }
             }
         }
-        // $responsibilities = DB::table('responsibilities')
-        //     ->join('companies', 'companies.id', '=', 'responsibilities.id_company')
-        //     ->where('responsibilities.id', $employee->id_responsibility)
-        //     ->where('companies.id', $company_id)
-        //     ->join('company_relations', function($join) {
-        //         $join
-        //             ->on('companies.id', '=', 'company_relations.id_contratada')
-        //             ->orOn('companies.id', '=', 'company_relations.id_contratante');
-        //     })
-        //     ->select('responsibilities.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo')
-        //     ->first();
             
         $req = $request->validated();
-        //$employee->documents = $responsibilities->documents;
         $employee->update($req);
         return redirect()->route('employees.edit', [$company_id, $employee->id]);
     }
@@ -327,24 +346,26 @@ class EmployeesController extends Controller {
         return redirect()->route('employees.index', $company_id);
     }
 
-    public function editdoc(Int $company_id, Int $employee_id, Request $request) { // document_manager
+    public function editdoc(Int $company_id, Int $employee_id, Request $request) {
         $employee = Employee::findOrFail($employee_id);
 
-        foreach (json_decode($employee->documents) as $old_type_document) {
-            $old_document = DB::table('document_paths')
-                ->where('id_employee', $employee_id)
-                ->where('type', $old_type_document)
-                ->first();
-            if($old_document){
-                if(in_array($old_document->type, $request->documents)) {
-                    throw ValidationException::withMessages(['document_manager' => 'Já existe documento enviado, favor excluir documento primeiro!']);
+        if(json_decode($employee->documents)){
+            foreach (json_decode($employee->documents) as $old_type_document) {
+                $old_document = DB::table('document_paths')
+                    ->where('id_employee', $employee_id)
+                    ->where('type', $old_type_document)
+                    ->first();
+                if($old_document){
+                    if(!(in_array($old_document->type, $request->documents))) {
+                        throw ValidationException::withMessages(['document_manager' => 'Já existe documento enviado, favor excluir documento primeiro!']);
+                    }
                 }
             }
         }
-        dd($this);
         
         $employee->documents = $request->documents;
         $employee->save();
+        
         return redirect()->route('employees.edit', [$company_id, $employee_id]);
     }
 }

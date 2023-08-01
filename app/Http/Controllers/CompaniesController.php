@@ -75,7 +75,43 @@ class CompaniesController extends Controller {
                 ->paginate(9);
         }
 
-        return view('companies.index', compact('companies', 'users', 'editor'));
+        $pendencias = 0;
+
+        $employees = DB::table('employees')
+            ->get();
+
+        $documents = DB::table('document_paths')
+            ->get()->unique();
+
+        $companies_doc_status = array();
+
+        foreach ($employees as $employee) {
+            if(json_decode($employee->documents)) {
+                foreach (json_decode($employee->documents) as $document) {
+                    $hasntDoc = true;
+                    foreach ($documents as $document_name) {
+                        if($document) {
+                            if(($document_name->id_employee == $employee->id && $document_name->type == $document)) {
+                                $hasntDoc = false;
+                            }
+                        }
+                    }
+                    if(($hasntDoc)) {
+                        $check_test = true;
+                        foreach ($companies_doc_status as $value) {
+                            if($value['id'] == $employee->id_company) {
+                                $check_test = false;
+                            }
+                        }
+                        if($check_test) {
+                            array_push($companies_doc_status, array ( 'id' => $employee->id_company, 'status' => false ));
+                        }
+                    }
+                }
+            }
+        }
+
+        return view('companies.index', compact('companies', 'users', 'editor', 'companies_doc_status'));
     }
     
     public function create() {

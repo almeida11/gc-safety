@@ -246,7 +246,8 @@ function limpaString($string) {
                                 @foreach(json_decode($employee->documents) as $document)
                                     @foreach(json_decode($documents) as $db_document)
                                         @if($db_document->name == $document)
-                                            <?php $document_name = $db_document->name ?>
+                                            <?php $document_name = $db_document->name;
+                                                $check_doc = false; ?>
                                         @endif
                                     @endforeach
                                     <tr class="border-b">
@@ -261,7 +262,8 @@ function limpaString($string) {
                                                 @foreach($document_paths as $document_path)
                                                     @if(limpaString($document_path->type))
                                                         @if(limpaString($document_path->type) == limpaString($document_name))
-                                                            <?php $document_name_display = $document_path->name ?>
+                                                            <?php $document_name_display = $document_path->name;
+                                                                $check_doc = true;  ?>
                                                             @break
                                                         @endif
                                                     @endif

@@ -43,6 +43,9 @@
                                             Status da Empresa
                                         </th>
                                     @endif
+                                    <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Documentos
+                                    </th>
                                     <th scope="col" width="200" class="px-6 py-3 bg-gray-50">
                                         
                                     </th>
@@ -81,6 +84,17 @@
                                                 {{ $company->ativo ? 'Ativo' : 'Inativo' }}
                                             </td>
                                         @endif
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                            <?php $texto_status = 'Documentos completos!'; ?>
+                                            @if($companies_doc_status)
+                                                @foreach ( $companies_doc_status as $status )
+                                                    @if($company->id == $status['id'])
+                                                        <?php $texto_status = 'Documentos pendentes!'; ?>
+                                                    @endif
+                                                @endforeach
+                                            @endif
+                                            {{ $texto_status }}
+                                        </td>   
                                         <td class=" py-4 whitespace-nowrap text-sm font-medium">
                                             <a href="{{ route('companies.show', $company->id) }}" class="mb-2 mr-2 bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-2 rounded">Verificar</a>
                                             @if(Auth::user()->type != 'Usuário')
