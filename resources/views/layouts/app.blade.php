@@ -37,14 +37,14 @@
                 return true;
             }
 
-            function getDocument(btn, fl) {
-                let file = document.getElementById(fl);
+            function getDocument(e) {
+                let file = document.getElementById(e.id.slice(0, -2).concat('fl'));
                 file.click();
             }
 
-            function changeName(evt, btn, fl) {
-                var url = evt.value;
-                let button = document.getElementById(btn);
+            function changeName(e) {
+                var url = e.value;
+                let button = document.getElementById(e.id.slice(0, -2).concat('bt'));
                 button.innerText =url.split(/(\\|\/)/g).pop();
             }
 

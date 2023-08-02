@@ -69,6 +69,43 @@ function limpaString($string) {
                 .div500 {
                     width:500px;
                 }
+                .table_info {
+                    display: flex;
+                    flex-direction: row;
+                    flex-wrap: nowrap;
+                    justify-content: space-evenly;
+                }
+
+                .div1000 {
+                    width:1600px;
+                }
+
+                .modal-left {
+                    position: relative;
+                }
+
+                .modal-right {
+                    border-radius: 1px;
+                    box-shadow: 0px 0px 0px 2px rgba(0,0,0,0.3);
+                }
+
+                .save_button {
+                    padding-top: .5rem;
+                    padding-bottom: .5rem;
+                    float: right;
+                    position: absolute;
+                    bottom: 0;
+                    right: 0;
+                }
+
+                .modal-size-pdf {
+                    width: 1100px;
+                    height: 800px;
+                    text-align: center;
+                    -webkit-box-shadow: 10px 10px 29px -4px rgba(0,0,0,0.49);
+                    -moz-box-shadow: 10px 10px 29px -4px rgba(0,0,0,0.49);
+                    box-shadow: 10px 10px 29px -4px rgba(0,0,0,0.49);
+                }
             </style>
 
             <div class="main-modal fixed w-full h-100 inset-0 z-50 overflow-hidden flex justify-center items-center animated fadeIn faster"
@@ -132,10 +169,108 @@ function limpaString($string) {
                     </div>
                 </div>
             </div>
-
+            <div class="main-modal2 fixed w-full h-100 inset-0 z-50 overflow-hidden flex justify-center items-center animated fadeIn faster"
+                style="background: rgba(0,0,0,.7);">
+                <div
+                    class="border border-teal-500 shadow-lg modal-container bg-white w-11/12 md:max-w-md mx-auto rounded shadow-lg z-50 overflow-y-auto">
+                    <div class="div1000 modal-content py-4 text-left px-6">
+                        <!--Title-->
+                        <div class="flex justify-between items-center pb-3">
+                            <p class="text-2xl font-bold mr-3" id="modal-title2">Title</p>
+                            <div class="modal-close2 cursor-pointer z-50 ml-3">
+                                <svg class="fill-current text-black" xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                                    viewBox="0 0 18 18">
+                                    <path
+                                        d="M14.53 4.53l-1.06-1.06L9 7.94 4.53 3.47 3.47 4.53 7.94 9l-4.47 4.47 1.06 1.06L9 10.06l4.47 4.47 1.06-1.06L10.06 9z">
+                                    </path>
+                                </svg>
+                            </div>
+                        </div>
+                        <!--Body-->
+                        <div class="my-5">
+                            <form class="table_info"  method="post" action="{{ route('updatedoc', [$company_id, $employee->id]) }}" enctype="multipart/form-data">
+                                @csrf
+                                <div class="modal-left">
+                                    <table class="min-w-full divide-y divide-gray-200 w-full">
+                                        <tr class="border-b">
+                                            <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                Enviar Documento
+                                            </th> 
+                                            <td class="td200 px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
+                                                <button type="button" id="1" class="modal-form-button inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150 mt-2 mr-2"
+                                                onclick="getDocument(this)" >
+                                                    Enviar!
+                                                </button>
+                                                <div>
+                                                    <input type="file" name="1" id="1" class="modal-form-input hidden" onchange="changeName(this)"
+                                                    
+                                                    class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-ful"
+                                                    />
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr class="border-b">
+                                            <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                Data de Vencimento
+                                            </th> 
+                                            <td class="td200 px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
+                                                <input type="date" name="" id="" 
+                                                    class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full"
+                                                    wire:model.defer="" autocomplete="" />
+                                                <div>
+                                                    <!-- Input file -->
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    <!--Footer-->
+                                    <div class="pb-2 pt-2 save_button">
+                                        @error('document_manager')
+                                            <p class="text-sm text-red-600">{{ $message }}</p>
+                                        @enderror
+                                        <button
+                                            class="focus:outline-none modal-close2 px-4 bg-gray-400 p-3 rounded-lg text-black hover:bg-gray-300 inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:shadow-outline-gray disabled:opacity-25 transition ease-in-out duration-150">Salvar</button>
+                                    </div>
+                                </div>
+                                
+                                <div class="modal-right" id="modal-div-obj">
+                                </div>
+                            </div>
+                            
+                        </form>
+                    </div>
+                </div>
+            </div>
             <script>
                 const modal = document.querySelector('.main-modal');
                 const closeButton = document.querySelectorAll('.modal-close');
+
+                const modal2 = document.querySelector('.main-modal2');
+                const closeButton2 = document.querySelectorAll('.modal-close2');
+                const title2 = document.getElementById('modal-title2');
+                const object2 = document.getElementById("modal-object");
+
+                const paths = [@if($employee->documents)
+@foreach(json_decode($employee->documents) as $document)
+@foreach(json_decode($documents) as $db_document)
+@if($db_document->name == $document)
+@if($document_paths->first())
+@foreach($document_paths as $document_path)
+@if(limpaString($document_path->type))
+@if(limpaString($document_path->type) == limpaString($db_document->name))
+<?php $document_name_display = $document_path->name;
+$document_path_display = $document_path->path; ?>
+<?php echo htmlspecialchars_decode("{type:\"".$document_path->type."\",path:\"".url("storage/{$document_path->path}/{$document_path->name}#view=FitH")."\"},") ?>
+@break
+@endif
+@endif
+@endforeach
+@endif
+@endif
+@endforeach
+@endforeach
+@endif
+];
 
                 const modalClose = () => {
                     modal.classList.remove('fadeIn');
@@ -164,7 +299,91 @@ function limpaString($string) {
                     }
                 }
                 @error('document_manager') openModal() @enderror
+
+                const modalClose2 = () => {
+                    modal2.classList.remove('fadeIn');
+                    modal2.classList.add('fadeOut');
+                    setTimeout(() => {
+                        modal2.style.display = 'none';
+                    }, 500);
+                }
+
+                const openModal2 = (title) => {
+                    var OldElement = document.getElementById("modal-object");
+                    if(OldElement) {
+                        OldElement.remove();
+                    }
+                    // type="application/pdf" width="100%" height="500px"
+                    var NewElement = document.createElement('object');
+                    NewElement.type = 'application/pdf';
+                    NewElement.data = 'temp';
+                    NewElement.id = 'modal-object';
+                    NewElement.classList.add('modal-size-pdf');
+
+                    var NewPha = document.createElement('p');
+                    NewPha.innerText = 'Documento não existe!';
+                    NewPha.id = 'modal-object-p';
+                    NewPha.classList.add('modal-size-pdf');
+
+                    var element1 = document.getElementById("modal-div-obj");
+                    element1.appendChild(NewElement);
+                    
+                    var element2 = document.getElementById("modal-object");
+                    element2.appendChild(NewPha);
+                    for (let index = 0; index < paths.length; index++) {
+                        if(paths[index].type == title) {
+                            var OldElement = document.getElementById("modal-object");
+                            if(OldElement) {
+                                OldElement.remove();
+                            }
+
+                            var NewElement = document.createElement('object');
+                            NewElement.type = 'application/pdf';
+                            NewElement.data = paths[index].path;
+                            NewElement.id = 'modal-object';
+                            NewElement.classList.add('modal-size-pdf');
+                        }
+                        var NewPha = document.createElement('p');
+                        NewPha.innerText = 'Documento não existe!';
+                        NewPha.id = 'modal-object-p';
+                        NewPha.classList.add('modal-size-pdf');
+
+                        var element1 = document.getElementById("modal-div-obj");
+                        element1.appendChild(NewElement);
+                        
+                        var element2 = document.getElementById("modal-object");
+                        element2.appendChild(NewPha);
+
+                        
+                    }
+                    var modal_button2 = document.querySelector('.modal-form-button');
+                    modal_button2.id = title.concat('bt');
+
+                    var modal_button2 = document.querySelector('.modal-form-input');
+                    modal_button2.id = title.concat('fl');
+                    modal_button2.name = title;
+                    
+                    title2.innerText = title;
+                    modal2.classList.remove('fadeOut');
+                    modal2.classList.add('fadeIn');
+                    modal2.style.display = 'flex';
+                }
+
+                for (let i = 0; i < closeButton2.length; i++) {
+
+                    const elements2 = closeButton2[i];
+
+                    elements2.onclick = (e) => modalClose2();
+
+                    modal2.style.display = 'none';
+
+                    window.onclick = function (event) {
+                        if (event.target == modal2) modalClose2();
+                    }
+                }
+                @error('document_manager') openModal2() @enderror
             </script>
+            
             <div class="mt-5 md:mt-0 md:col-span-2">
                 <form method="post" action="{{ route('employees.update', [$company_id, $employee->id]) }}" enctype="multipart/form-data">
                     <div class="flex flex-col">
@@ -246,6 +465,47 @@ function limpaString($string) {
                                 @foreach(json_decode($employee->documents) as $document)
                                     @foreach(json_decode($documents) as $db_document)
                                         @if($db_document->name == $document)
+                                        <?php $document_name = $db_document->name;
+                                                $check_doc = false; ?>
+                                        @endif
+                                    @endforeach
+                                    <tr class="border-b">
+                                        <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            {{ $document_name }}
+                                        </th>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
+                                            
+                                        <button onclick="openModal2('{{ $document_name }}')" type="button" id="{{ limpaString($document_name).'btn' }}" class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150 mt-2 mr-2"
+                                            onclick="getDocument('{{ limpaString($document_name).'btn' }}', '{{ limpaString($document_name).'fl' }}')">
+                                            <?php $document_name_display = 'Enviar!' ?>
+                                            @if($document_paths->first())
+                                                @foreach($document_paths as $document_path)
+                                                    @if(limpaString($document_path->type))
+                                                        @if(limpaString($document_path->type) == limpaString($document_name))
+                                                            <?php $document_name_display = $document_path->name;
+                                                                $document_path_display = $document_path->path;
+                                                                $check_doc = true;  ?>
+                                                                
+                                                            @break
+                                                        @endif
+                                                    @endif
+                                                @endforeach
+                                            @endif
+                                            
+                                            {{ $document_name_display }}
+                                        </button>
+                                            @error('document'.$document_name)
+                                                <p class="text-sm text-red-600">{{ $message }}</p>
+                                            @enderror
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            @endif
+                            
+                            <!-- @if($employee->documents)
+                                @foreach(json_decode($employee->documents) as $document)
+                                    @foreach(json_decode($documents) as $db_document)
+                                        @if($db_document->name == $document)
                                             <?php $document_name = $db_document->name;
                                                 $check_doc = false; ?>
                                         @endif
@@ -281,7 +541,7 @@ function limpaString($string) {
                                         </td>
                                     </tr>
                                 @endforeach
-                            @endif
+                            @endif -->
                             <tr class="border-b">
                                 <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Setor
