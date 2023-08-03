@@ -17,7 +17,11 @@ function limpaString($string) {
         <div class="max-w-7xl mx-auto py-10 sm:px-6 lg:px-8">
             <div class="block mb-8 mb-4">
                 <a href="{{ route('employees.index', $company_id) }}" class="bg-gray-200 hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">Voltar a Lista</a>
-                <a href="#" onclick="openModal()" class="bg-gray-200 hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">Gerir Documentos</a>
+                @if(Auth::user()->type != 'Usuário')
+                    @if ($editor->tipo == 'Contratante')
+                        <a href="#" onclick="openModal()" class="bg-gray-200 hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">Gerir Documentos</a>
+                    @endif
+                @endif
             </div>
             <style>
                 .animated {
@@ -96,6 +100,11 @@ function limpaString($string) {
                     position: absolute;
                     bottom: 0;
                     right: 0;
+                    display: flex;
+                    flex-wrap: nowrap;
+                    align-items: center;
+                    width: 100%;
+                    justify-content: space-between;
                 }
 
                 .modal-size-pdf {
@@ -214,23 +223,26 @@ function limpaString($string) {
                                                 Data de Vencimento
                                             </th> 
                                             <td class="td200 px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
-                                                <input type="date" name="" id="" 
-                                                    class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full"
-                                                    wire:model.defer="" autocomplete="" />
+                                                    <input type="date" name="due_date" id="due_date" 
+                                                        class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full"
+                                                        wire:model.defer="state.due_date" autocomplete="due_date" value="" />
                                                 <div>
                                                     <!-- Input file -->
                                                 </div>
                                             </td>
                                         </tr>
                                     </table>
+
+                                    <input type="text" name="modal_type" id="modal_type" class="hidden" />
+
                                     <!--Footer-->
                                     <div class="pb-2 pt-2 save_button">
-                                        @error('document_manager')
-                                            <p class="text-sm text-red-600">{{ $message }}</p>
-                                        @enderror
                                         <button
                                             class="focus:outline-none modal-close2 px-4 bg-gray-400 p-3 rounded-lg text-black hover:bg-gray-300 inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:shadow-outline-gray disabled:opacity-25 transition ease-in-out duration-150">Salvar</button>
-                                    </div>
+                                            @error('document_uploader')
+                                                <p class="text-sm text-red-600">{{ $message }}</p>
+                                            @enderror
+                                        </div>
                                 </div>
                                 
                                 <div class="modal-right" id="modal-div-obj">
@@ -249,6 +261,29 @@ function limpaString($string) {
                 const closeButton2 = document.querySelectorAll('.modal-close2');
                 const title2 = document.getElementById('modal-title2');
                 const object2 = document.getElementById("modal-object");
+                const due_date = document.getElementById("due_date");
+
+                const due_dates = [@if($employee->documents)
+@foreach(json_decode($employee->documents) as $document)
+@foreach(json_decode($documents) as $db_document)
+@if($db_document->name == $document)
+@if($document_paths->first())
+@foreach($document_paths as $document_path)
+@if(limpaString($document_path->type))
+@if(limpaString($document_path->type) == limpaString($db_document->name))
+<?php $document_name_display = $document_path->name;
+$document_path_display = $document_path->path; ?>
+<?php echo htmlspecialchars_decode("{type:\"".$document_path->type."\",due_date:\"".$document_path->due_date."\"},"); ?>
+@break
+@endif
+@endif
+@endforeach
+@endif
+@endif
+@endforeach
+@endforeach
+@endif
+];
 
                 const paths = [@if($employee->documents)
 @foreach(json_decode($employee->documents) as $document)
@@ -260,7 +295,7 @@ function limpaString($string) {
 @if(limpaString($document_path->type) == limpaString($db_document->name))
 <?php $document_name_display = $document_path->name;
 $document_path_display = $document_path->path; ?>
-<?php echo htmlspecialchars_decode("{type:\"".$document_path->type."\",path:\"".url("storage/{$document_path->path}/{$document_path->name}#view=FitH")."\"},") ?>
+<?php echo htmlspecialchars_decode("{type:\"".$document_path->type."\",path:\"".url("storage/{$document_path->path}/{$document_path->name}#view=FitH")."\"},"); ?>
 @break
 @endif
 @endif
@@ -309,6 +344,10 @@ $document_path_display = $document_path->path; ?>
                 }
 
                 const openModal2 = (title) => {
+
+                    var modalType = document.getElementById("modal_type");
+                    modalType.value = title;
+
                     var OldElement = document.getElementById("modal-object");
                     if(OldElement) {
                         OldElement.remove();
@@ -330,6 +369,16 @@ $document_path_display = $document_path->path; ?>
                     
                     var element2 = document.getElementById("modal-object");
                     element2.appendChild(NewPha);
+
+                    for (let index = 0; index < due_dates.length; index++) {
+                        if(due_dates[index].type == title) {
+                            due_date.value = due_dates[index].due_date;
+                            break;
+                        } else {
+                            due_date.value = null;
+                        }
+                    }
+
                     for (let index = 0; index < paths.length; index++) {
                         if(paths[index].type == title) {
                             var OldElement = document.getElementById("modal-object");
@@ -381,7 +430,7 @@ $document_path_display = $document_path->path; ?>
                         if (event.target == modal2) modalClose2();
                     }
                 }
-                @error('document_manager') openModal2() @enderror
+                @error('document_uploader_type') openModal2('{{ $message }}') @enderror
             </script>
             
             <div class="mt-5 md:mt-0 md:col-span-2">
@@ -418,7 +467,7 @@ $document_path_display = $document_path->path; ?>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
                                     <input type="text" name="cpf" id="cpf"
                                     class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full"
-                                    wire:model.defer="state.cpf" autocomplete="cpf"
+                                    wire:model.defer="state.cpf" autocomplete="cpf"  onkeypress="$(this).mask('000.000.000-00')"
                                         value="{{ old('cpf', $employee->cpf) }}" />
                                     @error('cpf')
                                         <p class="text-sm text-red-600">{{ $message }}</p>

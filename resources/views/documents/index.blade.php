@@ -7,14 +7,16 @@
 
     <div>
         <div class="max-w-7xl mx-auto py-10 sm:px-6 lg:px-8">
-            @if(Auth::user()->type != 'Usuário')
-                @if ($editor->tipo == 'Contratante')
+            
                     <div class="block mb-8 sm:px-6 lg:px-8 mb-4">
-                        <a href="{{ route('employees.index', $company_id) }}" class="bg-gray-200 hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">Voltar aos Funcionários</a>
-                        <a href="{{ route('documents.create', $company_id) }}" class="bg-gray-200 hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">Cadastrar Documentos</a>
+                        <a href="{{ route('companies.show', $company_id) }}" class="bg-gray-200 hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">Voltar a Empresa</a>
+                        @if(Auth::user()->type != 'Usuário')
+                            @if ($editor->tipo == 'Contratante')
+                                <a href="{{ route('documents.create', $company_id) }}" class="bg-gray-200 hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">Cadastrar Documentos</a>
+                            @endif
+                        @endif
                     </div>
-                @endif
-            @endif
+                
             </form>
                 <!--Search Bar-->
                 <!-- <div class="relative">

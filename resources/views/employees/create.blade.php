@@ -49,7 +49,7 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
                                     <input type="date" name="admission" id="admission" 
                                     class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full"
-                                    wire:model.defer="state.admission" autocomplete="new-admission" />
+                                    wire:model.defer="state.admission"autocomplete="new-admission" />
                                     @error('admission')
                                         <p class="text-sm text-red-600">{{ $message }}</p>
                                     @enderror

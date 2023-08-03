@@ -72,7 +72,7 @@ class EmployeesController extends Controller {
             }
         }
 
-        return view('employees.index', compact('employees', 'sectors', 'responsibilities', 'company_id', 'employees_doc_status'));
+        return view('employees.index', compact('employees', 'sectors', 'responsibilities', 'company_id', 'employees_doc_status', 'editor'));
     }
     
     public function create(Int $company_id) {
@@ -84,7 +84,6 @@ class EmployeesController extends Controller {
             ->first();
         
         $companies = DB::table('companies')
-            ->where('company_relations.id_contratante', $editor->id_company)
             ->where('companies.id', $company_id)
             ->join('company_relations', function($join) {
                 $join
@@ -201,10 +200,11 @@ class EmployeesController extends Controller {
             ->select('employees.*', 'companies.nome_fantasia AS company', 'responsibilities.name AS responsibility', 'sectors.name AS sector')
             ->first();
 
-        if($editor->company != $employee->company) abort(403, 'Access denied');
+        // if($editor->company != $employee->company) abort(403, 'Access denied');
 
         $documents = DB::table('documents')
             ->join('companies', 'companies.id', '=', 'documents.id_company')
+            ->where('companies.id', $company_id)
             ->join('company_relations', function($join) {
                 $join
                     ->on('companies.id', '=', 'company_relations.id_contratada')
@@ -216,10 +216,8 @@ class EmployeesController extends Controller {
         $document_paths = DB::table('document_paths')
             ->where('id_employee', $employee->id)
             ->get();
-        
-        
+
         $companies = DB::table('companies')
-            ->where('company_relations.id_contratante', $editor->id_company)
             ->where('companies.id', $company_id)
             ->join('company_relations', function($join) {
                 $join
@@ -257,7 +255,7 @@ class EmployeesController extends Controller {
             ->get();
 
         
-        return view('employees.edit', compact('employee', 'documents', 'companies', 'sectors', 'responsibilities', 'document_paths', 'company_id'));
+        return view('employees.edit', compact('employee', 'documents', 'companies', 'sectors', 'responsibilities', 'document_paths', 'company_id', 'editor'));
     }
     
     public function update(Int $company_id, UpdateEmployeeRequest $request, Employee $employee) {
@@ -318,11 +316,12 @@ class EmployeesController extends Controller {
         // if($editor->id_company != $employee->id_company) abort(403, 'Access denied');
         if($employee->documents){
             foreach (json_decode($employee->documents) as $document) {
+                $old_document = DB::table('document_paths')
+                    ->where('id_employee', $employee->id)
+                    ->where('type', $document)
+                    ->first();
                 if($request->{$document}) {
-                    $old_document = DB::table('document_paths')
-                        ->where('id_employee', $employee->id)
-                        ->where('type', $document)
-                        ->first();
+                    if(!(isset($request->due_date))) throw ValidationException::withMessages(['document_uploader' => 'Você deve enviar uma data de vencimento válida.', 'document_uploader_type'  => $document]);
 
                     $company = DB::table('companies')
                         ->where('companies.id', $employee->id_company)
@@ -338,7 +337,7 @@ class EmployeesController extends Controller {
                         ->first();
 
                     $extension = $request->{$document}->getClientOriginalExtension();
-                    if($extension != 'pdf') throw ValidationException::withMessages(['document'.$document => 'Você deve enviar somente arquivos do tipo pdf.']);
+                    if($extension != 'pdf') throw ValidationException::withMessages(['document_uploader' => 'Você deve enviar somente arquivos do tipo pdf.', 'document_uploader_type'  => $document]);
 
                     $path = 'documentos/'.$company->nome_fantasia.'/'.$employee->name;
                     $path = preg_replace('/[ -]+/' , '_' , strtolower( preg_replace("[^a-zA-Z0-9-]", "-", strtr(utf8_decode(trim($path)), utf8_decode("áàãâéêíóôõúüñçÁÀÃÂÉÊÍÓÔÕÚÜÑÇ"), "aaaaeeiooouuncAAAAEEIOOOUUNC-")) ));
@@ -362,11 +361,24 @@ class EmployeesController extends Controller {
                         $request->{$document}->storeAs($path, $document_name);
                         $document_path_model = array(
                             'path' => $path,
+                            'due_date' => $request->due_date,
                             'name' => $document_name,
                             'type' => $document,
                             'id_employee' => $employee->id,
                         );
                         $document_path = Document_path::create($document_path_model);
+                    }
+                } else {
+                    if($old_document) {
+                        if($old_document->type == $request->modal_type) {
+                            if($request->due_date) {
+                                $old_document = Document_path::findOrFail($old_document->id);
+                                $old_document->due_date = $request->due_date;
+                                $old_document->update();
+                            }
+                        }
+                    } else {
+                        throw ValidationException::withMessages(['document_uploader' => 'Você deve enviar um arquivo!', 'document_uploader_type'  => $request->modal_type]);
                     }
                 }
             }

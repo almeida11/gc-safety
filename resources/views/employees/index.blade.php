@@ -10,10 +10,8 @@
             <div class="block mb-8 sm:px-6 lg:px-8 mb-4">
                 <a href="{{ route('companies.show', $company_id) }}" class="bg-gray-200 hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">Voltar a Empresa</a>
                 <a href="{{ route('employees.create', $company_id) }}" class="bg-gray-200 hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">Cadastrar Funcionário</a>
-                <a href="{{ route('responsibilities.index', $company_id) }}" class="bg-gray-200 hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">Cargos</a>
-                <a href="{{ route('sectors.index', $company_id) }}" class="bg-gray-200 hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">Setores</a>
-                <a href="{{ route('documents.index', $company_id) }}" class="bg-gray-200 hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">Tipos de Documentos</a>
-            </div>
+                
+                    </div>
             </form>
                 <!--Search Bar-->
                 <!-- <div class="relative">
@@ -88,18 +86,15 @@
                                             @endif
                                             {{ $texto_status }}
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                         <td class=" py-4 whitespace-nowrap text-sm font-medium">
                                             <a href="{{ route('employees.show', ['company_id' => $company_id, 'employee' => $employee->id]) }}" class="mb-2 mr-2 bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-2 rounded">Verificar</a>
                                             @if(Auth::user()->type != 'Usuário')
                                                 <a href="{{ route('employees.edit', [$company_id, $employee->id]) }}" class="mb-2 mr-2 bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-2 rounded">Editar</a>
-                                                
-                                                    <form class="inline-block" action="{{ route('employees.destroy', [$company_id, $employee->id]) }}" method="POST" onsubmit="return confirm('Você tem certeza?');">
-                                                        <input type="hidden" name="_method" value="DELETE" >
-                                                        @csrf
-                                                        <input type="submit" class="mb-2 mr-2 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-2 rounded" value="Desativar">
-                                                    </form>
-                                                
+                                                <form class="inline-block" action="{{ route('employees.destroy', [$company_id, $employee->id]) }}" method="POST" onsubmit="return confirm('Você tem certeza?');">
+                                                    <input type="hidden" name="_method" value="DELETE" >
+                                                    @csrf
+                                                    <input type="submit" class="mb-2 mr-2 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-2 rounded" value="Desativar">
+                                                </form>
                                             @endif
                                         </td>
                                     </tr>

@@ -13,9 +13,10 @@ return new class extends Migration
     {
         Schema::create('document_paths', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('path');
-            $table->string('type');
+            $table->string('name')->nullable();
+            $table->string('path')->nullable();
+            $table->string('type')->nullable();
+            $table->date('due_date')->nullable();
             $table->unsignedBigInteger('id_employee')->nullable();
             $table->foreign('id_employee')->references('id')->on('employees')->onDelete('cascade')->nullable();
             $table->timestamps();

@@ -52,7 +52,6 @@ class DocumentsController extends Controller {
             ->paginate(9);
 
         $companies = DB::table('companies')
-            ->where('company_relations.id_contratante', $editor->id_company)
             ->where('companies.id', $company_id)
             ->join('company_relations', function($join) {
                 $join
@@ -99,7 +98,6 @@ class DocumentsController extends Controller {
         ->first();
         
         $companies = DB::table('companies')
-            ->where('company_relations.id_contratante', $editor->id_company)
             ->where('companies.id', $company_id)
             ->join('company_relations', function($join) {
                 $join

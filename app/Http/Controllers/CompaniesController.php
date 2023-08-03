@@ -200,6 +200,8 @@ class CompaniesController extends Controller {
     }
 
     public function show(Company $company) { 
+        $company_id = $company->id;
+
         $editor = DB::table('users')
             ->where('users.id', Auth::user()->id)
             ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
@@ -245,17 +247,20 @@ class CompaniesController extends Controller {
             if(!($editor->company == $company->nome_fantasia)) abort(404, 'Access denied');
         }
         
-        return view('companies.show', compact('company', 'users', 'editor'));
+        return view('companies.show', compact('company', 'users', 'editor', 'company_id'));
     }
 
     public function edit(Company $company) {
+
+        $company_id = $company->id;
+
         if(!(Auth::user()->type == 'Moderador' || Auth::user()->type == 'Administrador')) abort(404, 'Access denied');
 
         $editor = DB::table('users')
             ->where('users.id', Auth::user()->id)
             ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
             ->join('companies', 'companies.id', '=', 'user_relations.id_company')
-            ->select('users.*', 'companies.nome_fantasia AS company', 'user_relations.is_manager AS is_manager', 'companies.id AS id_company')
+            ->select('users.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo', 'companies.id AS id_company', 'user_relations.is_manager AS is_manager')
             ->first();
         
         $users = DB::table('users')
@@ -274,7 +279,7 @@ class CompaniesController extends Controller {
             ->select('companies.*', 'users.id AS id_manager')
             ->first();
 
-        return view('companies.edit', compact('company', 'users', 'editor'));
+        return view('companies.edit', compact('company', 'users', 'editor', 'company_id'));
     }
     
     public function update(UpdateCompanyRequest $request, Company $company) {
