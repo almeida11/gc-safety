@@ -288,7 +288,7 @@ class EmployeesController extends Controller {
         return redirect()->route('employees.index', $company_id);
     }
 
-    public function editdoc(Int $company_id, Int $employee_id, Request $request) {
+    public function editdoc(Int $company_id, Int $employee_id, Request $request) { // Tipos de Documentos
         $employee = Employee::findOrFail($employee_id);
 
         if(json_decode($employee->documents)){
@@ -304,14 +304,14 @@ class EmployeesController extends Controller {
                 }
             }
         }
-        
+
         $employee->documents = $request->documents;
         $employee->save();
         
         return redirect()->route('employees.edit', [$company_id, $employee_id]);
     }
 
-    public function updatedoc(Int $company_id, Int $employee_id, Request $request) {
+    public function updatedoc(Int $company_id, Int $employee_id, Request $request) { // Envio de documentos
         $employee = Employee::findOrFail($employee_id);
         // if($editor->id_company != $employee->id_company) abort(403, 'Access denied');
         if($employee->documents){
@@ -339,14 +339,25 @@ class EmployeesController extends Controller {
                     $extension = $request->{$document}->getClientOriginalExtension();
                     if($extension != 'pdf') throw ValidationException::withMessages(['document_uploader' => 'Você deve enviar somente arquivos do tipo pdf.', 'document_uploader_type'  => $document]);
 
-                    $path = 'documentos/'.$company->nome_fantasia.'/'.$employee->name;
+                    $path = 'documents/'.$company->nome_fantasia.'/'.$employee->name;
                     $path = preg_replace('/[ -]+/' , '_' , strtolower( preg_replace("[^a-zA-Z0-9-]", "-", strtr(utf8_decode(trim($path)), utf8_decode("áàãâéêíóôõúüñçÁÀÃÂÉÊÍÓÔÕÚÜÑÇ"), "aaaaeeiooouuncAAAAEEIOOOUUNC-")) ));
 
                     $document_name = $document . '_' . $employee->id. "_" . $employee->name . ".{$extension}";
                     $document_name = preg_replace('/[ -]+/' , '_' , strtolower( preg_replace("[^a-zA-Z0-9-]", "-", strtr(utf8_decode(trim($document_name)), utf8_decode("áàãâéêíóôõúüñçÁÀÃÂÉÊÍÓÔÕÚÜÑÇ"), "aaaaeeiooouuncAAAAEEIOOOUUNC-")) ));
                     
                     if($old_document){
-                        if (Storage::exists($old_document->name)) {
+                        if (Storage::exists($old_document->path . "/" . $old_document->name)) {
+                            $path_to_old = $old_document->path . "/old/";
+                            $name_to_old = (String) (count($files = Storage::files($old_document->path . "/old")) + 1). "_" . $old_document->name;
+                            Storage::move($old_document->path . "/" . $old_document->name, $path_to_old . $name_to_old);
+                            $document_path_model = array(
+                                'path' => $path_to_old,
+                                'due_date' => $old_document->due_date,
+                                'name' => $name_to_old,
+                                'type' => $old_document->type,
+                                'id_employee' => $old_document->id_employee,
+                            );
+                            $document_path = Document_path::create($document_path_model);
                             Storage::delete($old_document->name);
                         }
                         $request->{$document}->storeAs($path, $document_name);
