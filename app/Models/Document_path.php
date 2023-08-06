@@ -12,6 +12,8 @@ class Document_path extends Model
     protected $fillable = [
         'name',
         'type',
+        'actual',
+        'status',
         'due_date',
         'path',
         'id_employee',

@@ -16,6 +16,8 @@ return new class extends Migration
             $table->string('name')->nullable();
             $table->string('path')->nullable();
             $table->string('type')->nullable();
+            $table->string('status')->nullable();
+            $table->integer('actual')->nullable();
             $table->date('due_date')->nullable();
             $table->unsignedBigInteger('id_employee')->nullable();
             $table->foreign('id_employee')->references('id')->on('employees')->onDelete('cascade')->nullable();

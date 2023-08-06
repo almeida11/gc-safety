@@ -43,6 +43,10 @@
             }
 
             function changeName(e) {
+                let modal_date_create = document.getElementById('modal_date_create');
+                if(modal_date_create) {
+                    modal_date_create.classList.remove("hidden");
+                }
                 var url = e.value;
                 let button = document.getElementById(e.id.slice(0, -2).concat('bt'));
                 button.innerText =url.split(/(\\|\/)/g).pop();
@@ -55,6 +59,20 @@
                     evt.innerText = 'NÃO EXIGIR!';
                 } else {
                     evt.innerText = 'EXIGIR!';
+                }
+            }
+
+            function allowUpdate() {
+                let modal_save_update = document.getElementById('modal_save_update');
+                if(modal_save_update) {
+                    modal_save_update.classList.remove("hidden");
+                }
+            }
+
+            function allowCreate() {
+                let modal_save_create = document.getElementById('modal_save_create');
+                if(modal_save_create) {
+                    modal_save_create.classList.remove("hidden");
                 }
             }
             

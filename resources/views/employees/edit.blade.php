@@ -17,7 +17,7 @@ function limpaString($string) {
         <div class="max-w-7xl mx-auto py-10 sm:px-6 lg:px-8">
             <div class="block mb-8 mb-4">
                 <a href="{{ route('employees.index', $company_id) }}" class="bg-gray-200 hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">Voltar a Lista</a>
-                @if(Auth::user()->type != 'Usuário')
+                @if(Auth::user()->type != 'Funcionário')
                     @if ($editor->tipo == 'Contratante')
                         <a href="#" onclick="openModal()" class="bg-gray-200 hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">Gerir Documentos</a>
                     @endif
@@ -74,6 +74,7 @@ function limpaString($string) {
                     width:500px;
                 }
                 .table_info {
+                    height: 100%;
                     display: flex;
                     flex-direction: row;
                     flex-wrap: nowrap;
@@ -97,23 +98,34 @@ function limpaString($string) {
                     padding-top: .5rem;
                     padding-bottom: .5rem;
                     float: right;
-                    position: absolute;
                     bottom: 0;
                     right: 0;
                     display: flex;
                     flex-wrap: nowrap;
                     align-items: center;
-                    width: 100%;
                     justify-content: space-between;
                 }
 
                 .modal-size-pdf {
                     width: 1100px;
-                    height: 800px;
+                    height: 100%;
                     text-align: center;
                     -webkit-box-shadow: 10px 10px 29px -4px rgba(0,0,0,0.49);
                     -moz-box-shadow: 10px 10px 29px -4px rgba(0,0,0,0.49);
                     box-shadow: 10px 10px 29px -4px rgba(0,0,0,0.49);
+                }
+
+                .modal_body {
+                    height: 80vh;
+                }
+
+                .text-reset {
+                    margin: 0;
+                    padding: 0;
+                    border: 0;
+                    font-size: 100%;
+                    font: inherit;
+                    vertical-align: baseline;
                 }
             </style>
 
@@ -196,14 +208,58 @@ function limpaString($string) {
                             </div>
                         </div>
                         <!--Body-->
-                        <div class="my-5">
+                        <div class="my-5 modal_body">
                             <form class="table_info"  method="post" action="{{ route('updatedoc', [$company_id, $employee->id]) }}" enctype="multipart/form-data">
                                 @csrf
                                 <div class="modal-left">
-                                    <table class="min-w-full divide-y divide-gray-200 w-full">
+                                    <table id="modal-table" class="min-w-full divide-y divide-gray-200 w-full">
+                                        <tr class="border-b"  id="modal_doc_info">
+                                            <th colspan='2' scope="col" class="px-6 py-3 bg-gray-50 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                Dados do Documento
+                                            </th> 
+                                        </tr>
+                                        <tr class="border-b hidden" id="modal_date_info">
+                                            <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                Data de Vencimento
+                                            </th> 
+                                            <td class="td200 px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
+                                                    <input type="date" name="old_due_date" id="old_due_date" 
+                                                        class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full"
+                                                        wire:model.defer="state.old_due_date" autocomplete="old_due_date" value="" onchange="allowUpdate()" />
+                                                <div>
+                                                    <!-- Input file -->
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr class="border-b hidden" id="modal_status_info">
+                                            <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                Status
+                                            </th> 
+                                            <td id="modal-status" class="td200 px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
+                                                
+                                            </td>
+                                        </tr>
+                                        <tr class="border-b hidden" id="modal_save_update">
+                                            <th colspan='2' scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 tracking-wider">
+                                                <div class="pb-2 pt-2 save_button">
+                                                    @error('document_uploader')
+                                                        <p id="document_uploader" class="text-reset text-sm text-red-600">{{ $message }}</p>
+                                                    @enderror
+                                                    <button id="save_button"
+                                                        class="ml-2 focus:outline-none modal-close2 px-4 bg-gray-400 p-3 rounded-lg text-black hover:bg-gray-300 inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:shadow-outline-gray disabled:opacity-25 transition ease-in-out duration-150">Salvar</button>
+                                                        
+                                                </div>
+                                            </th> 
+                                        
+                                        </tr>
+                                        <tr class="border-b">
+                                            <th colspan='2' scope="col" class="px-6 py-3 bg-gray-50 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                Enviar novo Documento
+                                            </th> 
+                                        </tr>
                                         <tr class="border-b">
                                             <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                Enviar Documento
+                                                Documento 
                                             </th> 
                                             <td class="td200 px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
                                                 <button type="button" id="1" class="modal-form-button inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150 mt-2 mr-2"
@@ -218,31 +274,43 @@ function limpaString($string) {
                                                 </div>
                                             </td>
                                         </tr>
-                                        <tr class="border-b">
+                                        <tr class="border-b hidden" id="modal_date_create">
                                             <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                                 Data de Vencimento
                                             </th> 
                                             <td class="td200 px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
-                                                    <input type="date" name="due_date" id="due_date" 
+                                                    <input type="date" name="new_due_date" id="new_due_date" 
                                                         class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full"
-                                                        wire:model.defer="state.due_date" autocomplete="due_date" value="" />
+                                                        wire:model.defer="state.new_due_date" autocomplete="new_due_date" value="" onchange="allowCreate()"  />
                                                 <div>
                                                     <!-- Input file -->
                                                 </div>
                                             </td>
+                                        </tr>
+                                        <tr class="border-b hidden" id="modal_save_create">
+                                            <th colspan='2' scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 tracking-wider">
+                                                <div class="pb-2 pt-2 save_button">
+                                                    @error('document_uploader')
+                                                        <p id="document_uploader" class="text-reset text-sm text-red-600">{{ $message }}</p>
+                                                    @enderror
+                                                    <button id="save_button"
+                                                        class="ml-2 focus:outline-none modal-close2 px-4 bg-gray-400 p-3 rounded-lg text-black hover:bg-gray-300 inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:shadow-outline-gray disabled:opacity-25 transition ease-in-out duration-150">Salvar</button>
+                                                        
+                                                </div>
+                                            </th> 
+                                        
+                                        </tr>
+                                        <tr class="border-b hidden" id="modal_historic">
+                                            <th colspan='2' scope="col" class="px-6 py-3 bg-gray-50 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                Histórico de Envios
+                                            </th> 
                                         </tr>
                                     </table>
 
                                     <input type="text" name="modal_type" id="modal_type" class="hidden" />
 
                                     <!--Footer-->
-                                    <div class="pb-2 pt-2 save_button">
-                                        <button
-                                            class="focus:outline-none modal-close2 px-4 bg-gray-400 p-3 rounded-lg text-black hover:bg-gray-300 inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:shadow-outline-gray disabled:opacity-25 transition ease-in-out duration-150">Salvar</button>
-                                            @error('document_uploader')
-                                                <p class="text-sm text-red-600">{{ $message }}</p>
-                                            @enderror
-                                        </div>
+                                    
                                 </div>
                                 
                                 <div class="modal-right" id="modal-div-obj">
@@ -261,20 +329,28 @@ function limpaString($string) {
                 const closeButton2 = document.querySelectorAll('.modal-close2');
                 const title2 = document.getElementById('modal-title2');
                 const object2 = document.getElementById("modal-object");
-                const due_date = document.getElementById("due_date");
+                const old_due_date = document.getElementById("old_due_date");
+                const modal_status = document.getElementById("modal-status");
+                const save_button = document.getElementById("save_button");
+                const modal_doc_info = document.getElementById("modal_doc_info");
+                const modal_date_info = document.getElementById("modal_date_info");
+                const modal_status_info = document.getElementById("modal_status_info");
+                const modal_historic = document.getElementById("modal_historic");
 
-                const due_dates = [@if($employee->documents)
+            
+                const paths = [@if($employee->documents)
 @foreach(json_decode($employee->documents) as $document)
 @foreach(json_decode($documents) as $db_document)
 @if($db_document->name == $document)
 @if($document_paths->first())
 @foreach($document_paths as $document_path)
+@if($document_path->actual == 1)
 @if(limpaString($document_path->type))
 @if(limpaString($document_path->type) == limpaString($db_document->name))
 <?php $document_name_display = $document_path->name;
 $document_path_display = $document_path->path; ?>
-<?php echo htmlspecialchars_decode("{type:\"".$document_path->type."\",due_date:\"".$document_path->due_date."\"},"); ?>
-@break
+<?php echo htmlspecialchars_decode("{type:\"".$document_path->type."\",path:\"".url("storage/{$document_path->path}/{$document_path->name}#view=FitH")."\", due_date: '".$document_path->due_date."', status: '" . $document_path->status . "'},"); ?>
+@endif
 @endif
 @endif
 @endforeach
@@ -284,25 +360,11 @@ $document_path_display = $document_path->path; ?>
 @endforeach
 @endif
 ];
-
-                const paths = [@if($employee->documents)
-@foreach(json_decode($employee->documents) as $document)
-@foreach(json_decode($documents) as $db_document)
-@if($db_document->name == $document)
-@if($document_paths->first())
+                const old_paths = [@if($document_paths->first())
 @foreach($document_paths as $document_path)
-@if(limpaString($document_path->type))
-@if(limpaString($document_path->type) == limpaString($db_document->name))
-<?php $document_name_display = $document_path->name;
-$document_path_display = $document_path->path; ?>
-<?php echo htmlspecialchars_decode("{type:\"".$document_path->type."\",path:\"".url("storage/{$document_path->path}/{$document_path->name}#view=FitH")."\"},"); ?>
-@break
+@if($document_path->actual == 0)
+<?php echo htmlspecialchars_decode("{type:\"".$document_path->type."\",path:\"".url("storage/{$document_path->path}/{$document_path->name}#view=FitH")."\", due_date: '".$document_path->due_date."', status: '" . $document_path->status . "'},"); ?>
 @endif
-@endif
-@endforeach
-@endif
-@endif
-@endforeach
 @endforeach
 @endif
 ];
@@ -343,8 +405,18 @@ $document_path_display = $document_path->path; ?>
                     }, 500);
                 }
 
-                const openModal2 = (title) => {
+                const openModal2 = (title, path_par = false) => {
 
+                    let button_update = document.getElementById('modal_save_update');
+                    button_update.classList.add("hidden");
+
+                    var modal_tr_list = document.querySelectorAll('.modal-tr');
+
+                    if (modal_tr_list) {
+                        for (let index = 0; index < modal_tr_list.length; index++) {
+                            modal_tr_list[index].remove();
+                        }
+                    }
                     var modalType = document.getElementById("modal_type");
                     modalType.value = title;
 
@@ -353,57 +425,149 @@ $document_path_display = $document_path->path; ?>
                         OldElement.remove();
                     }
                     // type="application/pdf" width="100%" height="500px"
-                    var NewElement = document.createElement('object');
-                    NewElement.type = 'application/pdf';
-                    NewElement.data = 'temp';
-                    NewElement.id = 'modal-object';
-                    NewElement.classList.add('modal-size-pdf');
+                    var objectPdfViewer = document.createElement('object');
+                    objectPdfViewer.type = 'application/pdf';
+                    objectPdfViewer.data = 'temp';
+                    objectPdfViewer.id = 'modal-object';
+                    objectPdfViewer.classList.add('modal-size-pdf');
 
-                    var NewPha = document.createElement('p');
-                    NewPha.innerText = 'Documento não existe!';
-                    NewPha.id = 'modal-object-p';
-                    NewPha.classList.add('modal-size-pdf');
+                    var elementPHtmlPdfViewer = document.createElement('p');
+                    elementPHtmlPdfViewer.innerText = 'Documento não existe!';
+                    elementPHtmlPdfViewer.id = 'modal-object-p';
+                    elementPHtmlPdfViewer.classList.add('modal-size-pdf');
 
-                    var element1 = document.getElementById("modal-div-obj");
-                    element1.appendChild(NewElement);
+                    var modal_div_obj = document.getElementById("modal-div-obj");
+                    modal_div_obj.appendChild(objectPdfViewer);
                     
-                    var element2 = document.getElementById("modal-object");
-                    element2.appendChild(NewPha);
-
-                    for (let index = 0; index < due_dates.length; index++) {
-                        if(due_dates[index].type == title) {
-                            due_date.value = due_dates[index].due_date;
-                            break;
-                        } else {
-                            due_date.value = null;
-                        }
-                    }
-
-                    for (let index = 0; index < paths.length; index++) {
-                        if(paths[index].type == title) {
-                            var OldElement = document.getElementById("modal-object");
-                            if(OldElement) {
-                                OldElement.remove();
+                    var modal_object = document.getElementById("modal-object"); 
+                    modal_object.appendChild(elementPHtmlPdfViewer);
+                    
+                    if(!(path_par)){
+                        for (let index = 0; index < paths.length; index++) {
+                            if(paths[index].type == title) {
+                                old_due_date.value = paths[index].due_date;
+                                modal_status.innerText = paths[index].status;
+                                modal_doc_info.classList.remove("hidden");
+                                modal_date_info.classList.remove("hidden");
+                                modal_status_info.classList.remove("hidden");
+                                modal_historic.classList.remove("hidden");
+                                break;
+                            } else {
+                                old_due_date.value = null;
+                                modal_status.innerText = null;
+                                modal_doc_info.classList.add("hidden");
+                                modal_date_info.classList.add("hidden");
+                                modal_status_info.classList.add("hidden");
+                                modal_historic.classList.add("hidden");
+                                var elementMainTRButtonOldPDFViewer = document.getElementById("main-modal-tr");
+                                if(elementMainTRButtonOldPDFViewer) {
+                                    elementMainTRButtonOldPDFViewer.remove();
+                                }
+                                
                             }
-
-                            var NewElement = document.createElement('object');
-                            NewElement.type = 'application/pdf';
-                            NewElement.data = paths[index].path;
-                            NewElement.id = 'modal-object';
-                            NewElement.classList.add('modal-size-pdf');
                         }
-                        var NewPha = document.createElement('p');
-                        NewPha.innerText = 'Documento não existe!';
-                        NewPha.id = 'modal-object-p';
-                        NewPha.classList.add('modal-size-pdf');
+                        for (let index = 0; index < paths.length; index++) {
+                            if(paths[index].type == title) {
+                                var modal_button2 = document.getElementById(title.concat('bt'));
+                                if(modal_button2) {
+                                    modal_button2.disabled = false;
+                                }
+                                save_button.disabled = false;
+                                old_due_date.disabled = false;
 
-                        var element1 = document.getElementById("modal-div-obj");
-                        element1.appendChild(NewElement);
-                        
-                        var element2 = document.getElementById("modal-object");
-                        element2.appendChild(NewPha);
+                                var modal_object = document.getElementById("modal-object");
+                                if(modal_object) {
+                                    modal_object.remove();
+                                }
+                                
+                                var elementMainTRButtonOldPDFViewer = document.getElementById("main-modal-tr");
+                                if(elementMainTRButtonOldPDFViewer) {
+                                    elementMainTRButtonOldPDFViewer.remove();
+                                }
 
+                                var objectPdfViewer = document.createElement('object');
+                                objectPdfViewer.type = 'application/pdf';
+                                objectPdfViewer.data = paths[index].path;
+                                objectPdfViewer.id = 'modal-object';
+                                objectPdfViewer.classList.add('modal-size-pdf');
+
+                                var elementMainTRButtonOldPDFViewer = document.createElement('tr');
+                                elementMainTRButtonOldPDFViewer.id = 'main-modal-tr';
+                                elementMainTRButtonOldPDFViewer.classList.add('main-modal-tr', 'border-b');
+
+                                var main_modal_table = document.getElementById('modal-table').getElementsByTagName('tbody')[0]; 
+                                main_modal_table.appendChild(elementMainTRButtonOldPDFViewer);
+
+                                var elementMainTHButtonOldPDFViewer = document.createElement('th');
+                                elementMainTHButtonOldPDFViewer.id = 'main-modal-th';
+                                elementMainTHButtonOldPDFViewer.innerText = 'ATUAL';
+                                elementMainTHButtonOldPDFViewer.classList.add('px-6', 'py-3', 'bg-gray-50', 'text-left', 'text-xs', 'font-medium', 'text-gray-500', 'uppercase', 'tracking-wider');
+
+                                var main_modal_tr = document.getElementById('main-modal-tr'); 
+                                main_modal_tr.appendChild(elementMainTHButtonOldPDFViewer);
+
+                                var elementMainTDButtonOldPDFViewer = document.createElement('td');
+                                elementMainTDButtonOldPDFViewer.id = 'main-modal-td';
+                                elementMainTDButtonOldPDFViewer.classList.add('td200', 'px-6', 'py-4', 'whitespace-nowrap', 'text-sm', 'text-gray-900', 'bg-white', 'divide-y', 'divide-gray-200');
+
+                                main_modal_tr.appendChild(elementMainTDButtonOldPDFViewer);
+
+                                var elementMainButtonOldPDFViewer = document.createElement('button');
+                                elementMainButtonOldPDFViewer.onclick = function () {
+                                    openModal2(title);
+                                };
+                                elementMainButtonOldPDFViewer.type = 'button';
+                                elementMainButtonOldPDFViewer.id = 'main-modal-btn';
+                                elementMainButtonOldPDFViewer.disabled = true;
+                                elementMainButtonOldPDFViewer.innerText = 'Verificar!';
+                                elementMainButtonOldPDFViewer.classList.add('inline-flex' ,'items-center' ,'px-4' ,'py-2' ,'bg-white' ,'border' ,'border-gray-300' ,'rounded-md' ,'font-semibold' ,'text-xs' ,'text-gray-700' ,'uppercase' ,'tracking-widest' ,'shadow-sm' ,'hover:bg-gray-50' ,'focus:outline-none' ,'focus:ring-2' ,'focus:ring-indigo-500' ,'focus:ring-offset-2' ,'disabled:opacity-25' ,'transition' ,'ease-in-out' ,'duration-150' ,'mt-2' ,'mr-2');
+
+                                var modal_td = document.getElementById('main-modal-td'); 
+                                modal_td.appendChild(elementMainButtonOldPDFViewer);
+                            }
+                            var elementPHtmlPdfViewer = document.createElement('p');
+                            elementPHtmlPdfViewer.innerText = 'Documento não existe!';
+                            elementPHtmlPdfViewer.id = 'modal-object-p';
+                            elementPHtmlPdfViewer.classList.add('modal-size-pdf');
+
+                            var modal_div_obj = document.getElementById("modal-div-obj");
+                            modal_div_obj.appendChild(objectPdfViewer);
+                            
+                            var modal_object = document.getElementById("modal-object");
+                            modal_object.appendChild(elementPHtmlPdfViewer);
+                            
+                        }
+                    } else {
+                        var modal_button2 = document.getElementById(title.concat('bt'));
+                        modal_button2.disabled = true;
+                        var elementMainButtonOldPDFViewer = document.getElementById("main-modal-btn");
+                        elementMainButtonOldPDFViewer.disabled = false;
+                        old_due_date.value = path_par.due_date;
+                        modal_status.innerText = path_par.status;
+                        old_due_date.disabled = true;
+                        old_due_date.name = null;
+                        save_button.disabled = true;
+
+                        var OldElement = document.getElementById("modal-object");
+                        if(OldElement) {
+                            OldElement.remove();
+                        }
+
+                        var objectPdfViewer = document.createElement('object');
+                        objectPdfViewer.type = 'application/pdf';
+                        objectPdfViewer.data = path_par.path;
+                        objectPdfViewer.id = 'modal-object';
+                        objectPdfViewer.classList.add('modal-size-pdf');
+                        var elementPHtmlPdfViewer = document.createElement('p');
+                        elementPHtmlPdfViewer.innerText = 'Documento não existe!';
+                        elementPHtmlPdfViewer.id = 'modal-object-p';
+                        elementPHtmlPdfViewer.classList.add('modal-size-pdf');
+
+                        var modal_div_obj = document.getElementById("modal-div-obj");
+                        modal_div_obj.appendChild(objectPdfViewer);
                         
+                        var modal_object = document.getElementById("modal-object");
+                        modal_object.appendChild(elementPHtmlPdfViewer);
                     }
                     var modal_button2 = document.querySelector('.modal-form-button');
                     modal_button2.id = title.concat('bt');
@@ -416,6 +580,50 @@ $document_path_display = $document_path->path; ?>
                     modal2.classList.remove('fadeOut');
                     modal2.classList.add('fadeIn');
                     modal2.style.display = 'flex';
+
+                    for (let index = 0; index < old_paths.length; index++){
+                        if(old_paths[index].type == title) {
+                            // old_paths[index].type;
+                            modal_historic.classList.remove("hidden");
+
+                            var elementTRButtonOldPDFViewer = document.createElement('tr');
+                            elementTRButtonOldPDFViewer.id = 'modal-tr-'+ index;
+                            elementTRButtonOldPDFViewer.classList.add('modal-tr', 'border-b');
+
+                            var modal_table = document.getElementById('modal-table').getElementsByTagName('tbody')[0]; 
+                            modal_table.appendChild(elementTRButtonOldPDFViewer);
+
+                            var elementTHButtonOldPDFViewer = document.createElement('th');
+                            elementTHButtonOldPDFViewer.id = 'modal-th-'+ index;
+                            elementTHButtonOldPDFViewer.innerText = old_paths[index].due_date;
+                            elementTHButtonOldPDFViewer.classList.add('px-6', 'py-3', 'bg-gray-50', 'text-left', 'text-xs', 'font-medium', 'text-gray-500', 'uppercase', 'tracking-wider');
+
+                            var modal_tr = document.getElementById('modal-tr-'+ index); 
+                            modal_tr.appendChild(elementTHButtonOldPDFViewer);
+
+                            var elementTDButtonOldPDFViewer = document.createElement('td');
+                            elementTDButtonOldPDFViewer.id = 'modal-td-'+ index;
+                            elementTDButtonOldPDFViewer.classList.add('td200', 'px-6', 'py-4', 'whitespace-nowrap', 'text-sm', 'text-gray-900', 'bg-white', 'divide-y', 'divide-gray-200');
+
+                            modal_tr.appendChild(elementTDButtonOldPDFViewer);
+
+                            var elementButtonOldPDFViewer = document.createElement('button');
+                            elementButtonOldPDFViewer.onclick = function () {
+                                openModal2(title, old_paths[index]);
+                            };
+                            elementButtonOldPDFViewer.type = 'button';
+                            if(old_paths[index].path == path_par.path) {
+                                elementButtonOldPDFViewer.disabled = true;
+                            }
+                            elementButtonOldPDFViewer.id = 'modal-btn-'+ index;
+                            elementButtonOldPDFViewer.innerText = 'Verificar!';
+                            elementButtonOldPDFViewer.classList.add('inline-flex' ,'items-center' ,'px-4' ,'py-2' ,'bg-white' ,'border' ,'border-gray-300' ,'rounded-md' ,'font-semibold' ,'text-xs' ,'text-gray-700' ,'uppercase' ,'tracking-widest' ,'shadow-sm' ,'hover:bg-gray-50' ,'focus:outline-none' ,'focus:ring-2' ,'focus:ring-indigo-500' ,'focus:ring-offset-2' ,'disabled:opacity-25' ,'transition' ,'ease-in-out' ,'duration-150' ,'mt-2' ,'mr-2');
+
+                            var modal_td = document.getElementById('modal-td-'+ index); 
+                            modal_td.appendChild(elementButtonOldPDFViewer);
+                        }
+                    }
+
                 }
 
                 for (let i = 0; i < closeButton2.length; i++) {
@@ -524,8 +732,7 @@ $document_path_display = $document_path->path; ?>
                                         </th>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
                                             
-                                        <button onclick="openModal2('{{ $document_name }}')" type="button" id="{{ limpaString($document_name).'btn' }}" class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150 mt-2 mr-2"
-                                            onclick="getDocument('{{ limpaString($document_name).'btn' }}', '{{ limpaString($document_name).'fl' }}')">
+                                        <button onclick="openModal2('{{ $document_name }}')" type="button" id="{{ limpaString($document_name).'btn' }}" class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150 mt-2 mr-2">
                                             <?php $document_name_display = 'Enviar!' ?>
                                             @if($document_paths->first())
                                                 @foreach($document_paths as $document_path)
@@ -637,7 +844,7 @@ $document_path_display = $document_path->path; ?>
                             </tr>
                             <tr class="border-b">
                                 <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Status do Usuário
+                                    Status do Funcionário
                                 </th>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
                                     <div class="col-span-6 sm:col-span-4">
@@ -660,7 +867,7 @@ $document_path_display = $document_path->path; ?>
 
                             <tr class="border-b">
                                 <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Usuário Criado Em
+                                    Funcionário Criado Em
                                 </th>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
                                     {{ $employee->created_at }}
@@ -668,7 +875,7 @@ $document_path_display = $document_path->path; ?>
                             </tr>
                             <tr class="border-b">
                                 <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Usuário Atualizado Em
+                                    Funcionário Atualizado Em
                                 </th>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
                                     {{ $employee->updated_at }}

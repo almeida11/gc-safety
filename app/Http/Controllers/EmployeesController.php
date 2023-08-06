@@ -52,7 +52,7 @@ class EmployeesController extends Controller {
                     $hasntDoc = true;
                     foreach ($documents as $document_name) {
                         if($document) {
-                            if(($document_name->id_employee == $employee->id && $document_name->type == $document)) {
+                            if(($document_name->id_employee == $employee->id && $document_name->type == $document && $document_name->status == 'Aprovado')) {
                                 $hasntDoc = false;
                             }
                         }
@@ -71,7 +71,7 @@ class EmployeesController extends Controller {
                 }
             }
         }
-
+        
         return view('employees.index', compact('employees', 'sectors', 'responsibilities', 'company_id', 'employees_doc_status', 'editor'));
     }
     
@@ -321,7 +321,7 @@ class EmployeesController extends Controller {
                     ->where('type', $document)
                     ->first();
                 if($request->{$document}) {
-                    if(!(isset($request->due_date))) throw ValidationException::withMessages(['document_uploader' => 'Você deve enviar uma data de vencimento válida.', 'document_uploader_type'  => $document]);
+                    if(!(isset($request->new_due_date))) throw ValidationException::withMessages(['document_uploader' => 'Você deve enviar uma data de vencimento válida.', 'document_uploader_type'  => $document]);
 
                     $company = DB::table('companies')
                         ->where('companies.id', $employee->id_company)
@@ -344,7 +344,6 @@ class EmployeesController extends Controller {
 
                     $document_name = $document . '_' . $employee->id. "_" . $employee->name . ".{$extension}";
                     $document_name = preg_replace('/[ -]+/' , '_' , strtolower( preg_replace("[^a-zA-Z0-9-]", "-", strtr(utf8_decode(trim($document_name)), utf8_decode("áàãâéêíóôõúüñçÁÀÃÂÉÊÍÓÔÕÚÜÑÇ"), "aaaaeeiooouuncAAAAEEIOOOUUNC-")) ));
-                    
                     if($old_document){
                         if (Storage::exists($old_document->path . "/" . $old_document->name)) {
                             $path_to_old = $old_document->path . "/old/";
@@ -354,38 +353,45 @@ class EmployeesController extends Controller {
                                 'path' => $path_to_old,
                                 'due_date' => $old_document->due_date,
                                 'name' => $name_to_old,
+                                'status' => 'Substituído',
+                                'actual' => 0,
                                 'type' => $old_document->type,
                                 'id_employee' => $old_document->id_employee,
                             );
-                            $document_path = Document_path::create($document_path_model);
+                            $document_path_old = Document_path::create($document_path_model);
                             Storage::delete($old_document->name);
                         }
                         $request->{$document}->storeAs($path, $document_name);
 
                         $old_document = Document_path::findOrFail($old_document->id);
-                        
                         $old_document->name = $document_name;
                         $old_document->path = $path;
-
+                        $old_document->due_date = $request->new_due_date;
                         $old_document->update();
                     } else {
                         $request->{$document}->storeAs($path, $document_name);
                         $document_path_model = array(
                             'path' => $path,
-                            'due_date' => $request->due_date,
+                            'due_date' => $request->new_due_date,
                             'name' => $document_name,
                             'type' => $document,
+                            'status' => 'Pendente',
+                            'actual' => 1,
                             'id_employee' => $employee->id,
                         );
                         $document_path = Document_path::create($document_path_model);
                     }
+                    break;
                 } else {
                     if($old_document) {
                         if($old_document->type == $request->modal_type) {
-                            if($request->due_date) {
-                                $old_document = Document_path::findOrFail($old_document->id);
-                                $old_document->due_date = $request->due_date;
-                                $old_document->update();
+                            if($request->old_due_date) {
+                                if($request->old_due_date != $old_document->due_date) {
+                                    $old_document = Document_path::findOrFail($old_document->id);
+                                    $old_document->due_date = $request->old_due_date;
+                                    $old_document->update();
+                                    break;
+                                }
                             }
                         }
                     } else {
