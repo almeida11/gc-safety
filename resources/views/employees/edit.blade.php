@@ -336,6 +336,9 @@ function limpaString($string) {
                 const modal_date_info = document.getElementById("modal_date_info");
                 const modal_status_info = document.getElementById("modal_status_info");
                 const modal_historic = document.getElementById("modal_historic");
+                const new_due_date = document.getElementById("new_due_date");
+                const modal_save_create = document.getElementById("modal_save_create");
+                const modal_date_create = document.getElementById("modal_date_create");
 
             
                 const paths = [@if($employee->documents)
@@ -406,9 +409,14 @@ $document_path_display = $document_path->path; ?>
                 }
 
                 const openModal2 = (title, path_par = false) => {
+                    if(modal_date_create) {
+                        modal_date_create.classList.add("hidden");
+                    }
 
                     let button_update = document.getElementById('modal_save_update');
-                    button_update.classList.add("hidden");
+                    if(button_update) {
+                        button_update.classList.add("hidden");
+                    }
 
                     var modal_tr_list = document.querySelectorAll('.modal-tr');
 
@@ -445,6 +453,18 @@ $document_path_display = $document_path->path; ?>
                     if(!(path_par)){
                         for (let index = 0; index < paths.length; index++) {
                             if(paths[index].type == title) {
+                                
+                                var modal_button2 = document.querySelector('.modal-form-button');
+                                if(modal_button2) {
+                                    modal_button2.innerText = 'Enviar!';
+                                }
+                                
+                                var modal_button2 = document.querySelector('.modal-form-input');
+                                if(modal_button2) {
+                                    modal_button2.value = '';
+                                }
+                                new_due_date.value = null;
+                                modal_save_create.classList.add("hidden");
                                 old_due_date.value = paths[index].due_date;
                                 modal_status.innerText = paths[index].status;
                                 modal_doc_info.classList.remove("hidden");
