@@ -9,8 +9,8 @@
         <div class="max-w-7xl mx-auto py-10 sm:px-6 lg:px-8">
             @if(Auth::user()->type != 'Usuário')
                 <div class="block mb-8 sm:px-6 lg:px-8 mb-4">
-                    <a href="{{ route('companies.show', $company_id) }}" class="bg-gray-200 hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">Voltar a Empresa</a>
-                    <a href="{{ route('responsibilities.create', $company_id) }}" class="bg-gray-200 hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">Cadastrar Cargo</a>
+                    <a href="{{ route('companies.show', $company_id) }}" class="bg-gray-200 hover:bg-gray-300 text-black  py-2 px-4 rounded">Voltar a Empresa</a>
+                    <a href="{{ route('responsibilities.create', $company_id) }}" class="bg-gray-200 hover:bg-gray-300 text-black  py-2 px-4 rounded">Cadastrar Cargo</a>
                 </div>
             @endif
             </form>
@@ -24,7 +24,7 @@
                 </div> -->
                 <!--End Search Bar-->
                 <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-                    <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8" style="min-width: 100%; white-space: nowrap;">
+                    <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8" style="min-width: 100%;  nowrap;">
                         <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
                             <table class="min-w-full divide-y divide-gray-200 w-full">
                                 <thead>

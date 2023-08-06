@@ -16,10 +16,10 @@ function limpaString($string) {
         
         <div class="max-w-7xl mx-auto py-10 sm:px-6 lg:px-8">
             <div class="block mb-8 mb-4">
-                <a href="{{ route('employees.index', $company_id) }}" class="bg-gray-200 hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">Voltar a Lista</a>
+                <a href="{{ route('employees.index', $company_id) }}" class="bg-gray-200 hover:bg-gray-300 text-black  py-2 px-4 rounded">Voltar a Lista</a>
                 @if(Auth::user()->type != 'Funcionário')
                     @if ($editor->tipo == 'Contratante')
-                        <a href="#" onclick="openModal()" class="bg-gray-200 hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">Gerir Documentos</a>
+                        <a href="#" onclick="openModal()" class="bg-gray-200 hover:bg-gray-300 text-black  py-2 px-4 rounded">Gerir Documentos</a>
                     @endif
                 @endif
             </div>
@@ -132,7 +132,7 @@ function limpaString($string) {
             <div class="main-modal fixed w-full h-100 inset-0 z-50 overflow-hidden flex justify-center items-center animated fadeIn faster"
                 style="background: rgba(0,0,0,.7);">
                 <div
-                    class="border border-teal-500 shadow-lg modal-container bg-white w-11/12 md:max-w-md mx-auto rounded shadow-lg z-50 overflow-y-auto">
+                    class="border border-teal-500 shadow-lg modal-container bg-white   mx-auto rounded shadow-lg z-50 overflow-y-auto">
                     <div class="div500 modal-content py-4 text-left px-6">
                         <!--Title-->
                         <div class="flex justify-between items-center pb-3">
@@ -193,7 +193,7 @@ function limpaString($string) {
             <div class="main-modal2 fixed w-full h-100 inset-0 z-50 overflow-hidden flex justify-center items-center animated fadeIn faster"
                 style="background: rgba(0,0,0,.7);">
                 <div
-                    class="border border-teal-500 shadow-lg modal-container bg-white w-11/12 md:max-w-md mx-auto rounded shadow-lg z-50 overflow-y-auto">
+                    class="border border-teal-500 shadow-lg modal-container bg-white   mx-auto rounded shadow-lg z-50 overflow-y-auto">
                     <div class="div1000 modal-content py-4 text-left px-6">
                         <!--Title-->
                         <div class="flex justify-between items-center pb-3">
@@ -213,7 +213,7 @@ function limpaString($string) {
                                 @csrf
                                 <div class="modal-left">
                                     <table id="modal-table" class="min-w-full divide-y divide-gray-200 w-full">
-                                        <tr class="border-b"  id="modal_doc_info">
+                                        <tr class="border-b hidden"  id="modal_doc_info">
                                             <th colspan='2' scope="col" class="px-6 py-3 bg-gray-50 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                                                 Dados do Documento
                                             </th> 

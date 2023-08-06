@@ -8,13 +8,13 @@
     <div>
         <div class="max-w-7xl mx-auto py-10 sm:px-6 lg:px-8">
             <div class="block mb-8 mb-4">
-                <a href="{{ route('companies.index') }}" class="bg-gray-200 hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">Voltar a Lista</a>
-                <a href="{{ route('employees.index', $company->id) }}" class="bg-gray-200 hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">Funcionários</a>
-                <a href="{{ route('responsibilities.index', $company_id) }}" class="bg-gray-200 hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">Cargos</a>
-                <a href="{{ route('sectors.index', $company_id) }}" class="bg-gray-200 hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">Setores</a>
+                <a href="{{ route('companies.index') }}" class="bg-gray-200 hover:bg-gray-300 text-black  py-2 px-4 rounded">Voltar a Lista</a>
+                <a href="{{ route('employees.index', $company->id) }}" class="bg-gray-200 hover:bg-gray-300 text-black  py-2 px-4 rounded">Funcionários</a>
+                <a href="{{ route('responsibilities.index', $company_id) }}" class="bg-gray-200 hover:bg-gray-300 text-black  py-2 px-4 rounded">Cargos</a>
+                <a href="{{ route('sectors.index', $company_id) }}" class="bg-gray-200 hover:bg-gray-300 text-black  py-2 px-4 rounded">Setores</a>
                 @if(Auth::user()->type != 'Usuário')
                     @if ($editor->tipo == 'Contratante')
-                        <a href="{{ route('documents.index', $company_id) }}" class="bg-gray-200 hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">Tipos de Documentos</a>
+                        <a href="{{ route('documents.index', $company_id) }}" class="bg-gray-200 hover:bg-gray-300 text-black  py-2 px-4 rounded">Tipos de Documentos</a>
                     @endif
                 @endif
             </div>
