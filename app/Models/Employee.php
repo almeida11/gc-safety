@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Laravel\Jetstream\HasProfilePhoto;
 
 class Employee extends Model
 {
     use HasFactory;
+    use HasProfilePhoto;
 
     protected $fillable = [
         'name',
@@ -17,5 +19,9 @@ class Employee extends Model
         'id_sector',
         'id_company',
         'active',
+    ];
+
+    protected $appends = [
+        'profile_photo_url',
     ];
 }

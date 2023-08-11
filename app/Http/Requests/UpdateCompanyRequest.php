@@ -15,7 +15,7 @@ class UpdateCompanyRequest extends FormRequest
                 Rule::unique('companies')->ignore($this->company),
                 'required',
             ],
-            'nome_fantasia'   => [
+            'name'   => [
                 'required',
             ],
             'atividade_principal'    => [

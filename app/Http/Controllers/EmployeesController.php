@@ -23,7 +23,7 @@ class EmployeesController extends Controller {
             ->where('users.id', Auth::user()->id)
             ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
             ->join('companies', 'companies.id', '=', 'user_relations.id_company')
-            ->select('users.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
+            ->select('users.*', 'companies.name AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
             ->first();
 
             
@@ -32,7 +32,7 @@ class EmployeesController extends Controller {
             ->where('companies.id', $company_id)
             ->join('responsibilities', 'responsibilities.id', '=', 'employees.id_responsibility')
             ->join('sectors', 'sectors.id', '=', 'employees.id_sector')
-            ->select('employees.*', 'companies.nome_fantasia AS company', 'responsibilities.name AS responsibility', 'sectors.name AS sector')
+            ->select('employees.*', 'companies.name AS company', 'responsibilities.name AS responsibility', 'sectors.name AS sector')
             ->paginate(9);
 
         $sectors = DB::table('employees')
@@ -80,7 +80,7 @@ class EmployeesController extends Controller {
             ->where('users.id', Auth::user()->id)
             ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
             ->join('companies', 'companies.id', '=', 'user_relations.id_company')
-            ->select('users.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
+            ->select('users.*', 'companies.name AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
             ->first();
         
         $companies = DB::table('companies')
@@ -106,7 +106,7 @@ class EmployeesController extends Controller {
                     ->on('companies.id', '=', 'company_relations.id_contratada')
                     ->orOn('companies.id', '=', 'company_relations.id_contratante');
             })
-            ->select('sectors.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo')
+            ->select('sectors.*', 'companies.name AS company', 'companies.tipo AS tipo')
             ->get();
         
         $responsibilities = DB::table('responsibilities')
@@ -117,7 +117,7 @@ class EmployeesController extends Controller {
                     ->on('companies.id', '=', 'company_relations.id_contratada')
                     ->orOn('companies.id', '=', 'company_relations.id_contratante');
             })
-            ->select('responsibilities.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo')
+            ->select('responsibilities.*', 'companies.name AS company', 'companies.tipo AS tipo')
             ->get();
     
         return view('employees.create', compact('companies', 'sectors', 'responsibilities', 'company_id'));
@@ -128,7 +128,7 @@ class EmployeesController extends Controller {
             ->where('users.id', Auth::user()->id)
             ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
             ->join('companies', 'companies.id', '=', 'user_relations.id_company')
-            ->select('users.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
+            ->select('users.*', 'companies.name AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
             ->first();
 
         $req = $request->validated();
@@ -145,7 +145,7 @@ class EmployeesController extends Controller {
             ->where('users.id', Auth::user()->id)
             ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
             ->join('companies', 'companies.id', '=', 'user_relations.id_company')
-            ->select('users.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
+            ->select('users.*', 'companies.name AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
             ->first();
 
         $employee = DB::table('employees')
@@ -153,7 +153,7 @@ class EmployeesController extends Controller {
             ->join('companies', 'companies.id', '=', 'employees.id_company')
             ->join('responsibilities', 'responsibilities.id', '=', 'employees.id_responsibility')
             ->join('sectors', 'sectors.id', '=', 'employees.id_sector')
-            ->select('employees.*', 'companies.nome_fantasia AS company', 'responsibilities.name AS responsibility', 'sectors.name AS sector')
+            ->select('employees.*', 'companies.name AS company', 'responsibilities.name AS responsibility', 'sectors.name AS sector')
             ->first();
 
         $responsibilities = DB::table('responsibilities')
@@ -164,7 +164,7 @@ class EmployeesController extends Controller {
                     ->on('companies.id', '=', 'company_relations.id_contratada')
                     ->orOn('companies.id', '=', 'company_relations.id_contratante');
             })
-            ->select('responsibilities.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo')
+            ->select('responsibilities.*', 'companies.name AS company', 'companies.tipo AS tipo')
             ->paginate(9);
         if($editor->company != $employee->company) abort(403, 'Access denied');
         $documents = DB::table('documents')
@@ -174,7 +174,7 @@ class EmployeesController extends Controller {
                     ->on('companies.id', '=', 'company_relations.id_contratada')
                     ->orOn('companies.id', '=', 'company_relations.id_contratante');
             })
-            ->select('documents.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo')
+            ->select('documents.*', 'companies.name AS company', 'companies.tipo AS tipo')
             ->get();
 
         $document_paths = DB::table('document_paths')
@@ -189,7 +189,7 @@ class EmployeesController extends Controller {
             ->where('users.id', Auth::user()->id)
             ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
             ->join('companies', 'companies.id', '=', 'user_relations.id_company')
-            ->select('users.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
+            ->select('users.*', 'companies.name AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
             ->first();
         
         $employee = DB::table('employees')
@@ -197,7 +197,7 @@ class EmployeesController extends Controller {
             ->join('companies', 'companies.id', '=', 'employees.id_company')
             ->join('responsibilities', 'responsibilities.id', '=', 'employees.id_responsibility')
             ->join('sectors', 'sectors.id', '=', 'employees.id_sector')
-            ->select('employees.*', 'companies.nome_fantasia AS company', 'responsibilities.name AS responsibility', 'sectors.name AS sector')
+            ->select('employees.*', 'companies.name AS company', 'responsibilities.name AS responsibility', 'sectors.name AS sector')
             ->first();
 
         // if($editor->company != $employee->company) abort(403, 'Access denied');
@@ -210,11 +210,12 @@ class EmployeesController extends Controller {
                     ->on('companies.id', '=', 'company_relations.id_contratada')
                     ->orOn('companies.id', '=', 'company_relations.id_contratante');
             })
-            ->select('documents.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo')
+            ->select('documents.*', 'companies.name AS company', 'companies.tipo AS tipo')
             ->get();
         
         $document_paths = DB::table('document_paths')
             ->where('id_employee', $employee->id)
+            ->orderBy('created_at')
             ->get();
 
         $companies = DB::table('companies')
@@ -240,7 +241,7 @@ class EmployeesController extends Controller {
                     ->on('companies.id', '=', 'company_relations.id_contratada')
                     ->orOn('companies.id', '=', 'company_relations.id_contratante');
             })
-            ->select('sectors.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo')
+            ->select('sectors.*', 'companies.name AS company', 'companies.tipo AS tipo')
             ->get();
         
         $responsibilities = DB::table('responsibilities')
@@ -251,7 +252,7 @@ class EmployeesController extends Controller {
                     ->on('companies.id', '=', 'company_relations.id_contratada')
                     ->orOn('companies.id', '=', 'company_relations.id_contratante');
             })
-            ->select('responsibilities.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo')
+            ->select('responsibilities.*', 'companies.name AS company', 'companies.tipo AS tipo')
             ->get();
 
         
@@ -263,7 +264,7 @@ class EmployeesController extends Controller {
             ->where('users.id', Auth::user()->id)
             ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
             ->join('companies', 'companies.id', '=', 'user_relations.id_company')
-            ->select('users.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
+            ->select('users.*', 'companies.name AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
             ->first();
         
         $req = $request->validated();
@@ -276,7 +277,7 @@ class EmployeesController extends Controller {
             ->where('users.id', Auth::user()->id)
             ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
             ->join('companies', 'companies.id', '=', 'user_relations.id_company')
-            ->select('users.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
+            ->select('users.*', 'companies.name AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
             ->first();
             
         // if($editor->id_company != $employee->id_company) abort(403, 'Access denied');
@@ -339,7 +340,7 @@ class EmployeesController extends Controller {
                     $extension = $request->{$document}->getClientOriginalExtension();
                     if($extension != 'pdf') throw ValidationException::withMessages(['document_uploader' => 'Você deve enviar somente arquivos do tipo pdf.', 'document_uploader_type'  => $document]);
 
-                    $path = 'documents/'.$company->nome_fantasia.'/'.$employee->name;
+                    $path = 'documents/'.$company->name.'/'.$employee->name;
                     $path = preg_replace('/[ -]+/' , '_' , strtolower( preg_replace("[^a-zA-Z0-9-]", "-", strtr(utf8_decode(trim($path)), utf8_decode("áàãâéêíóôõúüñçÁÀÃÂÉÊÍÓÔÕÚÜÑÇ"), "aaaaeeiooouuncAAAAEEIOOOUUNC-")) ));
 
                     $document_name = $document . '_' . $employee->id. "_" . $employee->name . ".{$extension}";

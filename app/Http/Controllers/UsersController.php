@@ -8,10 +8,20 @@ use App\Http\Requests\StoreUserRequest;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Helpers\PaginationHelper;
 use App\Models\User_relation;
 use Illuminate\Http\Request;
 use App\Models\Company;
 use App\Models\User;
+
+
+// Administrador (ADEMIR) - GERENCIA TUDO GERAL TODAS PERMISSÕES
+// Fiscal (User contratante) - Só ver
+// Prestador (Adm contratada) - Gerencia Contratada
+// Cliente (Adm contratante) - Gerencia tudo da Contratada e Contratante
+// Analista (Mod contratante) - Só valida documentos
+
+
 
 class UsersController extends Controller {
     public function index() {
@@ -19,13 +29,13 @@ class UsersController extends Controller {
             ->where('users.id', Auth::user()->id)
             ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
             ->join('companies', 'companies.id', '=', 'user_relations.id_company')
-            ->select('users.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo', 'companies.id as id_company', 'user_relations.is_manager AS is_manager')
+            ->select('users.*', 'companies.name AS company', 'companies.tipo AS tipo', 'companies.id as id_company', 'user_relations.is_manager AS is_manager')
             ->first();
 
-        if(Auth::user()->type == 'Moderador') {
+        if(Auth::user()->type == 'Prestador') {
             if($editor->tipo == 'Contratante') {
                 $users = DB::table('users')
-                    ->where('users.type', '!=', 'Administrador')
+                    ->where('users.type', '!=', 'Cliente')
                     ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
                     ->join('companies', 'companies.id', '=', 'user_relations.id_company')
                     ->join('company_relations', function($join) {
@@ -34,13 +44,13 @@ class UsersController extends Controller {
                                 ->orOn('companies.id', '=', 'company_relations.id_contratante');
                     })
                     ->where('company_relations.id_contratante', $editor->id_company)
-                    ->select('users.*', 'companies.nome_fantasia AS company', 'companies.id AS id_company', 'user_relations.is_manager AS is_manager')
+                    ->select('users.*', 'companies.name AS company', 'companies.id AS id_company', 'user_relations.is_manager AS is_manager')
                     ->orderBy('type')
                     ->orderBy('company')
-                    ->paginate(9);
+                    ->paginate(9)->unique();
             } else {
                 $users = DB::table('users')
-                    ->where('users.type', '!=', 'Administrador')
+                    ->where('users.type', '!=', 'Cliente')
                     ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
                     ->join('companies', 'companies.id', '=', 'user_relations.id_company')
                     ->join('company_relations', function($join) {
@@ -48,15 +58,15 @@ class UsersController extends Controller {
                             ->on('companies.id', '=', 'company_relations.id_contratada');
                     })
                     ->where('company_relations.id_contratada', $editor->id_company)
-                    ->select('users.*', 'companies.nome_fantasia AS company', 'companies.id AS id_company', 'user_relations.is_manager AS is_manager')
+                    ->select('users.*', 'companies.name AS company', 'companies.id AS id_company', 'user_relations.is_manager AS is_manager')
                     ->orderBy('type')
                     ->orderBy('company')
-                    ->paginate(9);
+                    ->paginate(9)->unique();
             }
         } else {
             if($editor->tipo == 'Contratante') {
                 $users = DB::table('users')
-                    ->where('users.type', '!=', 'Administrador')
+                    ->where('users.type', '!=', 'Cliente')
                     ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
                     ->join('companies', 'companies.id', '=', 'user_relations.id_company')
                     ->join('company_relations', function($join) {
@@ -66,13 +76,13 @@ class UsersController extends Controller {
                     })
                     ->where('company_relations.id_contratante', $editor->id_company)
                     ->where('users.active', 1)
-                    ->select('users.*', 'companies.nome_fantasia AS company', 'companies.id AS id_company', 'user_relations.is_manager AS is_manager')
+                    ->select('users.*', 'companies.name AS company', 'companies.id AS id_company', 'user_relations.is_manager AS is_manager')
                     ->orderBy('type')
                     ->orderBy('company')
-                    ->paginate(9);
+                    ->paginate(9)->unique();
             } else {
                 $users = DB::table('users')
-                    ->where('users.type', '!=', 'Administrador')
+                    ->where('users.type', '!=', 'Cliente')
                     ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
                     ->join('companies', 'companies.id', '=', 'user_relations.id_company')
                     ->join('company_relations', function($join) {
@@ -81,24 +91,27 @@ class UsersController extends Controller {
                     })
                     ->where('company_relations.id_contratada', $editor->id_company)
                     ->where('users.active', 1)
-                    ->select('users.*', 'companies.nome_fantasia AS company', 'companies.id AS id_company', 'user_relations.is_manager AS is_manager')
+                    ->select('users.*', 'companies.name AS company', 'companies.id AS id_company', 'user_relations.is_manager AS is_manager')
                     ->orderBy('type')
                     ->orderBy('company')
-                    ->paginate(9);
+                    ->paginate(9)->unique();
             }
         }
+        
+        $users = PaginationHelper::paginate($users, 9);
+        
         $editor = DB::table('users')
             ->where('users.id', Auth::user()->id)
             ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
             ->join('companies', 'companies.id', '=', 'user_relations.id_company')
-            ->select('users.*', 'companies.nome_fantasia AS company', 'user_relations.is_manager AS is_manager')
+            ->select('users.*', 'companies.name AS company', 'user_relations.is_manager AS is_manager')
             ->first();
             
-        if (Auth::user()->type == 'Administrador') {
+        if (Auth::user()->type == 'Cliente') {
             $users = DB::table('users')
                 ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
                 ->join('companies', 'companies.id', '=', 'user_relations.id_company')
-                ->select('users.*', 'companies.nome_fantasia AS company', 'user_relations.is_manager AS is_manager')
+                ->select('users.*', 'companies.name AS company', 'user_relations.is_manager AS is_manager')
                 ->orderBy('type')
                 ->paginate(9);
         }
@@ -106,16 +119,16 @@ class UsersController extends Controller {
     }
 
     public function create() {
-        if(!(Auth::user()->type == 'Moderador' || Auth::user()->type == 'Administrador')) abort(403, 'Access denied');
+        if(!(Auth::user()->type == 'Prestador' || Auth::user()->type == 'Cliente')) abort(403, 'Access denied');
 
         $editor = DB::table('users')
             ->where('users.id', Auth::user()->id)
             ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
             ->join('companies', 'companies.id', '=', 'user_relations.id_company')
-            ->select('users.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
+            ->select('users.*', 'companies.name AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
             ->first();
 
-        if(Auth::user()->type == 'Administrador') {
+        if(Auth::user()->type == 'Cliente') {
             $companies = Company::all();
         } else {
             if($editor->tipo == 'Contratante') {
@@ -155,25 +168,25 @@ class UsersController extends Controller {
             ->where('users.id', Auth::user()->id)
             ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
             ->join('companies', 'companies.id', '=', 'user_relations.id_company')
-            ->select('users.*', 'companies.nome_fantasia AS company', 'user_relations.is_manager AS is_manager')
+            ->select('users.*', 'companies.name AS company', 'user_relations.is_manager AS is_manager')
             ->first();
         
         return view('users.create', compact('companies', 'editor'));
     }
 
     public function store(StoreUserRequest $request) {
-        if(!(Auth::user()->type == 'Moderador' || Auth::user()->type == 'Administrador')) abort(403, 'Access denied');
+        if(!(Auth::user()->type == 'Prestador' || Auth::user()->type == 'Cliente')) abort(403, 'Access denied');
 
         $req = $request->validated();
 
-        if(Auth::user()->type == 'Moderador') {
-            if($req["type"] == 'Administrador') throw ValidationException::withMessages(['erro' => 'Você não tem permissão para isso!']);
+        if(Auth::user()->type == 'Prestador') {
+            if($req["type"] == 'Cliente') throw ValidationException::withMessages(['erro' => 'Você não tem permissão para isso!']);
             
             $editor = DB::table('users')
                 ->where('users.id', Auth::user()->id)
                 ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
                 ->join('companies', 'companies.id', '=', 'user_relations.id_company')
-                ->select('users.*', 'companies.nome_fantasia AS company', 'user_relations.is_manager AS is_manager', 'companies.id AS id_company' )
+                ->select('users.*', 'companies.name AS company', 'user_relations.is_manager AS is_manager', 'companies.id AS id_company' )
                 ->first();
 
             if($editor->id_company != (int) $req['company']){
@@ -184,6 +197,8 @@ class UsersController extends Controller {
         $temp_company = (int) $req['company'];
 
         unset($req['company']);
+
+        $req['password'] = \Hash::make($req['password']);
 
         $user = User::create($req);
 
@@ -208,14 +223,14 @@ class UsersController extends Controller {
                     ->on('companies.id', '=', 'company_relations.id_contratada')
                         ->orOn('companies.id', '=', 'company_relations.id_contratante');
             })
-            ->select('users.*','company_relations.id_contratante', 'companies.nome_fantasia AS company', 'user_relations.is_manager AS is_manager')
+            ->select('users.*','company_relations.id_contratante', 'companies.name AS company', 'user_relations.is_manager AS is_manager')
             ->first();
         
         $editor = DB::table('users')
             ->where('users.id', Auth::user()->id)
             ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
             ->join('companies', 'companies.id', '=', 'user_relations.id_company')
-            ->select('users.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
+            ->select('users.*', 'companies.name AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
             ->first();
         
         if(!($editor->company == $user->company || $editor->id_company == $user->id_contratante)) abort(403, 'Access denied');
@@ -224,7 +239,7 @@ class UsersController extends Controller {
     }
 
     public function edit(User $user) {
-        if(!(Auth::user()->type == 'Moderador' || Auth::user()->type == 'Administrador')) abort(403, 'Access denied');
+        if(!(Auth::user()->type == 'Prestador' || Auth::user()->type == 'Cliente' || Auth::user()->type == 'Administrador')) abort(403, 'Access denied');
 
         $user = DB::table('users')
             ->where('users.id', $user->id)
@@ -235,17 +250,17 @@ class UsersController extends Controller {
                     ->on('companies.id', '=', 'company_relations.id_contratada')
                         ->orOn('companies.id', '=', 'company_relations.id_contratante');
             })
-            ->select('users.*','company_relations.id_contratante', 'companies.nome_fantasia AS company', 'user_relations.is_manager AS is_manager')
+            ->select('users.*','company_relations.id_contratante', 'companies.name AS company', 'user_relations.is_manager AS is_manager')
             ->first();
         
         $editor = DB::table('users')
             ->where('users.id', Auth::user()->id)
             ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
             ->join('companies', 'companies.id', '=', 'user_relations.id_company')
-            ->select('users.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
+            ->select('users.*', 'companies.name AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
             ->first();
         
-        if(Auth::user()->type == 'Administrador') {
+        if(Auth::user()->type == 'Cliente') {
             $companies = Company::all();
         } else {
             if($editor->tipo == 'Contratante') {
@@ -296,23 +311,23 @@ class UsersController extends Controller {
                     ->on('companies.id', '=', 'company_relations.id_contratada')
                         ->orOn('companies.id', '=', 'company_relations.id_contratante');
             })
-            ->select('users.*', 'companies.id AS id_company','company_relations.id_contratante', 'companies.nome_fantasia AS company', 'user_relations.is_manager AS is_manager')
+            ->select('users.*', 'companies.id AS id_company','company_relations.id_contratante', 'companies.name AS company', 'user_relations.is_manager AS is_manager')
             ->first();
         
         $editor = DB::table('users')
             ->where('users.id', Auth::user()->id)
             ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
             ->join('companies', 'companies.id', '=', 'user_relations.id_company')
-            ->select('users.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
+            ->select('users.*', 'companies.name AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
             ->first();
         
         if(!($editor->company == $user_check->company || $editor->id_company == $user_check->id_contratante)) abort(403, 'Access denied');
 
-        if(!(Auth::user()->type == 'Moderador' || Auth::user()->type == 'Administrador')) abort(403, 'Access denied');
+        if(!(Auth::user()->type == 'Prestador' || Auth::user()->type == 'Cliente')) abort(403, 'Access denied');
 
         $req = $request->validated();
 
-        if(!(Auth::user()->type == 'Administrador')) {
+        if(!(Auth::user()->type == 'Cliente')) {
             if($editor->id == $user_check->id) {
                 if((int) $req['active'] != $user_check->active) throw ValidationException::withMessages(['erro' => 'Você não tem permissão para isso!']);
                 if((int) $req['company'] != $user_check->id_company) throw ValidationException::withMessages(['erro' => 'Você não tem permissão para isso!']);
@@ -320,12 +335,12 @@ class UsersController extends Controller {
         }
 
 
-        if(Auth::user()->type == 'Moderador') {
-            if($req["type"] == 'Administrador') throw ValidationException::withMessages(['erro' => 'Você não tem permissão para isso!']);
+        if(Auth::user()->type == 'Prestador') {
+            if($req["type"] == 'Cliente') throw ValidationException::withMessages(['erro' => 'Você não tem permissão para isso!']);
             
             $user_check = User::where('id', $user->id)->first();
 
-            if($user_check->type == 'Administrador') throw ValidationException::withMessages(['erro' => 'Você não tem permissão para isso!']);
+            if($user_check->type == 'Cliente') throw ValidationException::withMessages(['erro' => 'Você não tem permissão para isso!']);
         }
         
         $req["password"] = $req["password"] == null ? $user->password : Hash::make($req["password"]);
@@ -380,7 +395,7 @@ class UsersController extends Controller {
         $relations = User_relation::findOrFail($relations->id);
         $relations->id_company = (int) $req['company'];
         
-        if((Auth::user()->type == 'Administrador') && ($user_check->is_manager == 1)){
+        if((Auth::user()->type == 'Cliente') && ($user_check->is_manager == 1)){
             $relations->is_manager = 0;
         } 
 
@@ -394,7 +409,7 @@ class UsersController extends Controller {
     }
 
     public function destroy(User $user) {
-        if(!(Auth::user()->type == 'Moderador' || Auth::user()->type == 'Administrador' || Auth::user()->id != $user->id)) abort(403, 'Access denied');
+        if(!(Auth::user()->type == 'Prestador' || Auth::user()->type == 'Cliente' || Auth::user()->id != $user->id)) abort(403, 'Access denied');
 
         $user_check = DB::table('users')
             ->where('users.id', $user->id)
@@ -405,13 +420,13 @@ class UsersController extends Controller {
                     ->on('companies.id', '=', 'company_relations.id_contratada')
                         ->orOn('companies.id', '=', 'company_relations.id_contratante');
             })
-            ->select('users.*','company_relations.id_contratante', 'companies.tipo AS tipo', 'companies.nome_fantasia AS company', 'user_relations.is_manager AS is_manager')
+            ->select('users.*','company_relations.id_contratante', 'companies.tipo AS tipo', 'companies.name AS company', 'user_relations.is_manager AS is_manager')
             ->first();
         $editor = DB::table('users')
             ->where('users.id', Auth::user()->id)
             ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
             ->join('companies', 'companies.id', '=', 'user_relations.id_company')
-            ->select('users.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
+            ->select('users.*', 'companies.name AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
             ->first();
         
         if($user_check->tipo == 'Contratante' && $user_check->is_manager == 1) abort(403, 'Access denied');

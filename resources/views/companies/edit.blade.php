@@ -1,3 +1,4 @@
+<?php use App\Models\Company; ?>
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
@@ -22,6 +23,55 @@
                 <form method="post" action="{{ route('companies.update', $company->id) }}">
                     <div class="flex flex-col">
                         <table class="min-w-full divide-y divide-gray-200 w-full">
+                            <tr class="border-b">
+                                <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Foto
+                                </th>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
+                                    @if (Laravel\Jetstream\Jetstream::managesProfilePhotos())
+                                        <div x-data="{photoName: null, photoPreview: null}" class="col-span-6 sm:col-span-4">
+                                            <!-- Profile Photo File Input -->
+                                            <input type="file" class="hidden"
+                                                        wire:model="photo"
+                                                        x-ref="photo"
+                                                        x-on:change="
+                                                                photoName = $refs.photo.files[0].name;
+                                                                const reader = new FileReader();
+                                                                reader.onload = (e) => {
+                                                                    photoPreview = e.target.result;
+                                                                };
+                                                                reader.readAsDataURL($refs.photo.files[0]);
+                                                        " />
+
+                                            <x-label for="photo" value="{{ __('Foto') }}" />
+
+                                            <!-- Current Profile Photo -->
+                                            <div class="mt-2" x-show="! photoPreview">
+                                                <img src="{{ Company::findOrFail($company->id)->profile_photo_url }}" alt="{{ Company::findOrFail($company->id)->name }}" class="rounded-full h-20 w-20 object-cover">
+                                            </div>
+
+                                            <!-- New Profile Photo Preview -->
+                                            <div class="mt-2" x-show="photoPreview" style="display: none;">
+                                                <span class="block rounded-full w-20 h-20 bg-cover bg-no-repeat bg-center"
+                                                    x-bind:style="'background-image: url(\'' + photoPreview + '\');'">
+                                                </span>
+                                            </div>
+
+                                            <x-secondary-button class="mt-2 mr-2" type="button" x-on:click.prevent="$refs.photo.click()">
+                                                {{ __('Select A New Photo') }}
+                                            </x-secondary-button>
+
+                                            @if (Company::findOrFail($company->id)->profile_photo_path)
+                                                <x-secondary-button type="button" class="mt-2" wire:click="deleteProfilePhoto">
+                                                    {{ __('Remove Photo') }}
+                                                </x-secondary-button>
+                                            @endif
+
+                                            <x-input-error for="photo" class="mt-2" />
+                                        </div>
+                                    @endif
+                                    </td>
+                            </tr>
                             <tr class="border-b">
                                 <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     ID
@@ -51,11 +101,11 @@
                                     Nome Fantasia
                                 </th>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
-                                    <input type="text" name="nome_fantasia" id="nome_fantasia"
+                                    <input type="text" name="name" id="name"
                                     class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full"
-                                    wire:model.defer="state.nome_fantasia" autocomplete="nome_fantasia" 
-                                        value="{{ old('nome_fantasia', $company->nome_fantasia) }}" />
-                                    @error('nome_fantasia')
+                                    wire:model.defer="state.name" autocomplete="name" 
+                                        value="{{ old('name', $company->name) }}" />
+                                    @error('name')
                                         <p class="text-sm text-red-600">{{ $message }}</p>
                                     @enderror
                                 </td>
@@ -168,7 +218,9 @@
                                     @enderror
                                 </td>
                             </tr>
-                            @if ($editor->type == 'Administrador')
+                            @if ($editor->type == 'Moderador')
+                            @if ($editor->tipo == 'Contratante')
+                            @if ($company->tipo == 'Contratada')
                             <tr class="border-b">
                                     <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Status da Empresa
@@ -200,9 +252,11 @@
                                             <select id="active" name="active"
                                             class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-ful"
                                             wire:model="active">
+                                                @if ($editor->type == 'Administrador')
                                                 <option value='1'>
                                                     Contratante
                                                 </option>
+                                                @endif
                                                 <option value='0' {{ $company->tipo == 'Contratada' ? 'selected' : '' }}>
                                                     Contratada
                                                 </option>
@@ -265,6 +319,8 @@
                                             </div>
                                         </td>
                                     </tr>
+                                @endif
+                                @endif
                                 @endif
                             @endif
                         </table>

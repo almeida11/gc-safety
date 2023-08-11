@@ -20,14 +20,14 @@ class DocumentsController extends Controller {
                     ->on('companies.id', '=', 'company_relations.id_contratada')
                     ->orOn('companies.id', '=', 'company_relations.id_contratante');
             })
-            ->select('documents.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo')
+            ->select('documents.*', 'companies.name AS company', 'companies.tipo AS tipo')
             ->paginate(9);
 
         $editor = DB::table('users')
             ->where('users.id', Auth::user()->id)
             ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
             ->join('companies', 'companies.id', '=', 'user_relations.id_company')
-            ->select('users.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
+            ->select('users.*', 'companies.name AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
             ->first();
         return view('documents.index', compact('editor', 'documents', 'company_id'));
     }
@@ -37,7 +37,7 @@ class DocumentsController extends Controller {
             ->where('users.id', Auth::user()->id)
             ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
             ->join('companies', 'companies.id', '=', 'user_relations.id_company')
-            ->select('users.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
+            ->select('users.*', 'companies.name AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
             ->first();
         
         $documents = DB::table('documents')
@@ -48,7 +48,7 @@ class DocumentsController extends Controller {
                     ->on('companies.id', '=', 'company_relations.id_contratada')
                     ->orOn('companies.id', '=', 'company_relations.id_contratante');
             })
-            ->select('documents.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo')
+            ->select('documents.*', 'companies.name AS company', 'companies.tipo AS tipo')
             ->paginate(9);
 
         $companies = DB::table('companies')
@@ -94,7 +94,7 @@ class DocumentsController extends Controller {
         ->where('users.id', Auth::user()->id)
         ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
         ->join('companies', 'companies.id', '=', 'user_relations.id_company')
-        ->select('users.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
+        ->select('users.*', 'companies.name AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
         ->first();
         
         $companies = DB::table('companies')

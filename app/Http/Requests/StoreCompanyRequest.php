@@ -14,7 +14,7 @@ class StoreCompanyRequest extends FormRequest
                 'unique:companies',
                 'required',
             ],
-            'nome_fantasia'   => [
+            'name'   => [
                 'required',
             ],
             'atividade_principal'    => [
@@ -38,11 +38,11 @@ class StoreCompanyRequest extends FormRequest
             ],
             'telefone'    => [
                 'required',
-                'regex:/^[(][0-9]{2}[)]aa [0-9]{4}-[0-9]{5}$/'
+                'regex:/^[(][0-9]{2}[)][0-9]{4}-[0-9]{4}$|[(][0-9]{2}[)][0-9]{4}-[0-9]{5}$/'
             ],
             'cnpj'    => [
                 'required',
-                'regex:/[0-9]{2}\.?[0-9]{3}\.?[0-9]{3}\/?[0-9]{4}\-?[0-9]{2}/'
+                'regex:/^[0-9]{2}\.?[0-9]{3}\.?[0-9]{3}\/?[0-9]{4}\-?[0-9]{2}$/'
             ],
             'id_manager'    => [
                 'nullable',

@@ -19,7 +19,7 @@ class SectorsController extends Controller {
             ->where('users.id', Auth::user()->id)
             ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
             ->join('companies', 'companies.id', '=', 'user_relations.id_company')
-            ->select('users.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
+            ->select('users.*', 'companies.name AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
             ->first();
         
         $sectors = DB::table('sectors')
@@ -30,7 +30,7 @@ class SectorsController extends Controller {
                     ->on('companies.id', '=', 'company_relations.id_contratada')
                     ->orOn('companies.id', '=', 'company_relations.id_contratante');
             })
-            ->select('sectors.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo')
+            ->select('sectors.*', 'companies.name AS company', 'companies.tipo AS tipo')
             ->paginate(9);
         return view('sectors.index', compact('sectors', 'editor', 'company_id'));
     }
@@ -40,7 +40,7 @@ class SectorsController extends Controller {
             ->where('users.id', Auth::user()->id)
             ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
             ->join('companies', 'companies.id', '=', 'user_relations.id_company')
-            ->select('users.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
+            ->select('users.*', 'companies.name AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
             ->first();
         
         $companies = DB::table('companies')
@@ -85,7 +85,7 @@ class SectorsController extends Controller {
             ->where('users.id', Auth::user()->id)
             ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
             ->join('companies', 'companies.id', '=', 'user_relations.id_company')
-            ->select('users.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
+            ->select('users.*', 'companies.name AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
             ->first();
         
         $companies = DB::table('companies')

@@ -1,4 +1,5 @@
 <?php
+use App\Models\Employee;
 
 function limpaString($string) {
     return $document_name = preg_replace('/[ -]+/' , '_' , strtolower( preg_replace("[^a-zA-Z0-9-]", "-", strtr(utf8_decode(trim($string)), utf8_decode("áàãâéêíóôõúüñçÁÀÃÂÉÊÍÓÔÕÚÜÑÇ"), "aaaaeeiooouuncAAAAEEIOOOUUNC-")) ));
@@ -352,7 +353,7 @@ function limpaString($string) {
 @if(limpaString($document_path->type) == limpaString($db_document->name))
 <?php $document_name_display = $document_path->name;
 $document_path_display = $document_path->path; ?>
-<?php echo htmlspecialchars_decode("{type:\"".$document_path->type."\",path:\"".url("storage/{$document_path->path}/{$document_path->name}#view=FitH")."\", due_date: '".$document_path->due_date."', status: '" . $document_path->status . "'},"); ?>
+<?php echo htmlspecialchars_decode("{type:\"".$document_path->type."\",path:\"".url("storage/{$document_path->path}/{$document_path->name}#view=FitH")."\", due_date: '".$document_path->due_date."', status: '" . $document_path->status . "', created_at: '" . $document_path->created_at . "'},"); ?>
 @endif
 @endif
 @endif
@@ -366,7 +367,7 @@ $document_path_display = $document_path->path; ?>
                 const old_paths = [@if($document_paths->first())
 @foreach($document_paths as $document_path)
 @if($document_path->actual == 0)
-<?php echo htmlspecialchars_decode("{type:\"".$document_path->type."\",path:\"".url("storage/{$document_path->path}/{$document_path->name}#view=FitH")."\", due_date: '".$document_path->due_date."', status: '" . $document_path->status . "'},"); ?>
+<?php echo htmlspecialchars_decode("{type:\"".$document_path->type."\",path:\"".url("storage/{$document_path->path}/{$document_path->name}#view=FitH")."\", due_date: '".$document_path->due_date."', status: '" . $document_path->status . "', created_at: '" . $document_path->created_at . "'},"); ?>
 @endif
 @endforeach
 @endif
@@ -377,7 +378,7 @@ $document_path_display = $document_path->path; ?>
                     modal.classList.add('fadeOut');
                     setTimeout(() => {
                         modal.style.display = 'none';
-                    }, 500);
+                    }, 500);~ç
                 }
 
                 const openModal = () => {
@@ -520,7 +521,7 @@ $document_path_display = $document_path->path; ?>
 
                                 var elementMainTHButtonOldPDFViewer = document.createElement('th');
                                 elementMainTHButtonOldPDFViewer.id = 'main-modal-th';
-                                elementMainTHButtonOldPDFViewer.innerText = 'ATUAL';
+                                elementMainTHButtonOldPDFViewer.innerText = paths[index].created_at.concat(' (ATUAL)');
                                 elementMainTHButtonOldPDFViewer.classList.add('px-6', 'py-3', 'bg-gray-50', 'text-left', 'text-xs', 'font-medium', 'text-gray-500', 'uppercase', 'tracking-wider');
 
                                 var main_modal_tr = document.getElementById('main-modal-tr'); 
@@ -615,7 +616,7 @@ $document_path_display = $document_path->path; ?>
 
                             var elementTHButtonOldPDFViewer = document.createElement('th');
                             elementTHButtonOldPDFViewer.id = 'modal-th-'+ index;
-                            elementTHButtonOldPDFViewer.innerText = old_paths[index].due_date;
+                            elementTHButtonOldPDFViewer.innerText = old_paths[index].created_at;
                             elementTHButtonOldPDFViewer.classList.add('px-6', 'py-3', 'bg-gray-50', 'text-left', 'text-xs', 'font-medium', 'text-gray-500', 'uppercase', 'tracking-wider');
 
                             var modal_tr = document.getElementById('modal-tr-'+ index); 
@@ -665,6 +666,56 @@ $document_path_display = $document_path->path; ?>
                 <form method="post" action="{{ route('employees.update', [$company_id, $employee->id]) }}" enctype="multipart/form-data">
                     <div class="flex flex-col">
                         <table class="min-w-full divide-y divide-gray-200 w-full">
+                            
+                        <tr class="border-b">
+                                <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Foto
+                                </th>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
+                                    @if (Laravel\Jetstream\Jetstream::managesProfilePhotos())
+                                        <div x-data="{photoName: null, photoPreview: null}" class="col-span-6 sm:col-span-4">
+                                            <!-- Profile Photo File Input -->
+                                            <input type="file" class="hidden"
+                                                        wire:model="photo"
+                                                        x-ref="photo"
+                                                        x-on:change="
+                                                                photoName = $refs.photo.files[0].name;
+                                                                const reader = new FileReader();
+                                                                reader.onload = (e) => {
+                                                                    photoPreview = e.target.result;
+                                                                };
+                                                                reader.readAsDataURL($refs.photo.files[0]);
+                                                        " />
+
+                                            <x-label for="photo" value="{{ __('Foto') }}" />
+
+                                            <!-- Current Profile Photo -->
+                                            <div class="mt-2" x-show="! photoPreview">
+                                                <img src="{{ Employee::findOrFail($employee->id)->profile_photo_url }}" alt="{{ Employee::findOrFail($employee->id)->name }}" class="rounded-full h-20 w-20 object-cover">
+                                            </div>
+
+                                            <!-- New Profile Photo Preview -->
+                                            <div class="mt-2" x-show="photoPreview" style="display: none;">
+                                                <span class="block rounded-full w-20 h-20 bg-cover bg-no-repeat bg-center"
+                                                    x-bind:style="'background-image: url(\'' + photoPreview + '\');'">
+                                                </span>
+                                            </div>
+
+                                            <x-secondary-button class="mt-2 mr-2" type="button" x-on:click.prevent="$refs.photo.click()">
+                                                {{ __('Select A New Photo') }}
+                                            </x-secondary-button>
+
+                                            @if (Employee::findOrFail($employee->id)->profile_photo_path)
+                                                <x-secondary-button type="button" class="mt-2" wire:click="deleteProfilePhoto">
+                                                    {{ __('Remove Photo') }}
+                                                </x-secondary-button>
+                                            @endif
+
+                                            <x-input-error for="photo" class="mt-2" />
+                                        </div>
+                                    @endif
+                                    </td>
+                            </tr>
                             <tr class="border-b">
                                 <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     ID
@@ -850,8 +901,8 @@ $document_path_display = $document_path->path; ?>
                                         class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-ful"
                                         wire:model="id_company">
                                             @foreach($companies as $company)
-                                                <option value="{{ $company->id }}" {{ $employee->company == $company->nome_fantasia ? 'selected' : '' }}>
-                                                    {{ $company->nome_fantasia }}
+                                                <option value="{{ $company->id }}" {{ $employee->company == $company->name ? 'selected' : '' }}>
+                                                    {{ $company->name }}
                                                 </option>
                                             @endforeach
                                            

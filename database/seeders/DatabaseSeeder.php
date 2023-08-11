@@ -30,12 +30,12 @@ class DatabaseSeeder extends Seeder
         \DB::table('companies')->insert([
             [
                 'razao_social' => 'Gigante Sistemas S/A',
-                'nome_fantasia' => 'Gigante Sistemas',
+                'name' => 'Gigante Sistemas',
                 'tipo' => "Contratante",
             ],
             [
                 'razao_social' => 'Mateus Sistemas S/A',
-                'nome_fantasia' => 'Mateus Sistemas',
+                'name' => 'Mateus Sistemas',
                 'tipo' => 'Contratada',
             ]
         ]);
@@ -53,6 +53,27 @@ class DatabaseSeeder extends Seeder
                 'password' => \Hash::make('12345678'),
                 'type' => 'Administrador',
                 'active' => true,
+            ],
+            [
+                'name' => 'Pablo',
+                'email' => 'pablo@gigantesistemas.com.br',
+                'password' => \Hash::make('12345678'),
+                'type' => 'Moderador',
+                'active' => true,
+            ],
+            [
+                'name' => 'Vinicius',
+                'email' => 'vinicius@gigantesistemas.com.br',
+                'password' => \Hash::make('12345678'),
+                'type' => 'Moderador',
+                'active' => true,
+            ],
+            [
+                'name' => 'Teste',
+                'email' => 'Teste@gigantesistemas.com.br',
+                'password' => \Hash::make('12345678'),
+                'type' => 'Moderador',
+                'active' => true,
             ]
         ]);
         \DB::table('user_relations')->insert([
@@ -65,6 +86,21 @@ class DatabaseSeeder extends Seeder
                 'id_company' => 2,
                 'id_user' => 2,
                 'is_manager' => 1,
+            ],
+            [
+                'id_company' => 1,
+                'id_user' => 3,
+                'is_manager' => 0,
+            ],
+            [
+                'id_company' => 1,
+                'id_user' => 4,
+                'is_manager' => 0,
+            ],
+            [
+                'id_company' => 1,
+                'id_user' => 5,
+                'is_manager' => 0,
             ]
         ]);
         \DB::table('company_relations')->insert([
@@ -73,8 +109,8 @@ class DatabaseSeeder extends Seeder
                 'id_contratada' => 2,
             ]
         ]);
-        User::factory()->count(50)->create();
-        User_relation::factory()->count(50)->create();
+        // User::factory()->count(50)->create();
+        // User_relation::factory()->count(50)->create();
         // Employee::factory()->count(50)->create();
     }
 }

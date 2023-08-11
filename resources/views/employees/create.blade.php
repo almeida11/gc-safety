@@ -110,7 +110,7 @@
                                         wire:model="id_company">
                                             @foreach($companies as $company)
                                                 <option value="{{ $company->id }}">
-                                                    {{ $company->nome_fantasia }}
+                                                    {{ $company->name }}
                                                 </option>
                                             @endforeach
                                            

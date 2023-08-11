@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('cpf');
             $table->date('admission');
+            $table->string('employee_photo_path', 2048)->nullable();
             $table->unsignedBigInteger('id_responsibility')->nullable();
             $table->foreign('id_responsibility')->references('id')->on('responsibilities')->onDelete('cascade')->nullable();
             $table->unsignedBigInteger('id_sector')->nullable();

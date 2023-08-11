@@ -21,7 +21,7 @@ class ResponsibilitiesController extends Controller {
             ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
             ->join('companies', 'companies.id', '=', 'user_relations.id_company')
             ->where('companies.id', $company_id)
-            ->select('users.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
+            ->select('users.*', 'companies.name AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
             ->first();
         
         $responsibilities = DB::table('responsibilities')
@@ -32,7 +32,7 @@ class ResponsibilitiesController extends Controller {
                     ->on('companies.id', '=', 'company_relations.id_contratada')
                     ->orOn('companies.id', '=', 'company_relations.id_contratante');
             })
-            ->select('responsibilities.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo')
+            ->select('responsibilities.*', 'companies.name AS company', 'companies.tipo AS tipo')
             ->paginate(9);
         return view('responsibilities.index', compact('responsibilities', 'editor', 'company_id'));
     }
@@ -42,7 +42,7 @@ class ResponsibilitiesController extends Controller {
             ->where('users.id', Auth::user()->id)
             ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
             ->join('companies', 'companies.id', '=', 'user_relations.id_company')
-            ->select('users.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
+            ->select('users.*', 'companies.name AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
             ->first();
 
         $documents = DB::table('documents')
@@ -53,7 +53,7 @@ class ResponsibilitiesController extends Controller {
                     ->on('companies.id', '=', 'company_relations.id_contratada')
                     ->orOn('companies.id', '=', 'company_relations.id_contratante');
             })
-            ->select('documents.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo')
+            ->select('documents.*', 'companies.name AS company', 'companies.tipo AS tipo')
             ->get();
         
         $companies = DB::table('companies')
@@ -78,7 +78,7 @@ class ResponsibilitiesController extends Controller {
             ->where('users.id', Auth::user()->id)
             ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
             ->join('companies', 'companies.id', '=', 'user_relations.id_company')
-            ->select('users.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
+            ->select('users.*', 'companies.name AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
             ->first();
 
         $req = $request->validated();
@@ -105,7 +105,7 @@ class ResponsibilitiesController extends Controller {
             ->where('users.id', Auth::user()->id)
             ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
             ->join('companies', 'companies.id', '=', 'user_relations.id_company')
-            ->select('users.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
+            ->select('users.*', 'companies.name AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
             ->first();
         
         $documents = DB::table('documents')
@@ -116,7 +116,7 @@ class ResponsibilitiesController extends Controller {
                     ->on('companies.id', '=', 'company_relations.id_contratada')
                     ->orOn('companies.id', '=', 'company_relations.id_contratante');
             })
-            ->select('documents.*', 'companies.nome_fantasia AS company', 'companies.tipo AS tipo')
+            ->select('documents.*', 'companies.name AS company', 'companies.tipo AS tipo')
             ->paginate(9);
 
         $companies = DB::table('companies')

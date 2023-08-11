@@ -1,3 +1,5 @@
+<?php use App\Models\User;?>
+
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
@@ -7,8 +9,8 @@
 
     <div>
         <div class="max-w-7xl mx-auto py-10 sm:px-6 lg:px-8">
-            @if(Auth::user()->type != 'Usuário')
-                <div class="block mb-8 sm:px-6 lg:px-8 mb-4">
+            @if(Auth::user()->type != 'Fiscal')
+                <div class="block mb-8 mb-4">
                     <a href="{{ route('users.create') }}" class="bg-gray-200 hover:bg-gray-300 text-black  py-2 px-4 rounded">Cadastrar Usuário</a>
                 </div>
             @endif
@@ -28,7 +30,10 @@
                             <table class="min-w-full divide-y divide-gray-200 w-full">
                                 <thead>
                                 <tr>
-                                    @if ($editor->type == 'Administrador')
+                                    <th scope="col" width="50" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Foto
+                                    </th>
+                                    @if ($editor->type == 'Cliente')
                                         <th scope="col" width="50" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             ID
                                         </th>
@@ -46,12 +51,12 @@
                                         Tipo do Usuário
                                     </th>
                                     
-                                    @if ($editor->type == 'Administrador')
+                                    @if ($editor->type == 'Cliente')
                                         <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             Status
                                         </th>
                                     @else
-                                        @if ($editor->type == 'Moderador')
+                                        @if ($editor->type == 'Prestador')
                                             <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                                 Status
                                             </th>
@@ -65,7 +70,14 @@
                                 <tbody class="bg-white divide-y divide-gray-200">
                                 @foreach ($users as $user)
                                     <tr>
-                                        @if ($editor->type == 'Administrador')
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                            @if (Laravel\Jetstream\Jetstream::managesProfilePhotos())
+                                                <button class="flex text-sm border-2 border-transparent rounded-full focus:outline-none focus:border-gray-300 transition">
+                                                    <img class="h-8 w-8 rounded-full object-cover" src="{{ User::findOrFail($user->id)->profile_photo_url }}" alt="{{ User::findOrFail($user->id)->name }}" />
+                                                </button>
+                                            @endif
+                                        </td>
+                                        @if ($editor->type == 'Cliente')
                                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                                 {{ $user->id }}
                                             </td>
@@ -89,12 +101,12 @@
                                             {{ $user->type }}
                                         </td>
 
-                                        @if ($editor->type == 'Administrador')
+                                        @if ($editor->type == 'Cliente')
                                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                                 {{ $user->active ? 'Ativo' : 'Inativo' }}
                                             </td>
                                         @else
-                                            @if ($editor->type == 'Moderador')
+                                            @if ($editor->type == 'Prestador')
                                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                                     {{ $user->active ? 'Ativo' : 'Inativo' }}
                                                 </td>

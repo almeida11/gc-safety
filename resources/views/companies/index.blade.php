@@ -1,3 +1,4 @@
+<?php use App\Models\Company; ?>
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
@@ -9,7 +10,7 @@
         <div class="max-w-7xl mx-auto py-10 sm:px-6 lg:px-8">
             @if(Auth::user()->type != 'Usuário')
                 @if ($editor->tipo == 'Contratante')
-                <div class="block mb-8 sm:px-6 lg:px-8 mb-4">
+                <div class="block mb-8 mb-4">
                     <a href="{{ route('companies.create') }}" class="bg-gray-200 hover:bg-gray-300 text-black  py-2 px-4 rounded">Cadastrar Empresa</a>
                 </div>
                 @endif
@@ -21,6 +22,9 @@
                             <table class="min-w-full divide-y divide-gray-200 w-full">
                                 <thead>
                                 <tr>
+                                    <th scope="col" width="50" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Foto
+                                    </th>
                                     @if ($editor->type == 'Administrador')
                                         <th scope="col" width="50" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             ID
@@ -40,7 +44,7 @@
                                     </th>
                                     @if ($editor->type == 'Administrador')
                                         <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Status da Empresa
+                                            Status
                                         </th>
                                     @endif
                                     <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -54,6 +58,13 @@
                                 <tbody class="bg-white divide-y divide-gray-200">
                                 @foreach ($companies as $company)
                                     <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                            @if (Laravel\Jetstream\Jetstream::managesProfilePhotos())
+                                                <button class="flex text-sm border-2 border-transparent rounded-full focus:outline-none focus:border-gray-300 transition">
+                                                    <img class="h-8 w-8 rounded-full object-cover" src="{{ Company::findOrFail($company->id)->profile_photo_url }}" alt="{{ Company::findOrFail($company->id)->name }}" />
+                                                </button>
+                                            @endif
+                                        </td>
                                         @if ($editor->type == 'Administrador')
                                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                                 {{ $company->id }}
@@ -61,7 +72,7 @@
                                         @endif
 
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                            {{ $company->nome_fantasia }}
+                                            {{ $company->name }}
                                         </td>
 
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -72,6 +83,7 @@
                                                 <?php 
                                                     if ($user->id == $company->id_manager) {
                                                         echo mb_strimwidth($user->name, 0, 20, "...");
+                                                        break;
                                                     }
                                                 ?>
                                             @endforeach

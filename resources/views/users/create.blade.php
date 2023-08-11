@@ -77,8 +77,8 @@
                                         class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-ful"
                                         wire:model="company">
                                             @foreach($companies as $company)
-                                                <option value="{{ $company->id }}" @if ($editor->company == $company->nome_fantasia) selected @endif>
-                                                    {{ $company->nome_fantasia }}
+                                                <option value="{{ $company->id }}" @if ($editor->company == $company->name) selected @endif>
+                                                    {{ $company->name }}
                                                 </option>
                                             @endforeach
                                            
@@ -98,16 +98,16 @@
                                         <select id="type" name="type"
                                         class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-ful"
                                         wire:model="type">
-                                            @if (Auth::user()->type == 'Administrador')
-                                                <option value="Administrador">
-                                                    Administrador
+                                            @if (Auth::user()->type == 'Cliente')
+                                                <option value="Cliente">
+                                                    Cliente
                                                 </option>
                                             @endif
-                                            <option value="Moderador">
-                                                Moderador
+                                            <option value="Prestador">
+                                                Prestador
                                             </option>
-                                            <option value="Usuário" selected>
-                                                Usuário
+                                            <option value="Fiscal" selected>
+                                                Fiscal
                                             </option>
                                         </select>
                                         @error('type')
