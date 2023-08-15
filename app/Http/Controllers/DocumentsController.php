@@ -12,6 +12,9 @@ use App\Models\Company;
 
 class DocumentsController extends Controller {
     public function index(Int $company_id) {
+
+        $busca = isset($_GET['query-documents']) ? $_GET['query-documents'] : '';
+
         $documents = DB::table('documents')
             ->join('companies', 'companies.id', '=', 'documents.id_company')
             ->where('companies.id', $company_id)
@@ -19,6 +22,11 @@ class DocumentsController extends Controller {
                 $join
                     ->on('companies.id', '=', 'company_relations.id_contratada')
                     ->orOn('companies.id', '=', 'company_relations.id_contratante');
+            })
+            ->where(function ($query) use ($busca) {
+                $query->where('documents.id', 'LIKE', '%' . $busca . '%')
+                ->orWhere('documents.name', 'LIKE', '%' . $busca . '%')
+                ->orWhere('companies.name', 'LIKE', '%' . $busca . '%');
             })
             ->select('documents.*', 'companies.name AS company', 'companies.tipo AS tipo')
             ->paginate(9);
@@ -29,7 +37,7 @@ class DocumentsController extends Controller {
             ->join('companies', 'companies.id', '=', 'user_relations.id_company')
             ->select('users.*', 'companies.name AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
             ->first();
-        return view('documents.index', compact('editor', 'documents', 'company_id'));
+        return view('documents.index', compact('editor', 'documents', 'company_id', 'busca'));
     }
 
     public function create(Int $company_id) {

@@ -42,9 +42,15 @@ function limpaString($string) {
                                             <x-label for="photo" value="{{ __('Foto') }}" />
 
                                             <!-- Current Profile Photo -->
-                                            <div class="mt-2" x-show="! photoPreview">
-                                                <img src="{{ Employee::findOrFail($employee->id)->profile_photo_url }}" alt="{{ Employee::findOrFail($employee->id)->name }}" class="rounded-full h-20 w-20 object-cover">
-                                            </div>
+                                            @if (Employee::findOrFail($employee->id)->employee_photo_path)
+                                                <div class="mt-2" x-show="! photoPreview">
+                                                    <img src="/storage/{{ Employee::findOrFail($employee->id)->employee_photo_path }}" alt="{{ Employee::findOrFail($employee->id)->name }}" class="rounded-full h-20 w-20 object-cover">
+                                                </div>
+                                            @else
+                                                <div class="mt-2" x-show="! photoPreview">
+                                                    <img src="{{ Employee::findOrFail($employee->id)->profile_photo_url }}" alt="{{ Employee::findOrFail($employee->id)->name }}" class="rounded-full h-20 w-20 object-cover">
+                                                </div>
+                                            @endif
 
                                             <!-- New Profile Photo Preview -->
                                             <div class="mt-2" x-show="photoPreview" style="display: none;">
@@ -52,16 +58,6 @@ function limpaString($string) {
                                                     x-bind:style="'background-image: url(\'' + photoPreview + '\');'">
                                                 </span>
                                             </div>
-
-                                            <x-secondary-button class="mt-2 mr-2" type="button" x-on:click.prevent="$refs.photo.click()">
-                                                {{ __('Select A New Photo') }}
-                                            </x-secondary-button>
-
-                                            @if (Employee::findOrFail($employee->id)->profile_photo_path)
-                                                <x-secondary-button type="button" class="mt-2" wire:click="deleteProfilePhoto">
-                                                    {{ __('Remove Photo') }}
-                                                </x-secondary-button>
-                                            @endif
 
                                             <x-input-error for="photo" class="mt-2" />
                                         </div>

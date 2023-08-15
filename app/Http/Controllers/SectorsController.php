@@ -15,6 +15,9 @@ use App\Models\Sector;
 
 class SectorsController extends Controller {
     public function index(Int $company_id) {
+
+        $busca = isset($_GET['query-sector']) ? $_GET['query-sector'] : '';
+
         $editor = DB::table('users')
             ->where('users.id', Auth::user()->id)
             ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
@@ -30,9 +33,14 @@ class SectorsController extends Controller {
                     ->on('companies.id', '=', 'company_relations.id_contratada')
                     ->orOn('companies.id', '=', 'company_relations.id_contratante');
             })
+            ->where(function ($query) use ($busca) {
+                $query->where('sectors.id', 'LIKE', '%' . $busca . '%')
+                ->orWhere('sectors.name', 'LIKE', '%' . $busca . '%')
+                ->orWhere('companies.name', 'LIKE', '%' . $busca . '%');
+            })
             ->select('sectors.*', 'companies.name AS company', 'companies.tipo AS tipo')
             ->paginate(9);
-        return view('sectors.index', compact('sectors', 'editor', 'company_id'));
+        return view('sectors.index', compact('sectors', 'editor', 'company_id', 'busca'));
     }
     
     public function create(Int $company_id) {

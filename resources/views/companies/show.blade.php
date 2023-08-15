@@ -44,9 +44,16 @@
                                             <x-label for="photo" value="{{ __('Foto') }}" />
 
                                             <!-- Current Profile Photo -->
-                                            <div class="mt-2" x-show="! photoPreview">
-                                                <img src="{{ Company::findOrFail($company->id)->profile_photo_url }}" alt="{{ Company::findOrFail($company->id)->name }}" class="rounded-full h-20 w-20 object-cover">
-                                            </div>
+                                            
+                                            @if (Company::findOrFail($company->id)->company_photo_path)
+                                                <div class="mt-2" x-show="! photoPreview">
+                                                    <img src="/storage/{{ Company::findOrFail($company->id)->company_photo_path }}" alt="{{ Company::findOrFail($company->id)->name }}" class="rounded-full h-20 w-20 object-cover">
+                                                </div>
+                                            @else
+                                                <div class="mt-2" x-show="! photoPreview">
+                                                    <img src="{{ Company::findOrFail($company->id)->profile_photo_url }}" alt="{{ Company::findOrFail($company->id)->name }}" class="rounded-full h-20 w-20 object-cover">
+                                                </div>
+                                            @endif
 
                                             <!-- New Profile Photo Preview -->
                                             <div class="mt-2" x-show="photoPreview" style="display: none;">
@@ -54,16 +61,6 @@
                                                     x-bind:style="'background-image: url(\'' + photoPreview + '\');'">
                                                 </span>
                                             </div>
-
-                                            <x-secondary-button class="mt-2 mr-2" type="button" x-on:click.prevent="$refs.photo.click()">
-                                                {{ __('Select A New Photo') }}
-                                            </x-secondary-button>
-
-                                            @if (Company::findOrFail($company->id)->profile_photo_path)
-                                                <x-secondary-button type="button" class="mt-2" wire:click="deleteProfilePhoto">
-                                                    {{ __('Remove Photo') }}
-                                                </x-secondary-button>
-                                            @endif
 
                                             <x-input-error for="photo" class="mt-2" />
                                         </div>

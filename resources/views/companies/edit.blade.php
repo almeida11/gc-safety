@@ -20,7 +20,7 @@
                 @endif
             </div>
             <div class="mt-5 md:mt-0 md:col-span-2">
-                <form method="post" action="{{ route('companies.update', $company->id) }}">
+                <form method="post" action="{{ route('companies.update', $company->id) }}" enctype="multipart/form-data">
                     <div class="flex flex-col">
                         <table class="min-w-full divide-y divide-gray-200 w-full">
                             <tr class="border-b">
@@ -34,6 +34,7 @@
                                             <input type="file" class="hidden"
                                                         wire:model="photo"
                                                         x-ref="photo"
+                                                        name="company_photo_path"
                                                         x-on:change="
                                                                 photoName = $refs.photo.files[0].name;
                                                                 const reader = new FileReader();
@@ -46,9 +47,16 @@
                                             <x-label for="photo" value="{{ __('Foto') }}" />
 
                                             <!-- Current Profile Photo -->
-                                            <div class="mt-2" x-show="! photoPreview">
-                                                <img src="{{ Company::findOrFail($company->id)->profile_photo_url }}" alt="{{ Company::findOrFail($company->id)->name }}" class="rounded-full h-20 w-20 object-cover">
-                                            </div>
+                                            
+                                            @if (Company::findOrFail($company->id)->company_photo_path)
+                                                <div class="mt-2" x-show="! photoPreview">
+                                                    <img src="/storage/{{ Company::findOrFail($company->id)->company_photo_path }}" alt="{{ Company::findOrFail($company->id)->name }}" class="rounded-full h-20 w-20 object-cover">
+                                                </div>
+                                            @else
+                                                <div class="mt-2" x-show="! photoPreview">
+                                                    <img src="{{ Company::findOrFail($company->id)->profile_photo_url }}" alt="{{ Company::findOrFail($company->id)->name }}" class="rounded-full h-20 w-20 object-cover">
+                                                </div>
+                                            @endif
 
                                             <!-- New Profile Photo Preview -->
                                             <div class="mt-2" x-show="photoPreview" style="display: none;">
@@ -61,11 +69,17 @@
                                                 {{ __('Select A New Photo') }}
                                             </x-secondary-button>
 
-                                            @if (Company::findOrFail($company->id)->profile_photo_path)
-                                                <x-secondary-button type="button" class="mt-2" wire:click="deleteProfilePhoto">
+                                            @if (Company::findOrFail($company->id)->company_photo_path)
+                                                <x-secondary-button type="button" class="mt-2" onclick="fdeleteProfilePhoto()" wire:click="deleteProfilePhoto">
                                                     {{ __('Remove Photo') }}
                                                 </x-secondary-button>
+                                                
+                                                <input type="text" id="deleteProfile" name="deleteProfilePhoto" class="hidden">
                                             @endif
+
+                                            @error('foto')
+                                                <p class="text-sm text-red-600">{{ $message }}</p>
+                                            @enderror
 
                                             <x-input-error for="photo" class="mt-2" />
                                         </div>

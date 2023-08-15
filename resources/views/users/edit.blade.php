@@ -13,7 +13,7 @@
                 <a href="{{ route('users.index') }}" class="bg-gray-200 hover:bg-gray-300 text-black  py-2 px-4 rounded">Voltar a Lista</a>
             </div>
             <div class="mt-5 md:mt-0 md:col-span-2">
-                <form method="post" action="{{ route('users.update', $user->id) }}">
+                <form method="post" action="{{ route('users.update', $user->id) }}"  enctype="multipart/form-data">
                     <div class="flex flex-col">
                         <table class="min-w-full divide-y divide-gray-200 w-full">
                             <tr class="border-b">
@@ -27,6 +27,7 @@
                                             <input type="file" class="hidden"
                                                         wire:model="photo"
                                                         x-ref="photo"
+                                                        name="profile_photo_path"
                                                         x-on:change="
                                                                 photoName = $refs.photo.files[0].name;
                                                                 const reader = new FileReader();
@@ -55,9 +56,11 @@
                                             </x-secondary-button>
 
                                             @if (User::findOrFail($user->id)->profile_photo_path)
-                                                <x-secondary-button type="button" class="mt-2" wire:click="deleteProfilePhoto">
+                                                <x-secondary-button type="button" class="mt-2" onclick="fdeleteProfilePhoto()" wire:click="deleteProfilePhoto">
                                                     {{ __('Remove Photo') }}
                                                 </x-secondary-button>
+                                                
+                                                <input type="text" id="deleteProfile" name="deleteProfilePhoto" class="hidden">
                                             @endif
 
                                             <x-input-error for="photo" class="mt-2" />

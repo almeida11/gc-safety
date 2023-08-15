@@ -22,7 +22,7 @@
                 </div>
                 @if (Route::has('companies.index'))
                     <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                        <x-nav-link href="{{ route('companies.index') }}" :active="request()->routeIs('companies.*')">
+                        <x-nav-link href="{{ route('companies.index') }}" :active="request()->routeIs('companies.*') or request()->routeIs('employees.*') or request()->routeIs('responsibilities.*') or request()->routeIs('sectors.*') or request()->routeIs('documents.*')">
                             Empresas
                         </x-nav-link>
                     </div>

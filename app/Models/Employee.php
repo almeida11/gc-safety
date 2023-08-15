@@ -19,6 +19,7 @@ class Employee extends Model
         'id_sector',
         'id_company',
         'active',
+        'employee_photo_path',
     ];
 
     protected $appends = [

@@ -30,6 +30,7 @@ class User extends Authenticatable
         'type',
         'company',
         'active',
+        'profile_photo_path',
     ];
 
     /**

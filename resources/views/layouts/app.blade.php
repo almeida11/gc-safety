@@ -32,6 +32,14 @@
             }
         </style>
         <script>
+            function getInitial(name) {
+                const strings = name.split(' ');
+                const initials = strings
+                    .filter(string => string.toLowerCase() !== 'de' && string.toLowerCase() !== 'da'  && string.toLowerCase() !== 'do' && string.toLowerCase() !== 'e')
+                    .map(string => string[0].toUpperCase())
+                    .join('');
+                return initials;
+                }
             function onlyNumberKey(evt) {
                 var ASCIICode = (evt.which) ? evt.which : evt.keyCode
                 if (ASCIICode > 31 && (ASCIICode < 48 || ASCIICode > 57))
@@ -78,6 +86,10 @@
                 }
             }
             
+            function fdeleteProfilePhoto() {
+                let deleteProfilePhotoButton = document.getElementById('deleteProfile');
+                deleteProfilePhotoButton.value = 'deleteProfilePhoto';
+            }
         </script>
     </head>
     <body class="font-sans antialiased">

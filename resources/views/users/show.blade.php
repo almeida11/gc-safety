@@ -47,16 +47,6 @@
                                                 </span>
                                             </div>
 
-                                            <x-secondary-button class="mt-2 mr-2" type="button" x-on:click.prevent="$refs.photo.click()">
-                                                {{ __('Select A New Photo') }}
-                                            </x-secondary-button>
-
-                                            @if (User::findOrFail($user->id)->profile_photo_path)
-                                                <x-secondary-button type="button" class="mt-2" wire:click="deleteProfilePhoto">
-                                                    {{ __('Remove Photo') }}
-                                                </x-secondary-button>
-                                            @endif
-
                                             <x-input-error for="photo" class="mt-2" />
                                         </div>
                                     @endif

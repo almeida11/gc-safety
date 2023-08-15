@@ -16,6 +16,9 @@ use App\Models\Document;
 
 class ResponsibilitiesController extends Controller {
     public function index(Int $company_id) {
+
+        $busca = isset($_GET['query-responsibilities']) ? $_GET['query-responsibilities'] : '';
+
         $editor = DB::table('users')
             ->where('users.id', Auth::user()->id)
             ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
@@ -32,9 +35,14 @@ class ResponsibilitiesController extends Controller {
                     ->on('companies.id', '=', 'company_relations.id_contratada')
                     ->orOn('companies.id', '=', 'company_relations.id_contratante');
             })
+            ->where(function ($query) use ($busca) {
+                $query->where('responsibilities.id', 'LIKE', '%' . $busca . '%')
+                ->orWhere('responsibilities.name', 'LIKE', '%' . $busca . '%')
+                ->orWhere('companies.name', 'LIKE', '%' . $busca . '%');
+            })
             ->select('responsibilities.*', 'companies.name AS company', 'companies.tipo AS tipo')
             ->paginate(9);
-        return view('responsibilities.index', compact('responsibilities', 'editor', 'company_id'));
+        return view('responsibilities.index', compact('responsibilities', 'editor', 'company_id', 'busca'));
     }
     
     public function create(Int $company_id) {

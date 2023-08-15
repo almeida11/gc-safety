@@ -19,6 +19,9 @@ use App\Models\Sector;
 
 class EmployeesController extends Controller {
     public function index(Int $company_id) {
+
+        $busca = isset($_GET['query-employees']) ? $_GET['query-employees'] : '';
+
         $editor = DB::table('users')
             ->where('users.id', Auth::user()->id)
             ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
@@ -32,6 +35,12 @@ class EmployeesController extends Controller {
             ->where('companies.id', $company_id)
             ->join('responsibilities', 'responsibilities.id', '=', 'employees.id_responsibility')
             ->join('sectors', 'sectors.id', '=', 'employees.id_sector')
+            ->where(function ($query) use ($busca) {
+                $query->where('employees.id', 'LIKE', '%' . $busca . '%')
+                ->orWhere('employees.name', 'LIKE', '%' . $busca . '%')
+                ->orWhere('responsibilities.name', 'LIKE', '%' . $busca . '%')
+                ->orWhere('sectors.name', 'LIKE', '%' . $busca . '%');
+            })
             ->select('employees.*', 'companies.name AS company', 'responsibilities.name AS responsibility', 'sectors.name AS sector')
             ->paginate(9);
 
@@ -72,7 +81,7 @@ class EmployeesController extends Controller {
             }
         }
         
-        return view('employees.index', compact('employees', 'sectors', 'responsibilities', 'company_id', 'employees_doc_status', 'editor'));
+        return view('employees.index', compact('employees', 'sectors', 'responsibilities', 'company_id', 'employees_doc_status', 'editor', 'busca'));
     }
     
     public function create(Int $company_id) {
@@ -266,9 +275,44 @@ class EmployeesController extends Controller {
             ->join('companies', 'companies.id', '=', 'user_relations.id_company')
             ->select('users.*', 'companies.name AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
             ->first();
-        
+
+        $employee_check = DB::table('employees')
+            ->where('employees.id', $employee->id)
+            ->join('companies', 'companies.id', '=', 'employees.id_company')
+            ->join('responsibilities', 'responsibilities.id', '=', 'employees.id_responsibility')
+            ->join('sectors', 'sectors.id', '=', 'employees.id_sector')
+            ->select('employees.*', 'companies.name AS company', 'responsibilities.name AS responsibility', 'sectors.name AS sector')
+            ->first();
+
+        if($request->employee_photo_path) {
+            if(explode("/", $request->employee_photo_path->getClientmimeType())[0] != 'image') {
+                throw ValidationException::withMessages(['foto' => 'Você deve enviar somente arquivos de imagem.']);
+            }
+
+            $extension = $request->employee_photo_path->getClientOriginalExtension();
+
+            $path = 'documents/'.$employee_check->company.'/'.$employee_check->name.'/';
+            $path = preg_replace('/[ -]+/' , '_' , strtolower( preg_replace("[^a-zA-Z0-9-]", "-", strtr(utf8_decode(trim($path)), utf8_decode("áàãâéêíóôõúüñçÁÀÃÂÉÊÍÓÔÕÚÜÑÇ"), "aaaaeeiooouuncAAAAEEIOOOUUNC-")) ));
+
+            $document_name = 'FOTO_' . $employee_check->id. "_" . $employee_check->name . ".{$extension}";
+            $document_name = preg_replace('/[ -]+/' , '_' , strtolower( preg_replace("[^a-zA-Z0-9-]", "-", strtr(utf8_decode(trim($document_name)), utf8_decode("áàãâéêíóôõúüñçÁÀÃÂÉÊÍÓÔÕÚÜÑÇ"), "aaaaeeiooouuncAAAAEEIOOOUUNC-")) ));
+
+            $request->employee_photo_path->storeAs($path, $document_name);
+        }
+
         $req = $request->validated();
+        
+        if($request->deleteProfilePhoto == 'deleteProfilePhoto') {
+            Storage::disk('public')->delete($employee->employee_photo_path);
+            $req['employee_photo_path'] = null;
+        }
+
+        if($request->employee_photo_path) {
+            $req['employee_photo_path'] = $path . $document_name;
+        }
+
         $employee->update($req);
+
         return redirect()->route('employees.edit', [$company_id, $employee->id]);
     }
     

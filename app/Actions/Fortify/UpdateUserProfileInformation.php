@@ -7,6 +7,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Laravel\Fortify\Contracts\UpdatesUserProfileInformation;
+use Illuminate\Support\Facades\DB;
 
 class UpdateUserProfileInformation implements UpdatesUserProfileInformation
 {
@@ -24,7 +25,29 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
         ])->validateWithBag('updateProfileInformation');
 
         if (isset($input['photo'])) {
-            $user->updateProfilePhoto($input['photo']);
+            $user_check = DB::table('users')
+                ->where('users.id', $user->id)
+                ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
+                ->join('companies', 'companies.id', '=', 'user_relations.id_company')
+                ->join('company_relations', function($join) {
+                    $join
+                        ->on('companies.id', '=', 'company_relations.id_contratada')
+                            ->orOn('companies.id', '=', 'company_relations.id_contratante');
+                })
+                ->select('users.*', 'companies.id AS id_company','company_relations.id_contratante', 'companies.name AS company', 'user_relations.is_manager AS is_manager')
+                ->first();
+            
+            $extension = $input['photo']->getClientOriginalExtension();
+
+            $path = 'documents/'.$user_check->company.'/usuarios/' . $user_check->name . '/';
+            $path = preg_replace('/[ -]+/' , '_' , strtolower( preg_replace("[^a-zA-Z0-9-]", "-", strtr(utf8_decode(trim($path)), utf8_decode("áàãâéêíóôõúüñçÁÀÃÂÉÊÍÓÔÕÚÜÑÇ"), "aaaaeeiooouuncAAAAEEIOOOUUNC-")) ));
+
+            $document_name = 'FOTO_' . $user_check->id. "_" . $user_check->name . ".{$extension}";
+            $document_name = preg_replace('/[ -]+/' , '_' , strtolower( preg_replace("[^a-zA-Z0-9-]", "-", strtr(utf8_decode(trim($document_name)), utf8_decode("áàãâéêíóôõúüñçÁÀÃÂÉÊÍÓÔÕÚÜÑÇ"), "aaaaeeiooouuncAAAAEEIOOOUUNC-")) ));
+
+            $storagePath = $path;
+            $storageName = $document_name;
+            $user->updateProfilePhoto($input['photo'], $storagePath, $document_name);
         }
 
         if ($input['email'] !== $user->email &&

@@ -27,6 +27,7 @@ class Company extends Model
         'id_manager',
         'ativo',
         'tipo',
+        'company_photo_path',
     ];
 
     protected $appends = [

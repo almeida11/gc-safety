@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Validation\ValidationException;
 use App\Http\Requests\UpdateCompanyRequest;
 use App\Http\Requests\StoreCompanyRequest;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Helpers\ValidationsHelper;
@@ -17,6 +18,9 @@ use App\Models\User;
 
 class CompaniesController extends Controller {
     public function index() {
+
+        $busca = isset($_GET['query-companie']) ? $_GET['query-companie'] : '';
+
         $editor = DB::table('users')
             ->where('users.id', Auth::user()->id)
             ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
@@ -44,6 +48,12 @@ class CompaniesController extends Controller {
                     ->where('user_relations.is_manager', 1);
                 })
                 ->leftJoin('users', 'user_relations.id_user', '=', 'users.id')
+                ->where(function ($query) use ($busca) {
+                    $query->where('companies.razao_social', 'LIKE', '%' . $busca . '%')
+                    ->orWhere('companies.cnpj', 'LIKE', '%' . $busca . '%')
+                    ->orWhere('companies.tipo', 'LIKE', '%' . $busca . '%')
+                    ->orWhere('users.name', 'LIKE', '%' . $busca . '%');
+                })
                 ->select('companies.*', 'users.id AS id_manager', 'company_relations.id_contratante')
                 ->paginate(9)->unique();
         } else {
@@ -58,6 +68,12 @@ class CompaniesController extends Controller {
                     ->where('user_relations.is_manager', 1);
                 })
                 ->leftJoin('users', 'user_relations.id_user', '=', 'users.id')
+                ->where(function ($query) use ($busca) {
+                    $query->where('companies.razao_social', 'LIKE', '%' . $busca . '%')
+                    ->orWhere('companies.cnpj', 'LIKE', '%' . $busca . '%')
+                    ->orWhere('companies.tipo', 'LIKE', '%' . $busca . '%')
+                    ->orWhere('users.name', 'LIKE', '%' . $busca . '%');
+                })
                 ->select('companies.*', 'users.id AS id_manager', 'company_relations.id_contratante')
                 ->paginate(9)->unique();
         }
@@ -71,6 +87,12 @@ class CompaniesController extends Controller {
                     ->where('user_relations.is_manager', 1);
                 })
                 ->leftJoin('users', 'user_relations.id_user', '=', 'users.id')
+                ->where(function ($query) use ($busca) {
+                    $query->where('companies.razao_social', 'LIKE', '%' . $busca . '%')
+                    ->orWhere('companies.cnpj', 'LIKE', '%' . $busca . '%')
+                    ->orWhere('companies.tipo', 'LIKE', '%' . $busca . '%')
+                    ->orWhere('users.name', 'LIKE', '%' . $busca . '%');
+                })
                 ->select('companies.*', 'users.id AS id_manager')
                 ->paginate(9);
         }
@@ -111,7 +133,7 @@ class CompaniesController extends Controller {
             }
         }
 
-        return view('companies.index', compact('companies', 'users', 'editor', 'companies_doc_status'));
+        return view('companies.index', compact('companies', 'users', 'editor', 'companies_doc_status', 'busca'));
     }
     
     public function create() {
@@ -153,37 +175,39 @@ class CompaniesController extends Controller {
         if (!(ValidationsHelper::is_cnpj($req["cnpj"]))) throw ValidationException::withMessages(['cnpj' => 'O campo cnpj tem um formato inválido.!']);
 
         if(Auth::user()->type == 'Moderador') $req['tipo'] = 'Contratada';
+            
+        if(isset($req['id_manager'])) {
+            $manager = (int) $req['id_manager'];
+            
+            unset($req['id_manager']);
 
-        $manager = (int) $req['id_manager'];
-        
-        unset($req['id_manager']);
-
-        $editor = DB::table('users')
-            ->where('users.id', Auth::user()->id)
-            ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
-            ->join('companies', 'companies.id', '=', 'user_relations.id_company')
-            ->select('users.*', 'companies.name AS company', 'user_relations.is_manager AS is_manager')
-            ->first();
-        
-        $company = DB::table('companies')
-            ->where('user_relations.id_user', $editor->id)
-            ->leftJoin('user_relations', function($join) {
-                $join->on('user_relations.id_company', '=', 'companies.id');
-            })
-            ->leftJoin('users', 'user_relations.id_user', '=', 'users.id')
-            ->select('companies.*', 'users.id AS id_manager')
-            ->first();
-
-        if(isset($manager->id)) {
-            $manager = DB::table('user_relations')
-                ->where('user_relations.id_user', $manager)
-                ->join('users', 'users.id', '=', 'user_relations.id_user')
-                ->select('user_relations.*')
+            $editor = DB::table('users')
+                ->where('users.id', Auth::user()->id)
+                ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
+                ->join('companies', 'companies.id', '=', 'user_relations.id_company')
+                ->select('users.*', 'companies.name AS company', 'user_relations.is_manager AS is_manager')
                 ->first();
             
-            $manager = User_relation::findOrFail($manager->id);
+            $company = DB::table('companies')
+                ->where('user_relations.id_user', $editor->id)
+                ->leftJoin('user_relations', function($join) {
+                    $join->on('user_relations.id_company', '=', 'companies.id');
+                })
+                ->leftJoin('users', 'user_relations.id_user', '=', 'users.id')
+                ->select('companies.*', 'users.id AS id_manager')
+                ->first();
 
-            $manager->is_manager = 1;
+            if(isset($manager->id)) {
+                $manager = DB::table('user_relations')
+                    ->where('user_relations.id_user', $manager)
+                    ->join('users', 'users.id', '=', 'user_relations.id_user')
+                    ->select('user_relations.*')
+                    ->first();
+                
+                $manager = User_relation::findOrFail($manager->id);
+
+                $manager->is_manager = 1;
+            }
         }
         $new_company = Company::create($req);
 
@@ -313,69 +337,95 @@ class CompaniesController extends Controller {
             }
             
         }
+        if($request->company_photo_path) {
+            if(explode("/", $request->company_photo_path->getClientmimeType())[0] != 'image') {
+                throw ValidationException::withMessages(['foto' => 'Você deve enviar somente arquivos de imagem.']);
+            }
+
+            $extension = $request->company_photo_path->getClientOriginalExtension();
+
+            $path = 'documents/'.$company->name.'/empresa/';
+            $path = preg_replace('/[ -]+/' , '_' , strtolower( preg_replace("[^a-zA-Z0-9-]", "-", strtr(utf8_decode(trim($path)), utf8_decode("áàãâéêíóôõúüñçÁÀÃÂÉÊÍÓÔÕÚÜÑÇ"), "aaaaeeiooouuncAAAAEEIOOOUUNC-")) ));
+
+            $document_name = 'FOTO_' . $company->id. "_" . $company->name . ".{$extension}";
+            $document_name = preg_replace('/[ -]+/' , '_' , strtolower( preg_replace("[^a-zA-Z0-9-]", "-", strtr(utf8_decode(trim($document_name)), utf8_decode("áàãâéêíóôõúüñçÁÀÃÂÉÊÍÓÔÕÚÜÑÇ"), "aaaaeeiooouuncAAAAEEIOOOUUNC-")) ));
+
+            $request->company_photo_path->storeAs($path, $document_name);
+        }
 
         $req = $request->validated();
+        
+        if($request->deleteProfilePhoto == 'deleteProfilePhoto') {
+            Storage::disk('public')->delete($company->company_photo_path);
+            $req['company_photo_path'] = null;
+        }
+
+        if($request->company_photo_path) {
+            $req['company_photo_path'] = $path . $document_name;
+        }
 
         if (!(ValidationsHelper::is_cnpj($req["cnpj"]))) throw ValidationException::withMessages(['cnpj' => 'O campo cnpj tem um formato inválido.!']);
 
-        $manager = (int) $req['id_manager'];
+        if(isset($req['id_manager'])) {
+            $manager = (int) $req['id_manager'];
 
-        unset($req['id_manager']);
+            unset($req['id_manager']);
 
-        if(isset($manager) && !(Auth::user()->type == 'Administrador')) {
-            $new_manager = DB::table('user_relations')
-                ->where('user_relations.id_user', $manager)
-                ->where('user_relations.id_company', $company->id)
-                ->join('users', 'users.id', '=', 'user_relations.id_user')
-                ->select('user_relations.*')
-                ->first();
+            if(isset($manager) && !(Auth::user()->type == 'Administrador')) {
+                $new_manager = DB::table('user_relations')
+                    ->where('user_relations.id_user', $manager)
+                    ->where('user_relations.id_company', $company->id)
+                    ->join('users', 'users.id', '=', 'user_relations.id_user')
+                    ->select('user_relations.*')
+                    ->first();
 
-            if(isset($new_manager)) {
+                if(isset($new_manager)) {
+                    $old_manager = DB::table('user_relations')
+                        ->where('user_relations.id_company', $company->id)
+                        ->where('user_relations.is_manager', 1)
+                        ->join('users', 'users.id', '=', 'user_relations.id_user')
+                        ->select('user_relations.*')
+                        ->first();
+                    if(isset($old_manager->id_user)) {
+                        if($old_manager->id_user != $manager) {
+                            $old_manager = User_relation::findOrFail($old_manager->id);
+                            $old_manager->is_manager = 0;
+                            $old_manager->update();
+                            
+                            $new_manager = User_relation::findOrFail($new_manager->id);
+                            $new_manager->is_manager = 1;
+                            $new_manager->update();
+                        }
+                    } else {
+                        $new_manager = User_relation::findOrFail($new_manager->id);
+                        $new_manager->is_manager = 1;
+                        $new_manager->update();
+                    }
+                } else {
+                    throw ValidationException::withMessages(['erro' => 'Usuario não faz parte da Empresa!']);
+                }
+            } else {
+                $new_manager = DB::table('user_relations')
+                    ->where('user_relations.id_user', $manager)
+                    ->join('users', 'users.id', '=', 'user_relations.id_user')
+                    ->select('user_relations.*')
+                    ->first();
                 $old_manager = DB::table('user_relations')
                     ->where('user_relations.id_company', $company->id)
                     ->where('user_relations.is_manager', 1)
                     ->join('users', 'users.id', '=', 'user_relations.id_user')
                     ->select('user_relations.*')
                     ->first();
-                if(isset($old_manager->id_user)) {
-                    if($old_manager->id_user != $manager) {
-                        $old_manager = User_relation::findOrFail($old_manager->id);
-                        $old_manager->is_manager = 0;
-                        $old_manager->update();
-                        
-                        $new_manager = User_relation::findOrFail($new_manager->id);
-                        $new_manager->is_manager = 1;
-                        $new_manager->update();
-                    }
-                } else {
+                if(isset($new_manager)) {
+                    $old_manager = User_relation::findOrFail($old_manager->id);
+                    $old_manager->is_manager = 0;
+                    $old_manager->update();
+
                     $new_manager = User_relation::findOrFail($new_manager->id);
                     $new_manager->is_manager = 1;
+                    $new_manager->id_company = $company->id;
                     $new_manager->update();
                 }
-            } else {
-                throw ValidationException::withMessages(['erro' => 'Usuario não faz parte da Empresa!']);
-            }
-        } else {
-            $new_manager = DB::table('user_relations')
-                ->where('user_relations.id_user', $manager)
-                ->join('users', 'users.id', '=', 'user_relations.id_user')
-                ->select('user_relations.*')
-                ->first();
-            $old_manager = DB::table('user_relations')
-                ->where('user_relations.id_company', $company->id)
-                ->where('user_relations.is_manager', 1)
-                ->join('users', 'users.id', '=', 'user_relations.id_user')
-                ->select('user_relations.*')
-                ->first();
-            if(isset($new_manager)) {
-                $old_manager = User_relation::findOrFail($old_manager->id);
-                $old_manager->is_manager = 0;
-                $old_manager->update();
-
-                $new_manager = User_relation::findOrFail($new_manager->id);
-                $new_manager->is_manager = 1;
-                $new_manager->id_company = $company->id;
-                $new_manager->update();
             }
         }
 
