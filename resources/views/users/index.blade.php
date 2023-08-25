@@ -35,14 +35,12 @@
                                     <th scope="col" width="50" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Foto
                                     </th>
-                                    @if ($editor->type == 'Cliente')
-                                        <th scope="col" width="50" class="py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            <a href="#" class="flex items-center justify-center ">
-                                                ID
-                                                <svg class="ml-1" width="30px" height="30px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke=""><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M5.70711 9.71069C5.31658 10.1012 5.31658 10.7344 5.70711 11.1249L10.5993 16.0123C11.3805 16.7927 12.6463 16.7924 13.4271 16.0117L18.3174 11.1213C18.708 10.7308 18.708 10.0976 18.3174 9.70708C17.9269 9.31655 17.2937 9.31655 16.9032 9.70708L12.7176 13.8927C12.3271 14.2833 11.6939 14.2832 11.3034 13.8927L7.12132 9.71069C6.7308 9.32016 6.09763 9.32016 5.70711 9.71069Z" fill="	#6B7280"></path> </g></svg>
-                                            </a>
-                                        </th> 
-                                    @endif
+                                    <th scope="col" width="50" class="py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <a href="#" class="flex items-center justify-center ">
+                                            ID
+                                            <svg class="ml-1" width="30px" height="30px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke=""><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M5.70711 9.71069C5.31658 10.1012 5.31658 10.7344 5.70711 11.1249L10.5993 16.0123C11.3805 16.7927 12.6463 16.7924 13.4271 16.0117L18.3174 11.1213C18.708 10.7308 18.708 10.0976 18.3174 9.70708C17.9269 9.31655 17.2937 9.31655 16.9032 9.70708L12.7176 13.8927C12.3271 14.2833 11.6939 14.2832 11.3034 13.8927L7.12132 9.71069C6.7308 9.32016 6.09763 9.32016 5.70711 9.71069Z" fill="	#6B7280"></path> </g></svg>
+                                        </a>
+                                    </th> 
                                     <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Nome
                                         <button type="submit" name="name-order"></button>
@@ -83,11 +81,9 @@
                                                 </button>
                                             @endif
                                         </td>
-                                        @if ($editor->type == 'Cliente')
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                {{ $user->id }}
-                                            </td>
-                                        @endif
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                            {{ $user->id }}
+                                        </td>
 
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                         <?php 
@@ -120,15 +116,13 @@
                                         @endif
                                         <td class=" py-4 whitespace-nowrap text-sm font-medium">
                                             <a href="{{ route('users.show', $user->id) }}" class="mb-2 mr-2 bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-2 rounded">Verificar</a>
-                                            @if(Auth::user()->type != 'Usuário')
+                                            @if(Auth::user()->type != 'Fiscal')
                                                 <a href="{{ route('users.edit', $user->id) }}" class="mb-2 mr-2 bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-2 rounded">Editar</a>
-                                                
-                                                    <form class="inline-block" action="{{ route('users.destroy', $user->id) }}" method="POST" onsubmit="return confirm('Você tem certeza?');">
-                                                        <input type="hidden" name="_method" value="DELETE" >
-                                                        @csrf
-                                                        <input @if(Auth::user()->id == $user->id) disabled="disabled" @endif type="submit" class="mb-2 mr-2 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-2 rounded" value="Desativar">
-                                                    </form>
-                                                
+                                                <form class="inline-block" action="{{ route('users.destroy', $user->id) }}" method="POST" onsubmit="return confirm('Você tem certeza?');">
+                                                    <input type="hidden" name="_method" value="DELETE" >
+                                                    @csrf
+                                                    <input @if(Auth::user()->id == $user->id) disabled="disabled" @endif type="submit" class="mb-2 mr-2 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-2 rounded" value="Desativar">
+                                                </form>
                                             @endif
                                         </td>
                                     </tr>

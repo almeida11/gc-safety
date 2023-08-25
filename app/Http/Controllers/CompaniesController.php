@@ -18,9 +18,10 @@ use App\Models\User;
 
 class CompaniesController extends Controller {
     public function index() {
-
         $busca = isset($_GET['query-companie']) ? $_GET['query-companie'] : '';
-
+        $orderby = isset($_GET['order-companie']) ? $_GET['order-companie'] : 'id';
+        $method = isset($_GET['method-companie']) ? $_GET['method-companie'] : 'asc';
+        
         $editor = DB::table('users')
             ->where('users.id', Auth::user()->id)
             ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
@@ -54,7 +55,8 @@ class CompaniesController extends Controller {
                     ->orWhere('companies.tipo', 'LIKE', '%' . $busca . '%')
                     ->orWhere('users.name', 'LIKE', '%' . $busca . '%');
                 })
-                ->select('companies.*', 'users.id AS id_manager', 'company_relations.id_contratante')
+                ->select('companies.*', 'users.id AS id_manager', 'users.name AS manager', 'company_relations.id_contratante')
+                ->orderBy($orderby, $method)
                 ->paginate(9)->unique();
         } else {
             $companies = DB::table('companies')
@@ -74,13 +76,14 @@ class CompaniesController extends Controller {
                     ->orWhere('companies.tipo', 'LIKE', '%' . $busca . '%')
                     ->orWhere('users.name', 'LIKE', '%' . $busca . '%');
                 })
-                ->select('companies.*', 'users.id AS id_manager', 'company_relations.id_contratante')
+                ->select('companies.*', 'users.id AS id_manager', 'users.name AS manager', 'company_relations.id_contratante')
+                ->orderBy($orderby, $method)
                 ->paginate(9)->unique();
         }
 
         $companies = PaginationHelper::paginate($companies, 9);
 
-        if (Auth::user()->type == 'Administrador') {
+        if (Auth::user()->type == 'Cliente') {
             $companies = DB::table('companies')
                 ->leftJoin('user_relations', function($join) {
                     $join->on('user_relations.id_company', '=', 'companies.id')
@@ -93,7 +96,8 @@ class CompaniesController extends Controller {
                     ->orWhere('companies.tipo', 'LIKE', '%' . $busca . '%')
                     ->orWhere('users.name', 'LIKE', '%' . $busca . '%');
                 })
-                ->select('companies.*', 'users.id AS id_manager')
+                ->select('companies.*', 'users.id AS id_manager', 'users.name AS manager')
+                ->orderBy($orderby, $method)
                 ->paginate(9);
         }
 
@@ -133,7 +137,7 @@ class CompaniesController extends Controller {
             }
         }
 
-        return view('companies.index', compact('companies', 'users', 'editor', 'companies_doc_status', 'busca'));
+        return view('companies.index', compact('companies', 'users', 'editor', 'companies_doc_status', 'busca', 'orderby', 'method'));
     }
     
     public function create() {
