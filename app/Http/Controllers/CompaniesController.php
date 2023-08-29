@@ -148,9 +148,8 @@ class CompaniesController extends Controller {
             ->select('users.*', 'companies.name AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager')
             ->first();
             
-        // if(!($editor->tipo == 'Contratante')) abort(404, 'Access denied');
-        // if(!($editor->is_manager == 1)) abort(404, 'Access denied');
-        // if(!(Auth::user()->type == 'Administrador')) abort(404, 'Access denied');
+        if(!($editor->tipo == 'Contratante')) abort(404, 'Access denied');
+        if(!($editor->type == 'Administrador' || $editor->type == 'Cliente' || $editor->type == 'Prestador')) abort(404, 'Access denied');
 
         $editor = DB::table('users')
             ->where('users.id', Auth::user()->id)
@@ -172,7 +171,7 @@ class CompaniesController extends Controller {
     }
 
     public function store(StoreCompanyRequest $request) {
-        if(!(Auth::user()->type == 'Moderador' || Auth::user()->type == 'Administrador')) abort(404, 'Access denied');
+        if(!($editor->type == 'Administrador' || $editor->type == 'Cliente' || $editor->type == 'Prestador')) abort(404, 'Access denied');
 
         $req = $request->validated();
         

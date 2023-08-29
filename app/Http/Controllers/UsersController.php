@@ -32,6 +32,8 @@ class UsersController extends Controller {
             ->first();
         
         $busca = isset($_GET['query-user']) ? $_GET['query-user'] : '';
+        $orderby = isset($_GET['order-companie']) ? $_GET['order-companie'] : 'company';
+        $method = isset($_GET['method-companie']) ? $_GET['method-companie'] : 'asc';
 
         if(Auth::user()->type == 'Cliente') {
             if($editor->tipo == 'Contratante') {
@@ -52,8 +54,7 @@ class UsersController extends Controller {
                     })
                     ->where('company_relations.id_contratante', $editor->id_company)
                     ->select('users.*', 'companies.name AS company', 'companies.id AS id_company', 'user_relations.is_manager AS is_manager')
-                    ->orderBy('type')
-                    ->orderBy('company')
+                    ->orderBy($orderby, $method)
                     ->paginate(9)->unique();
             } else {
                 $users = DB::table('users')
@@ -72,8 +73,7 @@ class UsersController extends Controller {
                     })
                     ->where('company_relations.id_contratada', $editor->id_company)
                     ->select('users.*', 'companies.name AS company', 'companies.id AS id_company', 'user_relations.is_manager AS is_manager')
-                    ->orderBy('type')
-                    ->orderBy('company')
+                    ->orderBy($orderby, $method)
                     ->paginate(9)->unique();
             }
         } else {
@@ -96,8 +96,7 @@ class UsersController extends Controller {
                     ->where('company_relations.id_contratante', $editor->id_company)
                     ->where('users.active', 1)
                     ->select('users.*', 'companies.name AS company', 'companies.id AS id_company', 'user_relations.is_manager AS is_manager')
-                    ->orderBy('type')
-                    ->orderBy('company')
+                    ->orderBy($orderby, $method)
                     ->paginate(9)->unique();
             } else {
                 $users = DB::table('users')
@@ -117,8 +116,7 @@ class UsersController extends Controller {
                     ->where('company_relations.id_contratada', $editor->id_company)
                     ->where('users.active', 1)
                     ->select('users.*', 'companies.name AS company', 'companies.id AS id_company', 'user_relations.is_manager AS is_manager')
-                    ->orderBy('type')
-                    ->orderBy('company')
+                    ->orderBy($orderby, $method)
                     ->paginate(9)->unique();
             }
         }
@@ -136,7 +134,7 @@ class UsersController extends Controller {
                 ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
                 ->join('companies', 'companies.id', '=', 'user_relations.id_company')
                 ->select('users.*', 'companies.name AS company', 'user_relations.is_manager AS is_manager')
-                ->orderBy('type')
+                ->orderBy($orderby, $method)
                 ->paginate(9)->unique();
         }
 
@@ -153,13 +151,13 @@ class UsersController extends Controller {
                 ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
                 ->join('companies', 'companies.id', '=', 'user_relations.id_company')
                 ->select('users.*', 'companies.name AS company', 'user_relations.is_manager AS is_manager')
-                ->orderBy('type')
+                ->orderBy($orderby, $method)
                 ->paginate(9)->unique();
         }
 
         $users = PaginationHelper::paginate($users, 9);
 
-        return view('users.index', compact('users', 'editor', 'busca'));
+        return view('users.index', compact('users', 'editor', 'busca', 'orderby', 'method'));
     }
 
     public function create() {

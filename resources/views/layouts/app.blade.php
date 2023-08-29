@@ -95,6 +95,12 @@
             deleteProfilePhotoButton.value = 'deleteProfilePhoto';
         }
 
+        function orderBy(e, a) {
+            let input1 = document.getElementById('order-companie');
+            input1.value = e;
+            let input2 = document.getElementById('method-companie');
+            input2.value = a;
+        }
     </script>
 </head>
 

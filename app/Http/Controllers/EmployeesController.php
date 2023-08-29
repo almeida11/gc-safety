@@ -21,6 +21,8 @@ class EmployeesController extends Controller {
     public function index(Int $company_id) {
 
         $busca = isset($_GET['query-employees']) ? $_GET['query-employees'] : '';
+        $orderby = isset($_GET['order-companie']) ? $_GET['order-companie'] : 'id';
+        $method = isset($_GET['method-companie']) ? $_GET['method-companie'] : 'asc';
 
         $editor = DB::table('users')
             ->where('users.id', Auth::user()->id)
@@ -28,7 +30,41 @@ class EmployeesController extends Controller {
             ->join('companies', 'companies.id', '=', 'user_relations.id_company')
             ->select('users.*', 'companies.name AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
             ->first();
+        if(($editor->tipo == 'Contratada') && !($editor->id_company == $company_id)) abort(404, 'Access denied');
 
+        $company = DB::table('companies')
+            ->where('companies.id', $company_id)
+            ->leftJoin('company_relations', function($join) {
+                $join->on('companies.id', '=', 'company_relations.id_contratada')->orOn('companies.id', '=', 'company_relations.id_contratante');
+            })
+            ->leftJoin('user_relations', function($join) {
+                $join->on('user_relations.id_company', '=', 'companies.id')
+                ->where('user_relations.is_manager', 1);
+            })
+            ->leftJoin('users', 'user_relations.id_user', '=', 'users.id')
+            ->select('companies.*', 'users.id AS id_manager', 'company_relations.id_contratante as id_contratante')
+            ->first();
+            
+        if($company->tipo == 'Contratada') {
+            $contratante = DB::table('companies')
+                ->where('companies.id', $company->id_contratante)
+                ->join('company_relations', function($join) {
+                    $join->on('companies.id', '=', 'company_relations.id_contratada')->orOn('companies.id', '=', 'company_relations.id_contratante');
+                })
+                ->leftJoin('user_relations', function($join) {
+                    $join->on('user_relations.id_company', '=', 'companies.id')
+                    ->where('user_relations.is_manager', 1);
+                })
+                ->leftJoin('users', 'user_relations.id_user', '=', 'users.id')
+                ->select('companies.*', 'users.id AS id_manager', 'company_relations.id_contratante as id_contratante')
+                ->first();
+            
+            if(!(isset($contratante))) abort(404, 'Access denied');
+        
+            if(!($company->id_contratante == $editor->id_company) && !($company->id == $editor->id_company)) abort(404, 'Access denied');
+        } else {
+            if(!($editor->company == $company->name)) abort(404, 'Access denied');
+        }
             
         $employees = DB::table('employees')
             ->join('companies', 'companies.id', '=', 'employees.id_company')
@@ -42,6 +78,7 @@ class EmployeesController extends Controller {
                 ->orWhere('sectors.name', 'LIKE', '%' . $busca . '%');
             })
             ->select('employees.*', 'companies.name AS company', 'responsibilities.name AS responsibility', 'sectors.name AS sector')
+            ->orderBy($orderby, $method)
             ->paginate(9);
 
         $sectors = DB::table('employees')
@@ -81,7 +118,7 @@ class EmployeesController extends Controller {
             }
         }
         
-        return view('employees.index', compact('employees', 'sectors', 'responsibilities', 'company_id', 'employees_doc_status', 'editor', 'busca'));
+        return view('employees.index', compact('employees', 'sectors', 'responsibilities', 'company_id', 'employees_doc_status', 'editor', 'busca', 'orderby', 'method'));
     }
     
     public function create(Int $company_id) {
@@ -91,6 +128,8 @@ class EmployeesController extends Controller {
             ->join('companies', 'companies.id', '=', 'user_relations.id_company')
             ->select('users.*', 'companies.name AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
             ->first();
+            
+        if(!($editor->type == 'Administrador' || $editor->type == 'Cliente' || $editor->type == 'Prestador')) abort(404, 'Access denied');
         
         $companies = DB::table('companies')
             ->where('companies.id', $company_id)
@@ -139,6 +178,7 @@ class EmployeesController extends Controller {
             ->join('companies', 'companies.id', '=', 'user_relations.id_company')
             ->select('users.*', 'companies.name AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
             ->first();
+        if(!($editor->type == 'Administrador' || $editor->type == 'Cliente' || $editor->type == 'Prestador')) abort(404, 'Access denied');
 
         $req = $request->validated();
 
@@ -156,14 +196,51 @@ class EmployeesController extends Controller {
             ->join('companies', 'companies.id', '=', 'user_relations.id_company')
             ->select('users.*', 'companies.name AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
             ->first();
+        if(($editor->tipo == 'Contratada') && !($editor->id_company == $company_id)) abort(404, 'Access denied');
 
+        $company = DB::table('companies')
+            ->where('companies.id', $company_id)
+            ->leftJoin('company_relations', function($join) {
+                $join->on('companies.id', '=', 'company_relations.id_contratada')->orOn('companies.id', '=', 'company_relations.id_contratante');
+            })
+            ->leftJoin('user_relations', function($join) {
+                $join->on('user_relations.id_company', '=', 'companies.id')
+                ->where('user_relations.is_manager', 1);
+            })
+            ->leftJoin('users', 'user_relations.id_user', '=', 'users.id')
+            ->select('companies.*', 'users.id AS id_manager', 'company_relations.id_contratante as id_contratante')
+            ->first();
+            
+        if($company->tipo == 'Contratada') {
+            $contratante = DB::table('companies')
+                ->where('companies.id', $company->id_contratante)
+                ->join('company_relations', function($join) {
+                    $join->on('companies.id', '=', 'company_relations.id_contratada')->orOn('companies.id', '=', 'company_relations.id_contratante');
+                })
+                ->leftJoin('user_relations', function($join) {
+                    $join->on('user_relations.id_company', '=', 'companies.id')
+                    ->where('user_relations.is_manager', 1);
+                })
+                ->leftJoin('users', 'user_relations.id_user', '=', 'users.id')
+                ->select('companies.*', 'users.id AS id_manager', 'company_relations.id_contratante as id_contratante')
+                ->first();
+            
+            if(!(isset($contratante))) abort(404, 'Access denied');
+        
+            if(!($company->id_contratante == $editor->id_company) && !($company->id == $editor->id_company)) abort(404, 'Access denied');
+        } else {
+            if(!($editor->company == $company->name)) abort(404, 'Access denied');
+        }
         $employee = DB::table('employees')
             ->where('employees.id', $employee->id)
             ->join('companies', 'companies.id', '=', 'employees.id_company')
+            ->where('companies.id', $company_id)
             ->join('responsibilities', 'responsibilities.id', '=', 'employees.id_responsibility')
             ->join('sectors', 'sectors.id', '=', 'employees.id_sector')
             ->select('employees.*', 'companies.name AS company', 'responsibilities.name AS responsibility', 'sectors.name AS sector')
             ->first();
+
+        if(!($employee)) abort(404, 'Access denied');
 
         $responsibilities = DB::table('responsibilities')
             ->join('companies', 'companies.id', '=', 'responsibilities.id_company')
@@ -175,7 +252,7 @@ class EmployeesController extends Controller {
             })
             ->select('responsibilities.*', 'companies.name AS company', 'companies.tipo AS tipo')
             ->paginate(9);
-        if($editor->company != $employee->company) abort(403, 'Access denied');
+
         $documents = DB::table('documents')
             ->join('companies', 'companies.id', '=', 'documents.id_company')
             ->join('company_relations', function($join) {
@@ -200,6 +277,7 @@ class EmployeesController extends Controller {
             ->join('companies', 'companies.id', '=', 'user_relations.id_company')
             ->select('users.*', 'companies.name AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
             ->first();
+        if(!($editor->type == 'Administrador' || $editor->type == 'Cliente' || $editor->type == 'Prestador')) abort(404, 'Access denied');
         
         $employee = DB::table('employees')
             ->where('employees.id', $employee->id)
@@ -275,6 +353,7 @@ class EmployeesController extends Controller {
             ->join('companies', 'companies.id', '=', 'user_relations.id_company')
             ->select('users.*', 'companies.name AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
             ->first();
+        if(!($editor->type == 'Administrador' || $editor->type == 'Cliente' || $editor->type == 'Prestador')) abort(404, 'Access denied');
 
         $employee_check = DB::table('employees')
             ->where('employees.id', $employee->id)
@@ -323,6 +402,7 @@ class EmployeesController extends Controller {
             ->join('companies', 'companies.id', '=', 'user_relations.id_company')
             ->select('users.*', 'companies.name AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
             ->first();
+        if(!($editor->type == 'Administrador' || $editor->type == 'Cliente' || $editor->type == 'Prestador')) abort(404, 'Access denied');
             
         // if($editor->id_company != $employee->id_company) abort(403, 'Access denied');
 
@@ -334,6 +414,13 @@ class EmployeesController extends Controller {
     }
 
     public function editdoc(Int $company_id, Int $employee_id, Request $request) { // Tipos de Documentos
+        $editor = DB::table('users')
+            ->where('users.id', Auth::user()->id)
+            ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
+            ->join('companies', 'companies.id', '=', 'user_relations.id_company')
+            ->select('users.*', 'companies.name AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
+            ->first();
+        if(!($editor->type == 'Administrador' || $editor->type == 'Cliente' || $editor->type == 'Prestador')) abort(404, 'Access denied');
         $employee = Employee::findOrFail($employee_id);
 
         if(json_decode($employee->documents)){
@@ -357,6 +444,13 @@ class EmployeesController extends Controller {
     }
 
     public function updatedoc(Int $company_id, Int $employee_id, Request $request) { // Envio de documentos
+        $editor = DB::table('users')
+            ->where('users.id', Auth::user()->id)
+            ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
+            ->join('companies', 'companies.id', '=', 'user_relations.id_company')
+            ->select('users.*', 'companies.name AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
+            ->first();
+        if(!($editor->type == 'Administrador' || $editor->type == 'Cliente' || $editor->type == 'Prestador')) abort(404, 'Access denied');
         $employee = Employee::findOrFail($employee_id);
         // if($editor->id_company != $employee->id_company) abort(403, 'Access denied');
         if($employee->documents){
