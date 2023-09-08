@@ -16,9 +16,9 @@ use App\Models\Company;
 use App\Models\User;
 
 // Administrador (ADEMIR) - GERENCIA TUDO GERAL TODAS PERMISSÕES
-// Fiscal (User contratante) - Só ver
-// Prestador (Adm contratada) - Gerencia Contratada
-// Cliente (Adm contratante) - Gerencia tudo da Contratada e Contratante
+// Fiscal (User contratante) - Só ver - FINALIZADO
+// Prestador (Adm contratada) - Gerencia Contratada - FINALIZADO
+// Cliente (Adm contratante) - Gerencia tudo da Contratada e Contratante - FINALIZADO
 // Analista (Mod contratante) - Só valida documentos
 
 class UsersController extends Controller {
@@ -161,14 +161,14 @@ class UsersController extends Controller {
     }
 
     public function create() {
-        if(!(Auth::user()->type == 'Cliente' || Auth::user()->type == 'Administrador')) abort(403, 'Access denied');
-
         $editor = DB::table('users')
             ->where('users.id', Auth::user()->id)
             ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
             ->join('companies', 'companies.id', '=', 'user_relations.id_company')
-            ->select('users.*', 'companies.name AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
+            ->select('users.*', 'companies.name AS company', 'companies.tipo AS tipo', 'companies.id AS id_company', 'user_relations.is_manager AS is_manager')
             ->first();
+        if(!($editor->type == 'Administrador' || $editor->type == 'Cliente' || $editor->type == 'Prestador')) abort(404, 'Access denied');
+        
 
         if(Auth::user()->type == 'Administrador') {
             $companies = Company::all();
@@ -217,8 +217,14 @@ class UsersController extends Controller {
     }
 
     public function store(StoreUserRequest $request) {
-        if(!(Auth::user()->type == 'Cliente' || Auth::user()->type == 'Administrador')) abort(403, 'Access denied');
-
+        $editor = DB::table('users')
+            ->where('users.id', Auth::user()->id)
+            ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
+            ->join('companies', 'companies.id', '=', 'user_relations.id_company')
+            ->select('users.*', 'companies.name AS company', 'companies.tipo AS tipo', 'companies.id AS id_company', 'user_relations.is_manager AS is_manager')
+            ->first();
+        if(!($editor->type == 'Administrador' || $editor->type == 'Cliente' || $editor->type == 'Prestador')) abort(404, 'Access denied');
+        
         $req = $request->validated();
 
         if(Auth::user()->type == 'Cliente') {
@@ -281,7 +287,6 @@ class UsersController extends Controller {
     }
 
     public function edit(User $user) {
-        if(!(Auth::user()->type == 'Cliente' || Auth::user()->type == 'Administrador' || Auth::user()->type == 'Administrador')) abort(403, 'Access denied');
 
         $user = DB::table('users')
             ->where('users.id', $user->id)
@@ -299,8 +304,10 @@ class UsersController extends Controller {
             ->where('users.id', Auth::user()->id)
             ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
             ->join('companies', 'companies.id', '=', 'user_relations.id_company')
-            ->select('users.*', 'companies.name AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
+            ->select('users.*', 'companies.name AS company', 'companies.tipo AS tipo', 'companies.id AS id_company', 'user_relations.is_manager AS is_manager')
             ->first();
+        if(!($editor->type == 'Administrador' || $editor->type == 'Cliente' || $editor->type == 'Prestador')) abort(404, 'Access denied');
+        
         
         if(Auth::user()->type == 'Administrador') {
             $companies = Company::all();

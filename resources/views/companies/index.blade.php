@@ -2,7 +2,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            Lista de Usuários
+            Lista de Empresas
         </h2>
     </x-slot>
 
@@ -228,7 +228,7 @@
                                                     @endif
                                                 </button>
                                             </th>
-                                            @if ($editor->type == 'Cliente')
+                                            @if ($editor->type == 'Cliente' || $editor->type == 'Administrador')
                                             <th scope="col"
                                                 class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                                 <button type="submit"
@@ -313,7 +313,7 @@
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                             {{ $company->tipo }}
                                         </td>
-                                        @if ($editor->type == 'Cliente')
+                                        @if ($editor->type == 'Cliente' || $editor->type == 'Administrador')
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                             {{ $company->ativo ? 'Ativo' : 'Inativo' }}
                                         </td>
@@ -335,7 +335,7 @@
                                             @if(Auth::user()->type != 'Fiscal')
                                             <a href="{{ route('companies.edit', $company->id) }}"
                                                 class="mb-2 mr-2 bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-2 rounded">Editar</a>
-                                            @if ($editor->tipo == 'Contratante')
+                                            @if ($editor->tipo == 'Contratante' || $editor->type == 'Administrador')
                                             <form class="inline-block"
                                                 action="{{ route('companies.destroy', $company->id) }}" method="POST"
                                                 onsubmit="return confirm('Você tem certeza?');">
