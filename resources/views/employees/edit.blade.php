@@ -191,6 +191,42 @@ function limpaString($string) {
                     </div>
                 </div>
             </div>
+            <div class="main-modal3 fixed w-full h-100 inset-0 z-100 overflow-hidden flex justify-center items-center animated fadeIn faster"
+                style="background: rgba(0,0,0,.7);">
+                <div
+                    class="border border-teal-500 shadow-lg modal-container bg-white   mx-auto rounded shadow-lg z-50 overflow-y-auto">
+                    <div class="div500 modal-content py-4 text-left px-6">
+                        <!--Title-->
+                        <div class="flex justify-between items-center pb-3">
+                            <p class="text-2xl font-bold mr-3">Descrição da Recusa</p>
+                            <div class="modal-close3 cursor-pointer z-50 ml-3">
+                                <svg class="fill-current text-black" xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                                    viewBox="0 0 18 18">
+                                    <path
+                                        d="M14.53 4.53l-1.06-1.06L9 7.94 4.53 3.47 3.47 4.53 7.94 9l-4.47 4.47 1.06 1.06L9 10.06l4.47 4.47 1.06-1.06L10.06 9z">
+                                    </path>
+                                </svg>
+                            </div>
+                        </div>
+                        <!--Body-->
+                        <div class="my-5">
+                            <div>
+                                <div class="mt-1">
+                                    <textarea id="disapproveDesc" name="description" rows="4" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 mt-1 block w-full sm:text-sm border-gray-300 rounded-md" placeholder="Descrição..."></textarea>
+                                </div>
+
+                            </div>
+                        </div>
+                        <!--Footer-->
+                        <div class="flex justify-end pt-2">
+                            @error('document_manager')
+                                <p class="text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                            <button onclick="disapproveDocModal(this)" type="button" class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150 mt-2 mr-2">Salvar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="main-modal2 fixed w-full h-100 inset-0 z-50 overflow-hidden flex justify-center items-center animated fadeIn faster"
                 style="background: rgba(0,0,0,.7);">
                 <div
@@ -215,15 +251,15 @@ function limpaString($string) {
                                 <div class="modal-left">
                                     <table id="modal-table" class="min-w-full divide-y divide-gray-200 w-full">
                                         <tr class="border-b hidden"  id="modal_doc_info">
-                                            <th colspan='2' scope="col" class="px-6 py-3 bg-gray-50 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            <th colspan='2' scope="col" class=" py-3 bg-gray-50 text-center text-xs font-medium text-gray-500 uppercase tracking-wider bg-white">
                                                 Dados do Documento
                                             </th> 
                                         </tr>
                                         <tr class="border-b hidden" id="modal_date_info">
-                                            <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            <th scope="col" class=" py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-white">
                                                 Data de Vencimento
                                             </th> 
-                                            <td class="td200 px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
+                                            <td class="td200  py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
                                                     <input type="date" name="old_due_date" id="old_due_date" 
                                                         class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full"
                                                         wire:model.defer="state.old_due_date" autocomplete="old_due_date" value="" onchange="allowUpdate()" />
@@ -233,15 +269,15 @@ function limpaString($string) {
                                             </td>
                                         </tr>
                                         <tr class="border-b hidden" id="modal_status_info">
-                                            <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            <th scope="col" class=" py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-white">
                                                 Status
                                             </th> 
-                                            <td id="modal-status" class="td200 px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
+                                            <td id="modal-status" class="td200  py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
                                                 
                                             </td>
                                         </tr>
                                         <tr class="border-b hidden" id="modal_save_update">
-                                            <th colspan='2' scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 tracking-wider">
+                                            <th colspan='2' scope="col" class=" py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 tracking-wider bg-white">
                                                 <div class="pb-2 pt-2 save_button">
                                                     @error('document_uploader')
                                                         <p id="document_uploader" class="text-reset text-sm text-red-600">{{ $message }}</p>
@@ -253,16 +289,55 @@ function limpaString($string) {
                                             </th> 
                                         
                                         </tr>
+                                        <tr class="border-b" id="sended-by-info">
+                                            <th scope="col" class=" py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-white">
+                                                Enviado por
+                                            </th> 
+                                            <td id="sended-by" class="td300  py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
+                                                
+                                            </td>
+                                        </tr>
+                                        <!-- <tr class="border-b" id="aproved-by-info">
+                                            <th scope="col" class=" py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-white">
+                                                Aprovado por
+                                            </th> 
+                                            <td id="aproved-by" class="td300  py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
+                                                
+                                            </td>
+                                        </tr> -->
+                                        <tr class="border-b hidden"  id="modal_aprove_title">
+                                            <th colspan='2' scope="col" class=" py-3 bg-gray-50 text-center text-xs font-medium text-gray-500 uppercase tracking-wider bg-white">
+                                                Aprovar Documento
+                                            </th> 
+                                        </tr>
+                                        <tr class="border-b hidden" id="modal_aprove_text">
+                                            <th scope="col" class=" py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-white">
+                                                <button type="button" id="2" class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150 mt-2 mr-2"
+                                                onclick="approveDoc(this)" >
+                                                    Aprovar
+                                                </button>
+                                                <div>
+                                                    <input type="text" name="approve" id="approve" value="" class="hidden"/>
+                                                    <textarea id="disapproveDescription" name="disapproveDescription" class="hidden"></textarea>
+                                                </div>
+                                            </th>
+                                            <td class="td200  py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-gray-200">
+                                                <button type="button" id="1" class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150 mt-2 mr-2"
+                                                onclick="disapproveDoc(this)" >
+                                                    Recusar
+                                                </button>
+                                            </td>
+                                        </tr>
                                         <tr class="border-b">
-                                            <th colspan='2' scope="col" class="px-6 py-3 bg-gray-50 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            <th colspan='2' scope="col" class=" py-3 bg-gray-50 text-center text-xs font-medium text-gray-500 uppercase tracking-wider bg-white">
                                                 Enviar novo Documento
                                             </th> 
                                         </tr>
                                         <tr class="border-b">
-                                            <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            <th scope="col" class=" py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-white">
                                                 Documento 
                                             </th> 
-                                            <td class="td200 px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
+                                            <td class="td200  py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-gray-200">
                                                 <button type="button" id="1" class="modal-form-button inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150 mt-2 mr-2"
                                                 onclick="getDocument(this)" >
                                                     Enviar!
@@ -276,10 +351,10 @@ function limpaString($string) {
                                             </td>
                                         </tr>
                                         <tr class="border-b hidden" id="modal_date_create">
-                                            <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            <th scope="col" class=" py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-white">
                                                 Data de Vencimento
                                             </th> 
-                                            <td class="td200 px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
+                                            <td class="td200  py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
                                                     <input type="date" name="new_due_date" id="new_due_date" 
                                                         class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full"
                                                         wire:model.defer="state.new_due_date" autocomplete="new_due_date" value="" onchange="allowCreate()"  />
@@ -289,7 +364,7 @@ function limpaString($string) {
                                             </td>
                                         </tr>
                                         <tr class="border-b hidden" id="modal_save_create">
-                                            <th colspan='2' scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 tracking-wider">
+                                            <th colspan='2' scope="col" class=" py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 tracking-wider bg-white">
                                                 <div class="pb-2 pt-2 save_button">
                                                     @error('document_uploader')
                                                         <p id="document_uploader" class="text-reset text-sm text-red-600">{{ $message }}</p>
@@ -302,7 +377,7 @@ function limpaString($string) {
                                         
                                         </tr>
                                         <tr class="border-b hidden" id="modal_historic">
-                                            <th colspan='2' scope="col" class="px-6 py-3 bg-gray-50 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            <th colspan='2' scope="col" class=" py-3 bg-gray-50 text-center text-xs font-medium text-gray-500 uppercase tracking-wider bg-white">
                                                 Histórico de Envios
                                             </th> 
                                         </tr>
@@ -328,10 +403,15 @@ function limpaString($string) {
 
                 const modal2 = document.querySelector('.main-modal2');
                 const closeButton2 = document.querySelectorAll('.modal-close2');
+
+                const modal3 = document.querySelector('.main-modal3');
+                const closeButton3 = document.querySelectorAll('.modal-close3');
+
                 const title2 = document.getElementById('modal-title2');
                 const object2 = document.getElementById("modal-object");
                 const old_due_date = document.getElementById("old_due_date");
                 const modal_status = document.getElementById("modal-status");
+                const sended_by = document.getElementById("sended-by");
                 const save_button = document.getElementById("save_button");
                 const modal_doc_info = document.getElementById("modal_doc_info");
                 const modal_date_info = document.getElementById("modal_date_info");
@@ -340,6 +420,8 @@ function limpaString($string) {
                 const new_due_date = document.getElementById("new_due_date");
                 const modal_save_create = document.getElementById("modal_save_create");
                 const modal_date_create = document.getElementById("modal_date_create");
+                const modal_aprove_text = document.getElementById("modal_aprove_text");
+                const modal_aprove_title = document.getElementById("modal_aprove_title");
 
             
                 const paths = [@if($employee->documents)
@@ -353,7 +435,7 @@ function limpaString($string) {
 @if(limpaString($document_path->type) == limpaString($db_document->name))
 <?php $document_name_display = $document_path->name;
 $document_path_display = $document_path->path; ?>
-<?php echo htmlspecialchars_decode("{type:\"".$document_path->type."\",path:\"".url("storage/{$document_path->path}/{$document_path->name}#view=FitH")."\", due_date: '".$document_path->due_date."', status: '" . $document_path->status . "', created_at: '" . $document_path->created_at . "'},"); ?>
+<?php echo htmlspecialchars_decode("{type:\"".$document_path->type."\",path:\"".url("storage/{$document_path->path}/{$document_path->name}#view=FitH")."\", due_date: '".$document_path->due_date."', status: '" . $document_path->status . "', created_at: '" . $document_path->created_at . "', updated_at: '" . $document_path->updated_at . "', sended_by: '" . $document_path->sended_by . "', aproved_by: '" . $document_path->aproved_by . "'},"); ?>
 @endif
 @endif
 @endif
@@ -367,7 +449,7 @@ $document_path_display = $document_path->path; ?>
                 const old_paths = [@if($document_paths->first())
 @foreach($document_paths as $document_path)
 @if($document_path->actual == 0)
-<?php echo htmlspecialchars_decode("{type:\"".$document_path->type."\",path:\"".url("storage/{$document_path->path}/{$document_path->name}#view=FitH")."\", due_date: '".$document_path->due_date."', status: '" . $document_path->status . "', created_at: '" . $document_path->created_at . "'},"); ?>
+<?php echo htmlspecialchars_decode("{type:\"".$document_path->type."\",path:\"".url("storage/{$document_path->path}/{$document_path->name}#view=FitH")."\", due_date: '".$document_path->due_date."', status: '" . $document_path->status . "', created_at: '" . $document_path->created_at . "', updated_at: '" . $document_path->updated_at . "', sended_by: '" . $document_path->sended_by . "', aproved_by: '" . $document_path->aproved_by . "'},"); ?>
 @endif
 @endforeach
 @endif
@@ -378,13 +460,27 @@ $document_path_display = $document_path->path; ?>
                     modal.classList.add('fadeOut');
                     setTimeout(() => {
                         modal.style.display = 'none';
-                    }, 500);~ç
+                    }, 500);
                 }
 
                 const openModal = () => {
                     modal.classList.remove('fadeOut');
                     modal.classList.add('fadeIn');
                     modal.style.display = 'flex';
+                }
+
+                const modalClose3 = () => {
+                    modal3.classList.remove('fadeIn');
+                    modal3.classList.add('fadeOut');
+                    setTimeout(() => {
+                        modal3.style.display = 'none';
+                    }, 500);
+                }
+
+                const openModal3 = () => {
+                    modal3.classList.remove('fadeOut');
+                    modal3.classList.add('fadeIn');
+                    modal3.style.display = 'flex';
                 }
 
                 for (let i = 0; i < closeButton.length; i++) {
@@ -399,7 +495,31 @@ $document_path_display = $document_path->path; ?>
                         if (event.target == modal) modalClose();
                     }
                 }
+
                 @error('document_manager') openModal() @enderror
+
+                const approveDoc = (e) => {
+                    const approve_input = document.getElementById("approve");
+                    approve_input.value = 'yes';
+                    save_button.click();
+                }
+
+                const disapproveDoc = (e) => {
+                    openModal3();
+                    // const approve_input = document.getElementById("approve");
+                    // approve_input.value = 'no';
+                    // save_button.click();
+                }
+
+                const disapproveDocModal = (e) => {
+                    const approve_input = document.getElementById("approve");
+                    approve_input.value = 'no';
+                    
+                    const disapproveDesc = document.getElementById("disapproveDesc");
+                    const disapproveDescription = document.getElementById("disapproveDescription");
+                    disapproveDescription.value = disapproveDesc.value;
+                    save_button.click();
+                }
 
                 const modalClose2 = () => {
                     modal2.classList.remove('fadeIn');
@@ -468,18 +588,24 @@ $document_path_display = $document_path->path; ?>
                                 modal_save_create.classList.add("hidden");
                                 old_due_date.value = paths[index].due_date;
                                 modal_status.innerText = paths[index].status;
+                                sended_by.innerText = paths[index].sended_by;
                                 modal_doc_info.classList.remove("hidden");
                                 modal_date_info.classList.remove("hidden");
                                 modal_status_info.classList.remove("hidden");
                                 modal_historic.classList.remove("hidden");
+                                modal_aprove_text.classList.remove("hidden");
+                                modal_aprove_title.classList.remove("hidden");
                                 break;
                             } else {
                                 old_due_date.value = null;
                                 modal_status.innerText = null;
+                                sended_by.innerText = null;
                                 modal_doc_info.classList.add("hidden");
                                 modal_date_info.classList.add("hidden");
                                 modal_status_info.classList.add("hidden");
                                 modal_historic.classList.add("hidden");
+                                modal_aprove_text.classList.add("hidden");
+                                modal_aprove_title.classList.add("hidden");
                                 var elementMainTRButtonOldPDFViewer = document.getElementById("main-modal-tr");
                                 if(elementMainTRButtonOldPDFViewer) {
                                     elementMainTRButtonOldPDFViewer.remove();
@@ -521,15 +647,21 @@ $document_path_display = $document_path->path; ?>
 
                                 var elementMainTHButtonOldPDFViewer = document.createElement('th');
                                 elementMainTHButtonOldPDFViewer.id = 'main-modal-th';
-                                elementMainTHButtonOldPDFViewer.innerText = paths[index].created_at.concat(' (ATUAL)');
-                                elementMainTHButtonOldPDFViewer.classList.add('px-6', 'py-3', 'bg-gray-50', 'text-left', 'text-xs', 'font-medium', 'text-gray-500', 'uppercase', 'tracking-wider');
 
                                 var main_modal_tr = document.getElementById('main-modal-tr'); 
                                 main_modal_tr.appendChild(elementMainTHButtonOldPDFViewer);
 
+                                var elementMainTheTextPDFViewer = document.createElement('p');
+                                elementMainTheTextPDFViewer.id = 'main-modal-p';
+                                elementMainTheTextPDFViewer.innerText = 'Enviado às '.concat(paths[index].updated_at);
+                                elementMainTheTextPDFViewer.classList.add('py-3', 'bg-gray-50', 'text-left', 'text-xs', 'font-medium', 'text-gray-500', 'tracking-wider', 'bg-white');
+
+                                var main_modal_th = document.getElementById('main-modal-th'); 
+                                main_modal_th.appendChild(elementMainTheTextPDFViewer);
+
                                 var elementMainTDButtonOldPDFViewer = document.createElement('td');
                                 elementMainTDButtonOldPDFViewer.id = 'main-modal-td';
-                                elementMainTDButtonOldPDFViewer.classList.add('td200', 'px-6', 'py-4', 'whitespace-nowrap', 'text-sm', 'text-gray-900', 'bg-white', 'divide-y', 'divide-gray-200');
+                                elementMainTDButtonOldPDFViewer.classList.add('td200', 'py-4', 'whitespace-nowrap', 'text-sm', 'text-gray-900', 'bg-white', 'divide-y', 'divide-gray-200');
 
                                 main_modal_tr.appendChild(elementMainTDButtonOldPDFViewer);
 
@@ -568,6 +700,8 @@ $document_path_display = $document_path->path; ?>
                         old_due_date.disabled = true;
                         old_due_date.name = null;
                         save_button.disabled = true;
+                        modal_aprove_text.classList.add("hidden");
+                        modal_aprove_title.classList.add("hidden");
 
                         var OldElement = document.getElementById("modal-object");
                         if(OldElement) {
@@ -602,7 +736,7 @@ $document_path_display = $document_path->path; ?>
                     modal2.classList.add('fadeIn');
                     modal2.style.display = 'flex';
 
-                    for (let index = 0; index < old_paths.length; index++){
+                    for (let index = old_paths.length -1; index >= 0 ; index--){
                         if(old_paths[index].type == title) {
                             // old_paths[index].type;
                             modal_historic.classList.remove("hidden");
@@ -616,15 +750,24 @@ $document_path_display = $document_path->path; ?>
 
                             var elementTHButtonOldPDFViewer = document.createElement('th');
                             elementTHButtonOldPDFViewer.id = 'modal-th-'+ index;
-                            elementTHButtonOldPDFViewer.innerText = old_paths[index].created_at;
-                            elementTHButtonOldPDFViewer.classList.add('px-6', 'py-3', 'bg-gray-50', 'text-left', 'text-xs', 'font-medium', 'text-gray-500', 'uppercase', 'tracking-wider');
+                            // elementTHButtonOldPDFViewer.innerText = old_paths[index].created_at;
+                            // elementTHButtonOldPDFViewer.classList.add('py-3', 'bg-gray-50', 'text-left', 'text-xs', 'font-medium', 'text-gray-500', 'uppercase', 'tracking-wider', 'bg-white');
 
                             var modal_tr = document.getElementById('modal-tr-'+ index); 
                             modal_tr.appendChild(elementTHButtonOldPDFViewer);
 
+                            var elementPButtonOldPDFViewer = document.createElement('p');
+                            elementPButtonOldPDFViewer.id = 'modal-p'+ index;
+                            
+                            elementPButtonOldPDFViewer.innerText = 'Enviado às '.concat(old_paths[index].created_at);
+                            elementPButtonOldPDFViewer.classList.add('py-3', 'bg-gray-50', 'text-left', 'text-xs', 'font-medium', 'text-gray-500', 'tracking-wider', 'bg-white');
+
+                            var modal_th = document.getElementById('modal-th-'+ index); 
+                            modal_th.appendChild(elementPButtonOldPDFViewer);
+
                             var elementTDButtonOldPDFViewer = document.createElement('td');
                             elementTDButtonOldPDFViewer.id = 'modal-td-'+ index;
-                            elementTDButtonOldPDFViewer.classList.add('td200', 'px-6', 'py-4', 'whitespace-nowrap', 'text-sm', 'text-gray-900', 'bg-white', 'divide-y', 'divide-gray-200');
+                            elementTDButtonOldPDFViewer.classList.add('td200', 'py-4', 'whitespace-nowrap', 'text-sm', 'text-gray-900', 'bg-white', 'divide-y', 'divide-gray-200');
 
                             modal_tr.appendChild(elementTDButtonOldPDFViewer);
 
@@ -659,6 +802,20 @@ $document_path_display = $document_path->path; ?>
                         if (event.target == modal2) modalClose2();
                     }
                 }
+
+                for (let i = 0; i < closeButton3.length; i++) {
+
+                    const elements3 = closeButton3[i];
+
+                    elements3.onclick = (e) => modalClose3();
+
+                    modal3.style.display = 'none';
+
+                    window.onclick = function (event) {
+                        if (event.target == modal3) modalClose3();
+                    }
+                }
+                
                 @error('document_uploader_type') openModal2('{{ $message }}') @enderror
             </script>
             

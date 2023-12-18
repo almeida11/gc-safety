@@ -15,7 +15,10 @@ class Document_path extends Model
         'actual',
         'status',
         'due_date',
+        'sended_by',
+        'aproved_by',
         'path',
         'id_employee',
+        'created_at',
     ];
 }

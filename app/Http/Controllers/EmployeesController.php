@@ -444,6 +444,7 @@ class EmployeesController extends Controller {
     }
 
     public function updatedoc(Int $company_id, Int $employee_id, Request $request) { // Envio de documentos
+        dd($request);
         $editor = DB::table('users')
             ->where('users.id', Auth::user()->id)
             ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
@@ -483,6 +484,7 @@ class EmployeesController extends Controller {
 
                     $document_name = $document . '_' . $employee->id. "_" . $employee->name . ".{$extension}";
                     $document_name = preg_replace('/[ -]+/' , '_' , strtolower( preg_replace("[^a-zA-Z0-9-]", "-", strtr(utf8_decode(trim($document_name)), utf8_decode("áàãâéêíóôõúüñçÁÀÃÂÉÊÍÓÔÕÚÜÑÇ"), "aaaaeeiooouuncAAAAEEIOOOUUNC-")) ));
+                    
                     if($old_document){
                         if (Storage::exists($old_document->path . "/" . $old_document->name)) {
                             $path_to_old = $old_document->path . "/old/";
@@ -495,6 +497,8 @@ class EmployeesController extends Controller {
                                 'status' => 'Substituído',
                                 'actual' => 0,
                                 'type' => $old_document->type,
+                                'sended_by' => $old_document->sended_by,
+                                'created_at' => $old_document->updated_at,
                                 'id_employee' => $old_document->id_employee,
                             );
                             $document_path_old = Document_path::create($document_path_model);
@@ -505,16 +509,20 @@ class EmployeesController extends Controller {
                         $old_document = Document_path::findOrFail($old_document->id);
                         $old_document->name = $document_name;
                         $old_document->path = $path;
+                        $old_document->status = 'Pendente';
+                        $old_document->sended_by = $editor->name;
                         $old_document->due_date = $request->new_due_date;
+                        $old_document->created_at = $old_document->updated_at;
                         $old_document->update();
                     } else {
-                        $request->{$document}->storeAs($path, $document_name);
+                        $resultStore = $request->{$document}->storeAs($path, $document_name);
                         $document_path_model = array(
                             'path' => $path,
                             'due_date' => $request->new_due_date,
                             'name' => $document_name,
                             'type' => $document,
                             'status' => 'Pendente',
+                            'sended_by' => $editor->name,
                             'actual' => 1,
                             'id_employee' => $employee->id,
                         );
@@ -522,19 +530,35 @@ class EmployeesController extends Controller {
                     }
                     break;
                 } else {
-                    if($old_document) {
-                        if($old_document->type == $request->modal_type) {
-                            if($request->old_due_date) {
-                                if($request->old_due_date != $old_document->due_date) {
-                                    $old_document = Document_path::findOrFail($old_document->id);
-                                    $old_document->due_date = $request->old_due_date;
-                                    $old_document->update();
-                                    break;
-                                }
+                    if($request->approve) {
+                        if($request->approve == 'yes') {
+                            $old_document = Document_path::findOrFail($old_document->id);
+                            $old_document->status = 'Aprovado';
+                            $old_document->update();
+                            break;
+                        } else {
+                            if($request->approve == 'no') {
+                                $old_document = Document_path::findOrFail($old_document->id);
+                                $old_document->status = 'Reprovado';
+                                $old_document->update();
+                                break;
                             }
                         }
                     } else {
-                        throw ValidationException::withMessages(['document_uploader' => 'Você deve enviar um arquivo!', 'document_uploader_type'  => $request->modal_type]);
+                        if($old_document) {
+                            if($old_document->type == $request->modal_type) {
+                                if($request->old_due_date) {
+                                    if($request->old_due_date != $old_document->due_date) {
+                                        $old_document = Document_path::findOrFail($old_document->id);
+                                        $old_document->due_date = $request->old_due_date;
+                                        $old_document->update();
+                                        break;
+                                    }
+                                }
+                            }
+                        } else {
+                            throw ValidationException::withMessages(['document_uploader' => 'Você deve enviar um arquivo!', 'document_uploader_type'  => $request->modal_type]);
+                        }
                     }
                 }
             }

@@ -56,6 +56,11 @@
             file.click();
         }
 
+        function limitString (string = '', limit = 0) {  
+            const fileExtension = string.split(".").pop();
+            return string.substring(0, limit).concat('.').concat(fileExtension)
+        }
+
         function changeName(e) {
             let modal_date_create = document.getElementById('modal_date_create');
             if (modal_date_create) {
@@ -63,7 +68,7 @@
             }
             var url = e.value;
             let button = document.getElementById(e.id.slice(0, -2).concat('bt'));
-            button.innerText = url.split(/(\\|\/)/g).pop();
+            button.innerText = limitString(url.split(/(\\|\/)/g).pop(), 10);
         }
 
         function selecionarBox(evt, chkbox) {
