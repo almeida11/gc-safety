@@ -18,7 +18,7 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->json('associated-company')->nullable();
-            $table->string('type')->default("Usuário");
+            $table->string('type')->default("Cliente");
             $table->string('responsibility')->nullable();
             $table->rememberToken();
             $table->foreignId('current_team_id')->nullable();

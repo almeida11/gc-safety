@@ -9,7 +9,7 @@
 
     <div>
         <div class="max-w-7xl mx-auto py-10 sm:px-6 lg:px-8">
-            @if(Auth::user()->type != 'Fiscal')
+            @if(Auth::user()->type == 'Cliente' || Auth::user()->type == 'Administrador')
                 <div class="block mb-8 mb-4">
                     <a href="{{ route('users.create') }}" class="bg-gray-200 hover:bg-gray-300 text-black  py-2 px-4 rounded">Cadastrar Usuário</a>
                 </div>

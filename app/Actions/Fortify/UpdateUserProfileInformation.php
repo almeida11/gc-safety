@@ -27,9 +27,9 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
         if (isset($input['photo'])) {
             $user_check = DB::table('users')
                 ->where('users.id', $user->id)
-                ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
-                ->join('companies', 'companies.id', '=', 'user_relations.id_company')
-                ->join('company_relations', function($join) {
+                ->leftjoin('user_relations', 'users.id', '=', 'user_relations.id_user')
+                ->leftjoin('companies', 'companies.id', '=', 'user_relations.id_company')
+                ->leftjoin('company_relations', function($join) {
                     $join
                         ->on('companies.id', '=', 'company_relations.id_contratada')
                             ->orOn('companies.id', '=', 'company_relations.id_contratante');

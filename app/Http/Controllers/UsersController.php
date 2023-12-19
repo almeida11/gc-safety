@@ -26,113 +26,133 @@ class UsersController extends Controller {
 
         $editor = DB::table('users')
             ->where('users.id', Auth::user()->id)
-            ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
-            ->join('companies', 'companies.id', '=', 'user_relations.id_company')
+            ->leftjoin('user_relations', 'users.id', '=', 'user_relations.id_user')
+            ->leftjoin('companies', 'companies.id', '=', 'user_relations.id_company')
             ->select('users.*', 'companies.name AS company', 'companies.tipo AS tipo', 'companies.id as id_company', 'user_relations.is_manager AS is_manager')
             ->first();
         
         $busca = isset($_GET['query-user']) ? $_GET['query-user'] : '';
-        $orderby = isset($_GET['order-companie']) ? $_GET['order-companie'] : 'company';
+        $orderby = isset($_GET['order-companie']) ? $_GET['order-companie'] : 'id';
         $method = isset($_GET['method-companie']) ? $_GET['method-companie'] : 'asc';
 
         if(Auth::user()->type == 'Cliente') {
-            if($editor->tipo == 'Contratante') {
-                $users = DB::table('users')
-                    ->where('users.type', '!=', 'Administrador')
-                    ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
-                    ->join('companies', 'companies.id', '=', 'user_relations.id_company')
-                    ->where(function ($query) use ($busca) {
-                        $query->where('users.name', 'LIKE', '%' . $busca . '%')
-                        ->orWhere('users.email', 'LIKE', '%' . $busca . '%')
-                        ->orWhere('companies.name', 'LIKE', '%' . $busca . '%')
-                        ->orWhere('users.type', 'LIKE', '%' . $busca . '%');
-                    })
-                    ->join('company_relations', function($join) {
-                        $join
-                            ->on('companies.id', '=', 'company_relations.id_contratada')
-                                ->orOn('companies.id', '=', 'company_relations.id_contratante');
-                    })
-                    ->where('company_relations.id_contratante', $editor->id_company)
-                    ->select('users.*', 'companies.name AS company', 'companies.id AS id_company', 'user_relations.is_manager AS is_manager')
-                    ->orderBy($orderby, $method)
-                    ->paginate(9)->unique();
-            } else {
-                $users = DB::table('users')
-                    ->where('users.type', '!=', 'Administrador')
-                    ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
-                    ->join('companies', 'companies.id', '=', 'user_relations.id_company')
-                    ->where(function ($query) use ($busca) {
-                        $query->where('users.name', 'LIKE', '%' . $busca . '%')
-                        ->orWhere('users.email', 'LIKE', '%' . $busca . '%')
-                        ->orWhere('companies.name', 'LIKE', '%' . $busca . '%')
-                        ->orWhere('users.type', 'LIKE', '%' . $busca . '%');
-                    })
-                    ->join('company_relations', function($join) {
-                        $join
-                            ->on('companies.id', '=', 'company_relations.id_contratada');
-                    })
-                    ->where('company_relations.id_contratada', $editor->id_company)
-                    ->select('users.*', 'companies.name AS company', 'companies.id AS id_company', 'user_relations.is_manager AS is_manager')
-                    ->orderBy($orderby, $method)
-                    ->paginate(9)->unique();
+            if(isset($editor->tipo)) {
+                if($editor->tipo == 'Contratante') {
+                    $users = DB::table('users')
+                        ->where('users.type', '!=', 'Administrador')
+                        ->leftjoin('user_relations', 'users.id', '=', 'user_relations.id_user')
+                        ->leftjoin('companies', 'companies.id', '=', 'user_relations.id_company')
+                        ->where(function ($query) use ($busca) {
+                            $query->where('users.name', 'LIKE', '%' . $busca . '%')
+                            ->orWhere('users.email', 'LIKE', '%' . $busca . '%')
+                            ->orWhere('companies.name', 'LIKE', '%' . $busca . '%')
+                            ->orWhere('users.type', 'LIKE', '%' . $busca . '%');
+                        })
+                        ->leftjoin('company_relations', function($join) {
+                            $join
+                                ->on('companies.id', '=', 'company_relations.id_contratada')
+                                    ->orOn('companies.id', '=', 'company_relations.id_contratante');
+                        })
+                        ->where(function ($query) use ($editor) {
+                            $query->where(function ($query) use ($editor) {
+                            $query->where(function ($query) use ($editor) {
+                            $query->where('company_relations.id_contratante', $editor->id_company)
+                            ->orWhere('companies.id', $editor->id_company);
+                        })
+                            ->orWhere('companies.id', $editor->id_company);
+                        })
+                            ->orWhere('companies.id', $editor->id_company);
+                        })
+                        ->select('users.*', 'companies.name AS company', 'companies.id AS id_company', 'user_relations.is_manager AS is_manager')
+                        ->orderBy($orderby, $method)
+                        ->paginate(9)->unique();
+                        
+                } else {
+                    $users = DB::table('users')
+                        ->where('users.type', '!=', 'Administrador')
+                        ->leftjoin('user_relations', 'users.id', '=', 'user_relations.id_user')
+                        ->leftjoin('companies', 'companies.id', '=', 'user_relations.id_company')
+                        ->where(function ($query) use ($busca) {
+                            $query->where('users.name', 'LIKE', '%' . $busca . '%')
+                            ->orWhere('users.email', 'LIKE', '%' . $busca . '%')
+                            ->orWhere('companies.name', 'LIKE', '%' . $busca . '%')
+                            ->orWhere('users.type', 'LIKE', '%' . $busca . '%');
+                        })
+                        ->leftjoin('company_relations', function($join) {
+                            $join
+                                ->on('companies.id', '=', 'company_relations.id_contratada');
+                        })
+                        ->where('company_relations.id_contratada', $editor->id_company)
+                        ->select('users.*', 'companies.name AS company', 'companies.id AS id_company', 'user_relations.is_manager AS is_manager')
+                        ->orderBy($orderby, $method)
+                        ->paginate(9)->unique();
+                }
             }
         } else {
-            if($editor->tipo == 'Contratante') {
-                $users = DB::table('users')
-                    ->where('users.type', '!=', 'Administrador')
-                    ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
-                    ->join('companies', 'companies.id', '=', 'user_relations.id_company')
-                    ->where(function ($query) use ($busca) {
-                        $query->where('users.name', 'LIKE', '%' . $busca . '%')
-                        ->orWhere('users.email', 'LIKE', '%' . $busca . '%')
-                        ->orWhere('companies.name', 'LIKE', '%' . $busca . '%')
-                        ->orWhere('users.type', 'LIKE', '%' . $busca . '%');
-                    })
-                    ->join('company_relations', function($join) {
-                        $join
-                            ->on('companies.id', '=', 'company_relations.id_contratada')
-                                ->orOn('companies.id', '=', 'company_relations.id_contratante');
-                    })
-                    ->where('company_relations.id_contratante', $editor->id_company)
-                    ->where('users.active', 1)
-                    ->select('users.*', 'companies.name AS company', 'companies.id AS id_company', 'user_relations.is_manager AS is_manager')
-                    ->orderBy($orderby, $method)
-                    ->paginate(9)->unique();
-            } else {
-                $users = DB::table('users')
-                    ->where('users.type', '!=', 'Administrador')
-                    ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
-                    ->join('companies', 'companies.id', '=', 'user_relations.id_company')
-                    ->where(function ($query) use ($busca) {
-                        $query->where('users.name', 'LIKE', '%' . $busca . '%')
-                        ->orWhere('users.email', 'LIKE', '%' . $busca . '%')
-                        ->orWhere('companies.name', 'LIKE', '%' . $busca . '%')
-                        ->orWhere('users.type', 'LIKE', '%' . $busca . '%');
-                    })
-                    ->join('company_relations', function($join) {
-                        $join
-                            ->on('companies.id', '=', 'company_relations.id_contratada');
-                    })
-                    ->where('company_relations.id_contratada', $editor->id_company)
-                    ->where('users.active', 1)
-                    ->select('users.*', 'companies.name AS company', 'companies.id AS id_company', 'user_relations.is_manager AS is_manager')
-                    ->orderBy($orderby, $method)
-                    ->paginate(9)->unique();
+            if(isset($editor->tipo)) {
+                if($editor->tipo == 'Contratante') {
+                    $users = DB::table('users')
+                        ->where('users.type', '!=', 'Administrador')
+                        ->leftjoin('user_relations', 'users.id', '=', 'user_relations.id_user')
+                        ->leftjoin('companies', 'companies.id', '=', 'user_relations.id_company')
+                        ->where(function ($query) use ($busca) {
+                            $query->where('users.name', 'LIKE', '%' . $busca . '%')
+                            ->orWhere('users.email', 'LIKE', '%' . $busca . '%')
+                            ->orWhere('companies.name', 'LIKE', '%' . $busca . '%')
+                            ->orWhere('users.type', 'LIKE', '%' . $busca . '%');
+                        })
+                        ->leftjoin('company_relations', function($join) {
+                            $join
+                                ->on('companies.id', '=', 'company_relations.id_contratada')
+                                    ->orOn('companies.id', '=', 'company_relations.id_contratante');
+                        })
+                        ->where(function ($query) use ($editor) {
+                            $query->where(function ($query) use ($editor) {
+                            $query->where('company_relations.id_contratante', $editor->id_company)
+                            ->orWhere('companies.id', $editor->id_company);
+                        })
+                            ->orWhere('companies.id', $editor->id_company);
+                        })
+                        ->where('users.active', 1)
+                        ->select('users.*', 'companies.name AS company', 'companies.id AS id_company', 'user_relations.is_manager AS is_manager')
+                        ->orderBy($orderby, $method)
+                        ->paginate(9)->unique();
+                } else {
+                    $users = DB::table('users')
+                        ->where('users.type', '!=', 'Administrador')
+                        ->leftjoin('user_relations', 'users.id', '=', 'user_relations.id_user')
+                        ->leftjoin('companies', 'companies.id', '=', 'user_relations.id_company')
+                        ->where(function ($query) use ($busca) {
+                            $query->where('users.name', 'LIKE', '%' . $busca . '%')
+                            ->orWhere('users.email', 'LIKE', '%' . $busca . '%')
+                            ->orWhere('companies.name', 'LIKE', '%' . $busca . '%')
+                            ->orWhere('users.type', 'LIKE', '%' . $busca . '%');
+                        })
+                        ->leftjoin('company_relations', function($join) {
+                            $join
+                                ->on('companies.id', '=', 'company_relations.id_contratada');
+                        })
+                        ->where('company_relations.id_contratada', $editor->id_company)
+                        ->where('users.active', 1)
+                        ->select('users.*', 'companies.name AS company', 'companies.id AS id_company', 'user_relations.is_manager AS is_manager')
+                        ->orderBy($orderby, $method)
+                        ->paginate(9)->unique();
+                }
             }
         }
         
         $editor = DB::table('users')
             ->where('users.id', Auth::user()->id)
-            ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
-            ->join('companies', 'companies.id', '=', 'user_relations.id_company')
+            ->leftjoin('user_relations', 'users.id', '=', 'user_relations.id_user')
+            ->leftjoin('companies', 'companies.id', '=', 'user_relations.id_company')
             ->select('users.*', 'companies.name AS company', 'user_relations.is_manager AS is_manager')
             ->first();
             
         if (Auth::user()->type == 'Administrador') {
             $users = DB::table('users')
                 ->where('users.name', 'LIKE', '%' . $busca . '%')
-                ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
-                ->join('companies', 'companies.id', '=', 'user_relations.id_company')
+                ->leftjoin('user_relations', 'users.id', '=', 'user_relations.id_user')
+                ->leftjoin('companies', 'companies.id', '=', 'user_relations.id_company')
                 ->select('users.*', 'companies.name AS company', 'user_relations.is_manager AS is_manager')
                 ->orderBy($orderby, $method)
                 ->paginate(9)->unique();
@@ -140,22 +160,24 @@ class UsersController extends Controller {
 
         $editor = DB::table('users')
             ->where('users.id', Auth::user()->id)
-            ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
-            ->join('companies', 'companies.id', '=', 'user_relations.id_company')
+            ->leftjoin('user_relations', 'users.id', '=', 'user_relations.id_user')
+            ->leftjoin('companies', 'companies.id', '=', 'user_relations.id_company')
             ->select('users.*', 'companies.name AS company', 'user_relations.is_manager AS is_manager')
             ->first();
-        
-        if (Auth::user()->type == 'Administrador') {
+
+        if(!isset($editor->company)) {
             $users = DB::table('users')
                 ->where('users.name', 'LIKE', '%' . $busca . '%')
-                ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
-                ->join('companies', 'companies.id', '=', 'user_relations.id_company')
+                ->leftjoin('user_relations', 'users.id', '=', 'user_relations.id_user')
+                ->leftjoin('companies', 'companies.id', '=', 'user_relations.id_company')
                 ->select('users.*', 'companies.name AS company', 'user_relations.is_manager AS is_manager')
                 ->orderBy($orderby, $method)
+                ->where('users.id', $editor->id)
                 ->paginate(9)->unique();
         }
 
         $users = PaginationHelper::paginate($users, 9);
+
 
         return view('users.index', compact('users', 'editor', 'busca', 'orderby', 'method'));
     }
@@ -163,10 +185,13 @@ class UsersController extends Controller {
     public function create() {
         $editor = DB::table('users')
             ->where('users.id', Auth::user()->id)
-            ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
-            ->join('companies', 'companies.id', '=', 'user_relations.id_company')
+            ->leftjoin('user_relations', 'users.id', '=', 'user_relations.id_user')
+            ->leftjoin('companies', 'companies.id', '=', 'user_relations.id_company')
             ->select('users.*', 'companies.name AS company', 'companies.tipo AS tipo', 'companies.id AS id_company', 'user_relations.is_manager AS is_manager')
             ->first();
+        if($editor->company == null) {
+            return view('errors.no_company');
+        }
         if(!($editor->type == 'Administrador' || $editor->type == 'Cliente' || $editor->type == 'Prestador')) abort(404, 'Access denied');
         
 
@@ -175,8 +200,14 @@ class UsersController extends Controller {
         } else {
             if($editor->tipo == 'Contratante') {
                 $companies = DB::table('companies')
-                    ->where('company_relations.id_contratante', $editor->id_company)
-                    ->join('company_relations', function($join) {
+                    ->where(function ($query) use ($editor) {
+                            $query->where(function ($query) use ($editor) {
+                            $query->where('company_relations.id_contratante', $editor->id_company)
+                            ->orWhere('companies.id', $editor->id_company);
+                        })
+                            ->orWhere('companies.id', $editor->id_company);
+                        })
+                    ->leftjoin('company_relations', function($join) {
                         $join
                             ->on('companies.id', '=', 'company_relations.id_contratada')
                             ->orOn('companies.id', '=', 'company_relations.id_contratante');
@@ -192,7 +223,7 @@ class UsersController extends Controller {
             } else {
                 $companies = DB::table('companies')
                     ->Where('company_relations.id_contratada', $editor->id_company)
-                    ->join('company_relations', function($join) {
+                    ->leftjoin('company_relations', function($join) {
                         $join
                             ->on('companies.id', '=', 'company_relations.id_contratada');
                     })
@@ -208,8 +239,8 @@ class UsersController extends Controller {
 
         $editor = DB::table('users')
             ->where('users.id', Auth::user()->id)
-            ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
-            ->join('companies', 'companies.id', '=', 'user_relations.id_company')
+            ->leftjoin('user_relations', 'users.id', '=', 'user_relations.id_user')
+            ->leftjoin('companies', 'companies.id', '=', 'user_relations.id_company')
             ->select('users.*', 'companies.name AS company', 'user_relations.is_manager AS is_manager')
             ->first();
         
@@ -219,8 +250,8 @@ class UsersController extends Controller {
     public function store(StoreUserRequest $request) {
         $editor = DB::table('users')
             ->where('users.id', Auth::user()->id)
-            ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
-            ->join('companies', 'companies.id', '=', 'user_relations.id_company')
+            ->leftjoin('user_relations', 'users.id', '=', 'user_relations.id_user')
+            ->leftjoin('companies', 'companies.id', '=', 'user_relations.id_company')
             ->select('users.*', 'companies.name AS company', 'companies.tipo AS tipo', 'companies.id AS id_company', 'user_relations.is_manager AS is_manager')
             ->first();
         if(!($editor->type == 'Administrador' || $editor->type == 'Cliente' || $editor->type == 'Prestador')) abort(404, 'Access denied');
@@ -232,8 +263,8 @@ class UsersController extends Controller {
             
             $editor = DB::table('users')
                 ->where('users.id', Auth::user()->id)
-                ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
-                ->join('companies', 'companies.id', '=', 'user_relations.id_company')
+                ->leftjoin('user_relations', 'users.id', '=', 'user_relations.id_user')
+                ->leftjoin('companies', 'companies.id', '=', 'user_relations.id_company')
                 ->select('users.*', 'companies.name AS company', 'user_relations.is_manager AS is_manager', 'companies.id AS id_company' )
                 ->first();
 
@@ -264,9 +295,9 @@ class UsersController extends Controller {
     public function show(User $user) {
         $user = DB::table('users')
             ->where('users.id', $user->id)
-            ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
-            ->join('companies', 'companies.id', '=', 'user_relations.id_company')
-            ->join('company_relations', function($join) {
+            ->leftjoin('user_relations', 'users.id', '=', 'user_relations.id_user')
+            ->leftjoin('companies', 'companies.id', '=', 'user_relations.id_company')
+            ->leftjoin('company_relations', function($join) {
                 $join
                     ->on('companies.id', '=', 'company_relations.id_contratada')
                         ->orOn('companies.id', '=', 'company_relations.id_contratante');
@@ -276,8 +307,8 @@ class UsersController extends Controller {
         
         $editor = DB::table('users')
             ->where('users.id', Auth::user()->id)
-            ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
-            ->join('companies', 'companies.id', '=', 'user_relations.id_company')
+            ->leftjoin('user_relations', 'users.id', '=', 'user_relations.id_user')
+            ->leftjoin('companies', 'companies.id', '=', 'user_relations.id_company')
             ->select('users.*', 'companies.name AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
             ->first();
         
@@ -290,9 +321,9 @@ class UsersController extends Controller {
 
         $user = DB::table('users')
             ->where('users.id', $user->id)
-            ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
-            ->join('companies', 'companies.id', '=', 'user_relations.id_company')
-            ->join('company_relations', function($join) {
+            ->leftjoin('user_relations', 'users.id', '=', 'user_relations.id_user')
+            ->leftjoin('companies', 'companies.id', '=', 'user_relations.id_company')
+            ->leftjoin('company_relations', function($join) {
                 $join
                     ->on('companies.id', '=', 'company_relations.id_contratada')
                         ->orOn('companies.id', '=', 'company_relations.id_contratante');
@@ -302,11 +333,11 @@ class UsersController extends Controller {
         
         $editor = DB::table('users')
             ->where('users.id', Auth::user()->id)
-            ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
-            ->join('companies', 'companies.id', '=', 'user_relations.id_company')
+            ->leftjoin('user_relations', 'users.id', '=', 'user_relations.id_user')
+            ->leftjoin('companies', 'companies.id', '=', 'user_relations.id_company')
             ->select('users.*', 'companies.name AS company', 'companies.tipo AS tipo', 'companies.id AS id_company', 'user_relations.is_manager AS is_manager')
             ->first();
-        if(!($editor->type == 'Administrador' || $editor->type == 'Cliente' || $editor->type == 'Prestador')) abort(404, 'Access denied');
+        if(!($editor->type == 'Administrador' || $editor->type == 'Cliente' || $editor->type == 'Prestador' || $editor->id == $user->id)) abort(404, 'Access denied');
         
         
         if(Auth::user()->type == 'Administrador') {
@@ -314,8 +345,14 @@ class UsersController extends Controller {
         } else {
             if($editor->tipo == 'Contratante') {
                 $companies = DB::table('companies')
-                    ->where('company_relations.id_contratante', $editor->id_company)
-                    ->join('company_relations', function($join) {
+                    ->where(function ($query) use ($editor) {
+                            $query->where(function ($query) use ($editor) {
+                            $query->where('company_relations.id_contratante', $editor->id_company)
+                            ->orWhere('companies.id', $editor->id_company);
+                        })
+                            ->orWhere('companies.id', $editor->id_company);
+                        })
+                    ->leftjoin('company_relations', function($join) {
                         $join
                             ->on('companies.id', '=', 'company_relations.id_contratada')
                             ->orOn('companies.id', '=', 'company_relations.id_contratante');
@@ -331,7 +368,7 @@ class UsersController extends Controller {
             } else {
                 $companies = DB::table('companies')
                     ->Where('company_relations.id_contratada', $editor->id_company)
-                    ->join('company_relations', function($join) {
+                    ->leftjoin('company_relations', function($join) {
                         $join
                             ->on('companies.id', '=', 'company_relations.id_contratada');
                     })
@@ -353,9 +390,9 @@ class UsersController extends Controller {
     public function update(UpdateUserRequest $request, User $user) {
         $user_check = DB::table('users')
             ->where('users.id', $user->id)
-            ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
-            ->join('companies', 'companies.id', '=', 'user_relations.id_company')
-            ->join('company_relations', function($join) {
+            ->leftjoin('user_relations', 'users.id', '=', 'user_relations.id_user')
+            ->leftjoin('companies', 'companies.id', '=', 'user_relations.id_company')
+            ->leftjoin('company_relations', function($join) {
                 $join
                     ->on('companies.id', '=', 'company_relations.id_contratada')
                         ->orOn('companies.id', '=', 'company_relations.id_contratante');
@@ -365,14 +402,14 @@ class UsersController extends Controller {
         
         $editor = DB::table('users')
             ->where('users.id', Auth::user()->id)
-            ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
-            ->join('companies', 'companies.id', '=', 'user_relations.id_company')
+            ->leftjoin('user_relations', 'users.id', '=', 'user_relations.id_user')
+            ->leftjoin('companies', 'companies.id', '=', 'user_relations.id_company')
             ->select('users.*', 'companies.name AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
             ->first();
         
-        if(!($editor->company == $user_check->company || $editor->id_company == $user_check->id_contratante)) abort(403, 'Access denied');
+        if(!($editor->company == $user_check->company || $editor->id_company == $user_check->id_contratante || $editor->id == $user->id)) abort(403, 'Access denied');
 
-        if(!(Auth::user()->type == 'Cliente' || Auth::user()->type == 'Administrador')) abort(403, 'Access denied');
+        if(!(Auth::user()->type == 'Cliente' || Auth::user()->type == 'Administrador' || $editor->id == $user->id)) abort(403, 'Access denied');
 
 
         if($request->profile_photo_path) {
@@ -404,8 +441,12 @@ class UsersController extends Controller {
 
         if(!(Auth::user()->type == 'Administrador')) {
             if($editor->id == $user_check->id) {
-                if((int) $req['active'] != $user_check->active) throw ValidationException::withMessages(['erro' => 'Você não tem permissão para isso!']);
-                if((int) $req['company'] != $user_check->id_company) throw ValidationException::withMessages(['erro' => 'Você não tem permissão para isso!']);
+                if(isset($req['active'])){
+                    if((int) $req['active'] != $user_check->active) throw ValidationException::withMessages(['erro' => 'Você não tem permissão para isso!']);
+                }
+                if(isset($req['company'])){
+                    if((int) $req['company'] != $user_check->id_company) throw ValidationException::withMessages(['erro' => 'Você não tem permissão para isso!']);
+                }
             }
         }
 
@@ -422,8 +463,14 @@ class UsersController extends Controller {
 
         if($editor->tipo == 'Contratante') {
             $companies = DB::table('companies')
-                ->where('company_relations.id_contratante', $editor->id_company)
-                ->join('company_relations', function($join) {
+                ->where(function ($query) use ($editor) {
+                            $query->where(function ($query) use ($editor) {
+                            $query->where('company_relations.id_contratante', $editor->id_company)
+                            ->orWhere('companies.id', $editor->id_company);
+                        })
+                            ->orWhere('companies.id', $editor->id_company);
+                        })
+                ->leftjoin('company_relations', function($join) {
                     $join
                         ->on('companies.id', '=', 'company_relations.id_contratada')
                         ->orOn('companies.id', '=', 'company_relations.id_contratante');
@@ -438,7 +485,7 @@ class UsersController extends Controller {
         } else {
             $companies = DB::table('companies')
                 ->Where('company_relations.id_contratada', $editor->id_company)
-                ->join('company_relations', function($join) {
+                ->leftjoin('company_relations', function($join) {
                     $join
                         ->on('companies.id', '=', 'company_relations.id_contratada');
                 })
@@ -460,23 +507,24 @@ class UsersController extends Controller {
         }
 
         if(!($company_validated)) throw ValidationException::withMessages(['erro' => 'Você não tem permissão para isso!']); */
-        
-        $relations = DB::table('user_relations')
-            ->where('user_relations.id_user', $user->id)
-            ->join('users', 'users.id', '=', 'user_relations.id_user')
-            ->select('user_relations.*')
-            ->first();
-        
-        $relations = User_relation::findOrFail($relations->id);
-        $relations->id_company = (int) $req['company'];
-        
-        if((Auth::user()->type == 'Administrador') && ($user_check->is_manager == 1)){
-            $relations->is_manager = 0;
-        } 
+        if(isset($req['company'])){
+            $relations = DB::table('user_relations')
+                ->where('user_relations.id_user', $user->id)
+                ->leftjoin('users', 'users.id', '=', 'user_relations.id_user')
+                ->select('user_relations.*')
+                ->first();
+            
+            $relations = User_relation::findOrFail($relations->id);
+            $relations->id_company = (int) $req['company'];
+            
+            if((Auth::user()->type == 'Administrador') && ($user_check->is_manager == 1)){
+                $relations->is_manager = 0;
+            } 
 
-        $relations->update();
+            $relations->update();
 
-        unset($req['company']);
+            unset($req['company']);
+        }
 
         $user->update($req);
 
@@ -488,9 +536,9 @@ class UsersController extends Controller {
 
         $user_check = DB::table('users')
             ->where('users.id', $user->id)
-            ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
-            ->join('companies', 'companies.id', '=', 'user_relations.id_company')
-            ->join('company_relations', function($join) {
+            ->leftjoin('user_relations', 'users.id', '=', 'user_relations.id_user')
+            ->leftjoin('companies', 'companies.id', '=', 'user_relations.id_company')
+            ->leftjoin('company_relations', function($join) {
                 $join
                     ->on('companies.id', '=', 'company_relations.id_contratada')
                         ->orOn('companies.id', '=', 'company_relations.id_contratante');
@@ -499,8 +547,8 @@ class UsersController extends Controller {
             ->first();
         $editor = DB::table('users')
             ->where('users.id', Auth::user()->id)
-            ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
-            ->join('companies', 'companies.id', '=', 'user_relations.id_company')
+            ->leftjoin('user_relations', 'users.id', '=', 'user_relations.id_user')
+            ->leftjoin('companies', 'companies.id', '=', 'user_relations.id_company')
             ->select('users.*', 'companies.name AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
             ->first();
         

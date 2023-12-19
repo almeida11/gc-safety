@@ -26,8 +26,8 @@ class EmployeesController extends Controller {
 
         $editor = DB::table('users')
             ->where('users.id', Auth::user()->id)
-            ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
-            ->join('companies', 'companies.id', '=', 'user_relations.id_company')
+            ->leftjoin('user_relations', 'users.id', '=', 'user_relations.id_user')
+            ->leftjoin('companies', 'companies.id', '=', 'user_relations.id_company')
             ->select('users.*', 'companies.name AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
             ->first();
         if(($editor->tipo == 'Contratada') && !($editor->id_company == $company_id)) abort(404, 'Access denied');
@@ -48,7 +48,7 @@ class EmployeesController extends Controller {
         if($company->tipo == 'Contratada') {
             $contratante = DB::table('companies')
                 ->where('companies.id', $company->id_contratante)
-                ->join('company_relations', function($join) {
+                ->leftjoin('company_relations', function($join) {
                     $join->on('companies.id', '=', 'company_relations.id_contratada')->orOn('companies.id', '=', 'company_relations.id_contratante');
                 })
                 ->leftJoin('user_relations', function($join) {
@@ -67,10 +67,10 @@ class EmployeesController extends Controller {
         }
             
         $employees = DB::table('employees')
-            ->join('companies', 'companies.id', '=', 'employees.id_company')
+            ->leftjoin('companies', 'companies.id', '=', 'employees.id_company')
             ->where('companies.id', $company_id)
-            ->join('responsibilities', 'responsibilities.id', '=', 'employees.id_responsibility')
-            ->join('sectors', 'sectors.id', '=', 'employees.id_sector')
+            ->leftjoin('responsibilities', 'responsibilities.id', '=', 'employees.id_responsibility')
+            ->leftjoin('sectors', 'sectors.id', '=', 'employees.id_sector')
             ->where(function ($query) use ($busca) {
                 $query->where('employees.id', 'LIKE', '%' . $busca . '%')
                 ->orWhere('employees.name', 'LIKE', '%' . $busca . '%')
@@ -117,15 +117,14 @@ class EmployeesController extends Controller {
                 }
             }
         }
-        
         return view('employees.index', compact('employees', 'sectors', 'responsibilities', 'company_id', 'employees_doc_status', 'editor', 'busca', 'orderby', 'method'));
     }
     
     public function create(Int $company_id) {
         $editor = DB::table('users')
             ->where('users.id', Auth::user()->id)
-            ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
-            ->join('companies', 'companies.id', '=', 'user_relations.id_company')
+            ->leftjoin('user_relations', 'users.id', '=', 'user_relations.id_user')
+            ->leftjoin('companies', 'companies.id', '=', 'user_relations.id_company')
             ->select('users.*', 'companies.name AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
             ->first();
             
@@ -133,7 +132,7 @@ class EmployeesController extends Controller {
         
         $companies = DB::table('companies')
             ->where('companies.id', $company_id)
-            ->join('company_relations', function($join) {
+            ->leftjoin('company_relations', function($join) {
                 $join
                     ->on('companies.id', '=', 'company_relations.id_contratada')
                     ->orOn('companies.id', '=', 'company_relations.id_contratante');
@@ -147,9 +146,9 @@ class EmployeesController extends Controller {
             ->get()->unique();
 
         $sectors = DB::table('sectors')
-            ->join('companies', 'companies.id', '=', 'sectors.id_company')
+            ->leftjoin('companies', 'companies.id', '=', 'sectors.id_company')
             ->where('companies.id', $company_id)
-            ->join('company_relations', function($join) {
+            ->leftjoin('company_relations', function($join) {
                 $join
                     ->on('companies.id', '=', 'company_relations.id_contratada')
                     ->orOn('companies.id', '=', 'company_relations.id_contratante');
@@ -158,9 +157,9 @@ class EmployeesController extends Controller {
             ->get();
         
         $responsibilities = DB::table('responsibilities')
-            ->join('companies', 'companies.id', '=', 'responsibilities.id_company')
+            ->leftjoin('companies', 'companies.id', '=', 'responsibilities.id_company')
             ->where('companies.id', $company_id)
-            ->join('company_relations', function($join) {
+            ->leftjoin('company_relations', function($join) {
                 $join
                     ->on('companies.id', '=', 'company_relations.id_contratada')
                     ->orOn('companies.id', '=', 'company_relations.id_contratante');
@@ -174,8 +173,8 @@ class EmployeesController extends Controller {
     public function store(Int $company_id, StoreEmployeeRequest $request) {
         $editor = DB::table('users')
             ->where('users.id', Auth::user()->id)
-            ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
-            ->join('companies', 'companies.id', '=', 'user_relations.id_company')
+            ->leftjoin('user_relations', 'users.id', '=', 'user_relations.id_user')
+            ->leftjoin('companies', 'companies.id', '=', 'user_relations.id_company')
             ->select('users.*', 'companies.name AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
             ->first();
         if(!($editor->type == 'Administrador' || $editor->type == 'Cliente' || $editor->type == 'Prestador')) abort(404, 'Access denied');
@@ -192,8 +191,8 @@ class EmployeesController extends Controller {
     public function show(Int $company_id, Employee $employee) {
         $editor = DB::table('users')
             ->where('users.id', Auth::user()->id)
-            ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
-            ->join('companies', 'companies.id', '=', 'user_relations.id_company')
+            ->leftjoin('user_relations', 'users.id', '=', 'user_relations.id_user')
+            ->leftjoin('companies', 'companies.id', '=', 'user_relations.id_company')
             ->select('users.*', 'companies.name AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
             ->first();
         if(($editor->tipo == 'Contratada') && !($editor->id_company == $company_id)) abort(404, 'Access denied');
@@ -214,7 +213,7 @@ class EmployeesController extends Controller {
         if($company->tipo == 'Contratada') {
             $contratante = DB::table('companies')
                 ->where('companies.id', $company->id_contratante)
-                ->join('company_relations', function($join) {
+                ->leftjoin('company_relations', function($join) {
                     $join->on('companies.id', '=', 'company_relations.id_contratada')->orOn('companies.id', '=', 'company_relations.id_contratante');
                 })
                 ->leftJoin('user_relations', function($join) {
@@ -233,19 +232,19 @@ class EmployeesController extends Controller {
         }
         $employee = DB::table('employees')
             ->where('employees.id', $employee->id)
-            ->join('companies', 'companies.id', '=', 'employees.id_company')
+            ->leftjoin('companies', 'companies.id', '=', 'employees.id_company')
             ->where('companies.id', $company_id)
-            ->join('responsibilities', 'responsibilities.id', '=', 'employees.id_responsibility')
-            ->join('sectors', 'sectors.id', '=', 'employees.id_sector')
+            ->leftjoin('responsibilities', 'responsibilities.id', '=', 'employees.id_responsibility')
+            ->leftjoin('sectors', 'sectors.id', '=', 'employees.id_sector')
             ->select('employees.*', 'companies.name AS company', 'responsibilities.name AS responsibility', 'sectors.name AS sector')
             ->first();
 
         if(!($employee)) abort(404, 'Access denied');
 
         $responsibilities = DB::table('responsibilities')
-            ->join('companies', 'companies.id', '=', 'responsibilities.id_company')
+            ->leftjoin('companies', 'companies.id', '=', 'responsibilities.id_company')
             ->where('companies.id', $company_id)
-            ->join('company_relations', function($join) {
+            ->leftjoin('company_relations', function($join) {
                 $join
                     ->on('companies.id', '=', 'company_relations.id_contratada')
                     ->orOn('companies.id', '=', 'company_relations.id_contratante');
@@ -254,8 +253,8 @@ class EmployeesController extends Controller {
             ->paginate(9);
 
         $documents = DB::table('documents')
-            ->join('companies', 'companies.id', '=', 'documents.id_company')
-            ->join('company_relations', function($join) {
+            ->leftjoin('companies', 'companies.id', '=', 'documents.id_company')
+            ->leftjoin('company_relations', function($join) {
                 $join
                     ->on('companies.id', '=', 'company_relations.id_contratada')
                     ->orOn('companies.id', '=', 'company_relations.id_contratante');
@@ -273,26 +272,26 @@ class EmployeesController extends Controller {
     public function edit(Int $company_id, Employee $employee) {
         $editor = DB::table('users')
             ->where('users.id', Auth::user()->id)
-            ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
-            ->join('companies', 'companies.id', '=', 'user_relations.id_company')
+            ->leftjoin('user_relations', 'users.id', '=', 'user_relations.id_user')
+            ->leftjoin('companies', 'companies.id', '=', 'user_relations.id_company')
             ->select('users.*', 'companies.name AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
             ->first();
         if(!($editor->type == 'Administrador' || $editor->type == 'Cliente' || $editor->type == 'Prestador')) abort(404, 'Access denied');
         
         $employee = DB::table('employees')
             ->where('employees.id', $employee->id)
-            ->join('companies', 'companies.id', '=', 'employees.id_company')
-            ->join('responsibilities', 'responsibilities.id', '=', 'employees.id_responsibility')
-            ->join('sectors', 'sectors.id', '=', 'employees.id_sector')
+            ->leftjoin('companies', 'companies.id', '=', 'employees.id_company')
+            ->leftjoin('responsibilities', 'responsibilities.id', '=', 'employees.id_responsibility')
+            ->leftjoin('sectors', 'sectors.id', '=', 'employees.id_sector')
             ->select('employees.*', 'companies.name AS company', 'responsibilities.name AS responsibility', 'sectors.name AS sector')
             ->first();
 
         // if($editor->company != $employee->company) abort(403, 'Access denied');
 
         $documents = DB::table('documents')
-            ->join('companies', 'companies.id', '=', 'documents.id_company')
+            ->leftjoin('companies', 'companies.id', '=', 'documents.id_company')
             ->where('companies.id', $company_id)
-            ->join('company_relations', function($join) {
+            ->leftjoin('company_relations', function($join) {
                 $join
                     ->on('companies.id', '=', 'company_relations.id_contratada')
                     ->orOn('companies.id', '=', 'company_relations.id_contratante');
@@ -307,7 +306,7 @@ class EmployeesController extends Controller {
 
         $companies = DB::table('companies')
             ->where('companies.id', $company_id)
-            ->join('company_relations', function($join) {
+            ->leftjoin('company_relations', function($join) {
                 $join
                     ->on('companies.id', '=', 'company_relations.id_contratada')
                     ->orOn('companies.id', '=', 'company_relations.id_contratante');
@@ -321,9 +320,9 @@ class EmployeesController extends Controller {
             ->get()->unique();
 
         $sectors = DB::table('sectors')
-            ->join('companies', 'companies.id', '=', 'sectors.id_company')
+            ->leftjoin('companies', 'companies.id', '=', 'sectors.id_company')
             ->where('companies.id', $company_id)
-            ->join('company_relations', function($join) {
+            ->leftjoin('company_relations', function($join) {
                 $join
                     ->on('companies.id', '=', 'company_relations.id_contratada')
                     ->orOn('companies.id', '=', 'company_relations.id_contratante');
@@ -332,9 +331,9 @@ class EmployeesController extends Controller {
             ->get();
         
         $responsibilities = DB::table('responsibilities')
-            ->join('companies', 'companies.id', '=', 'responsibilities.id_company')
+            ->leftjoin('companies', 'companies.id', '=', 'responsibilities.id_company')
             ->where('companies.id', $company_id)
-            ->join('company_relations', function($join) {
+            ->leftjoin('company_relations', function($join) {
                 $join
                     ->on('companies.id', '=', 'company_relations.id_contratada')
                     ->orOn('companies.id', '=', 'company_relations.id_contratante');
@@ -349,17 +348,17 @@ class EmployeesController extends Controller {
     public function update(Int $company_id, UpdateEmployeeRequest $request, Employee $employee) {
         $editor = DB::table('users')
             ->where('users.id', Auth::user()->id)
-            ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
-            ->join('companies', 'companies.id', '=', 'user_relations.id_company')
+            ->leftjoin('user_relations', 'users.id', '=', 'user_relations.id_user')
+            ->leftjoin('companies', 'companies.id', '=', 'user_relations.id_company')
             ->select('users.*', 'companies.name AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
             ->first();
         if(!($editor->type == 'Administrador' || $editor->type == 'Cliente' || $editor->type == 'Prestador')) abort(404, 'Access denied');
 
         $employee_check = DB::table('employees')
             ->where('employees.id', $employee->id)
-            ->join('companies', 'companies.id', '=', 'employees.id_company')
-            ->join('responsibilities', 'responsibilities.id', '=', 'employees.id_responsibility')
-            ->join('sectors', 'sectors.id', '=', 'employees.id_sector')
+            ->leftjoin('companies', 'companies.id', '=', 'employees.id_company')
+            ->leftjoin('responsibilities', 'responsibilities.id', '=', 'employees.id_responsibility')
+            ->leftjoin('sectors', 'sectors.id', '=', 'employees.id_sector')
             ->select('employees.*', 'companies.name AS company', 'responsibilities.name AS responsibility', 'sectors.name AS sector')
             ->first();
 
@@ -398,8 +397,8 @@ class EmployeesController extends Controller {
     public function destroy(Int $company_id, Employee $employee) {
         $editor = DB::table('users')
             ->where('users.id', Auth::user()->id)
-            ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
-            ->join('companies', 'companies.id', '=', 'user_relations.id_company')
+            ->leftjoin('user_relations', 'users.id', '=', 'user_relations.id_user')
+            ->leftjoin('companies', 'companies.id', '=', 'user_relations.id_company')
             ->select('users.*', 'companies.name AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
             ->first();
         if(!($editor->type == 'Administrador' || $editor->type == 'Cliente' || $editor->type == 'Prestador')) abort(404, 'Access denied');
@@ -416,8 +415,8 @@ class EmployeesController extends Controller {
     public function editdoc(Int $company_id, Int $employee_id, Request $request) { // Tipos de Documentos
         $editor = DB::table('users')
             ->where('users.id', Auth::user()->id)
-            ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
-            ->join('companies', 'companies.id', '=', 'user_relations.id_company')
+            ->leftjoin('user_relations', 'users.id', '=', 'user_relations.id_user')
+            ->leftjoin('companies', 'companies.id', '=', 'user_relations.id_company')
             ->select('users.*', 'companies.name AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
             ->first();
         if(!($editor->type == 'Administrador' || $editor->type == 'Cliente' || $editor->type == 'Prestador')) abort(404, 'Access denied');
@@ -444,11 +443,11 @@ class EmployeesController extends Controller {
     }
 
     public function updatedoc(Int $company_id, Int $employee_id, Request $request) { // Envio de documentos
-        dd($request);
+        // dd($request);
         $editor = DB::table('users')
             ->where('users.id', Auth::user()->id)
-            ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
-            ->join('companies', 'companies.id', '=', 'user_relations.id_company')
+            ->leftjoin('user_relations', 'users.id', '=', 'user_relations.id_user')
+            ->leftjoin('companies', 'companies.id', '=', 'user_relations.id_company')
             ->select('users.*', 'companies.name AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
             ->first();
         if(!($editor->type == 'Administrador' || $editor->type == 'Cliente' || $editor->type == 'Prestador')) abort(404, 'Access denied');
@@ -534,12 +533,15 @@ class EmployeesController extends Controller {
                         if($request->approve == 'yes') {
                             $old_document = Document_path::findOrFail($old_document->id);
                             $old_document->status = 'Aprovado';
+                            $old_document->aproved_by = $editor->name;
                             $old_document->update();
                             break;
                         } else {
                             if($request->approve == 'no') {
                                 $old_document = Document_path::findOrFail($old_document->id);
                                 $old_document->status = 'Reprovado';
+                                $old_document->aproved_by = $editor->name;
+                                $old_document->desc = $request->disapproveDescription;
                                 $old_document->update();
                                 break;
                             }

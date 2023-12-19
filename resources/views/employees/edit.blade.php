@@ -218,7 +218,7 @@ function limpaString($string) {
                             </div>
                         </div>
                         <!--Footer-->
-                        <div class="flex justify-end pt-2">
+                        <div class="flex justify-end pt-2"> 
                             @error('document_manager')
                                 <p class="text-sm text-red-600">{{ $message }}</p>
                             @enderror
@@ -289,7 +289,7 @@ function limpaString($string) {
                                             </th> 
                                         
                                         </tr>
-                                        <tr class="border-b" id="sended-by-info">
+                                        <tr class="border-b hidden" id="sended-by-info">
                                             <th scope="col" class=" py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-white">
                                                 Enviado por
                                             </th> 
@@ -297,14 +297,22 @@ function limpaString($string) {
                                                 
                                             </td>
                                         </tr>
-                                        <!-- <tr class="border-b" id="aproved-by-info">
-                                            <th scope="col" class=" py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-white">
-                                                Aprovado por
+                                        <tr class="border-b hidden" id="aproved-by-info">
+                                            <th id="aproved-by-text" scope="col" class=" py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-white">
+                                                
                                             </th> 
                                             <td id="aproved-by" class="td300  py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
                                                 
                                             </td>
-                                        </tr> -->
+                                        </tr>
+                                        <tr class="border-b hidden" id="desc-info">
+                                            <th scope="col" class=" py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-white">
+                                                Descrição
+                                            </th> 
+                                            <td id="desc" class="td300  py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
+                                                
+                                            </td>
+                                        </tr>
                                         <tr class="border-b hidden"  id="modal_aprove_title">
                                             <th colspan='2' scope="col" class=" py-3 bg-gray-50 text-center text-xs font-medium text-gray-500 uppercase tracking-wider bg-white">
                                                 Aprovar Documento
@@ -412,16 +420,24 @@ function limpaString($string) {
                 const old_due_date = document.getElementById("old_due_date");
                 const modal_status = document.getElementById("modal-status");
                 const sended_by = document.getElementById("sended-by");
+                const aproved_by = document.getElementById("aproved-by");
+                const aproved_by_text = document.getElementById("aproved-by-text");
+                const desc = document.getElementById("desc");
                 const save_button = document.getElementById("save_button");
                 const modal_doc_info = document.getElementById("modal_doc_info");
                 const modal_date_info = document.getElementById("modal_date_info");
                 const modal_status_info = document.getElementById("modal_status_info");
+                const sended_by_info = document.getElementById("sended-by-info");
+                const aproved_by_info = document.getElementById("aproved-by-info");
+                const desc_info = document.getElementById("desc-info");
                 const modal_historic = document.getElementById("modal_historic");
                 const new_due_date = document.getElementById("new_due_date");
                 const modal_save_create = document.getElementById("modal_save_create");
                 const modal_date_create = document.getElementById("modal_date_create");
                 const modal_aprove_text = document.getElementById("modal_aprove_text");
                 const modal_aprove_title = document.getElementById("modal_aprove_title");
+                const disapproveDesc = document.getElementById("disapproveDesc");
+                const disapproveDescription = document.getElementById("disapproveDescription");
 
             
                 const paths = [@if($employee->documents)
@@ -435,7 +451,7 @@ function limpaString($string) {
 @if(limpaString($document_path->type) == limpaString($db_document->name))
 <?php $document_name_display = $document_path->name;
 $document_path_display = $document_path->path; ?>
-<?php echo htmlspecialchars_decode("{type:\"".$document_path->type."\",path:\"".url("storage/{$document_path->path}/{$document_path->name}#view=FitH")."\", due_date: '".$document_path->due_date."', status: '" . $document_path->status . "', created_at: '" . $document_path->created_at . "', updated_at: '" . $document_path->updated_at . "', sended_by: '" . $document_path->sended_by . "', aproved_by: '" . $document_path->aproved_by . "'},"); ?>
+<?php echo htmlspecialchars_decode("{type:\"".$document_path->type."\",path:\"".url("storage/{$document_path->path}/{$document_path->name}#view=FitH")."\", due_date: '".$document_path->due_date."', status: '" . $document_path->status . "', created_at: '" . $document_path->created_at . "', updated_at: '" . $document_path->updated_at . "', sended_by: '" . $document_path->sended_by . "', aproved_by: '" . $document_path->aproved_by . "', desc: '" . $document_path->desc . "'},"); ?>
 @endif
 @endif
 @endif
@@ -449,7 +465,7 @@ $document_path_display = $document_path->path; ?>
                 const old_paths = [@if($document_paths->first())
 @foreach($document_paths as $document_path)
 @if($document_path->actual == 0)
-<?php echo htmlspecialchars_decode("{type:\"".$document_path->type."\",path:\"".url("storage/{$document_path->path}/{$document_path->name}#view=FitH")."\", due_date: '".$document_path->due_date."', status: '" . $document_path->status . "', created_at: '" . $document_path->created_at . "', updated_at: '" . $document_path->updated_at . "', sended_by: '" . $document_path->sended_by . "', aproved_by: '" . $document_path->aproved_by . "'},"); ?>
+<?php echo htmlspecialchars_decode("{type:\"".$document_path->type."\",path:\"".url("storage/{$document_path->path}/{$document_path->name}#view=FitH")."\", due_date: '".$document_path->due_date."', status: '" . $document_path->status . "', created_at: '" . $document_path->created_at . "', updated_at: '" . $document_path->updated_at . "', sended_by: '" . $document_path->sended_by . "', aproved_by: '" . $document_path->aproved_by . "', desc: '" . $document_path->desc . "'},"); ?>
 @endif
 @endforeach
 @endif
@@ -470,6 +486,8 @@ $document_path_display = $document_path->path; ?>
                 }
 
                 const modalClose3 = () => {
+                    disapproveDescription.required = false;
+                    disapproveDesc.required = false;
                     modal3.classList.remove('fadeIn');
                     modal3.classList.add('fadeOut');
                     setTimeout(() => {
@@ -478,6 +496,8 @@ $document_path_display = $document_path->path; ?>
                 }
 
                 const openModal3 = () => {
+                    disapproveDescription.required = true;
+                    disapproveDesc.required = true;
                     modal3.classList.remove('fadeOut');
                     modal3.classList.add('fadeIn');
                     modal3.style.display = 'flex';
@@ -515,8 +535,6 @@ $document_path_display = $document_path->path; ?>
                     const approve_input = document.getElementById("approve");
                     approve_input.value = 'no';
                     
-                    const disapproveDesc = document.getElementById("disapproveDesc");
-                    const disapproveDescription = document.getElementById("disapproveDescription");
                     disapproveDescription.value = disapproveDesc.value;
                     save_button.click();
                 }
@@ -589,12 +607,25 @@ $document_path_display = $document_path->path; ?>
                                 old_due_date.value = paths[index].due_date;
                                 modal_status.innerText = paths[index].status;
                                 sended_by.innerText = paths[index].sended_by;
+                                desc.innerText = paths[index].desc;
+                                aproved_by.innerText = paths[index].aproved_by;
+
                                 modal_doc_info.classList.remove("hidden");
                                 modal_date_info.classList.remove("hidden");
                                 modal_status_info.classList.remove("hidden");
+                                sended_by_info.classList.remove("hidden");
                                 modal_historic.classList.remove("hidden");
                                 modal_aprove_text.classList.remove("hidden");
                                 modal_aprove_title.classList.remove("hidden");
+                                if(paths[index].status == 'Aprovado') {
+                                    aproved_by_info.classList.remove("hidden");
+                                    aproved_by_text.innerText = "Aprovado por";
+                                }
+                                if(paths[index].status == 'Reprovado') {
+                                    aproved_by_info.classList.remove("hidden");
+                                    desc_info.classList.remove("hidden");
+                                    aproved_by_text.innerText = "Recusado por";
+                                }
                                 break;
                             } else {
                                 old_due_date.value = null;
@@ -603,6 +634,9 @@ $document_path_display = $document_path->path; ?>
                                 modal_doc_info.classList.add("hidden");
                                 modal_date_info.classList.add("hidden");
                                 modal_status_info.classList.add("hidden");
+                                sended_by_info.classList.add("hidden");
+                                aproved_by_info.classList.add("hidden");
+                                desc_info.classList.add("hidden");
                                 modal_historic.classList.add("hidden");
                                 modal_aprove_text.classList.add("hidden");
                                 modal_aprove_title.classList.add("hidden");
@@ -615,6 +649,9 @@ $document_path_display = $document_path->path; ?>
                         }
                         for (let index = 0; index < paths.length; index++) {
                             if(paths[index].type == title) {
+                                if(paths[index].desc) {
+
+                                }
                                 var modal_button2 = document.getElementById(title.concat('bt'));
                                 if(modal_button2) {
                                     modal_button2.disabled = false;

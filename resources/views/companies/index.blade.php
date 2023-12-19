@@ -8,8 +8,8 @@
 
     <div>
         <div class="max-w-7xl mx-auto py-10 sm:px-6 lg:px-8">
-            @if(Auth::user()->type != 'Fiscal')
-            @if ($editor->tipo == 'Contratante')
+            @if(Auth::user()->type == 'Cliente' || Auth::user()->type == 'Administrador')
+            @if ($editor->tipo == 'Contratante' || $editor->company == null)
             <div class="block mb-8 mb-4">
                 <a href="{{ route('companies.create') }}"
                     class="bg-gray-200 hover:bg-gray-300 text-black  py-2 px-4 rounded">Cadastrar Empresa</a>
@@ -276,6 +276,7 @@
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white divide-y divide-gray-200">
+                                    @if($companies != null)
                                     @foreach ($companies as $company)
                                     <tr>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -350,10 +351,13 @@
                                         </td>
                                     </tr>
                                     @endforeach
+                                    @endif
                                 </tbody>
                             </table>
                         </div>
+                        @if(isset($companies))
                         {{ $companies->links() }}
+                        @endif
                     </div>
                 </div>
             </div>

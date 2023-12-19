@@ -188,7 +188,7 @@
                                                 Selecione um Gerente!
                                             </option>
                                             @foreach ($users as $user)
-                                            <option value="{{ $user->id }}">
+                                            <option value="{{ $user->id }}" @if($editor->company == null) selected @endif>
                                                 {{ $user->name }}
                                             </option>
                                             @endforeach

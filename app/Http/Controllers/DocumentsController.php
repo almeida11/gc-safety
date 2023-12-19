@@ -14,8 +14,8 @@ class DocumentsController extends Controller {
     public function index(Int $company_id) {
         $editor = DB::table('users')
             ->where('users.id', Auth::user()->id)
-            ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
-            ->join('companies', 'companies.id', '=', 'user_relations.id_company')
+            ->leftjoin('user_relations', 'users.id', '=', 'user_relations.id_user')
+            ->leftjoin('companies', 'companies.id', '=', 'user_relations.id_company')
             ->select('users.*', 'companies.name AS company', 'companies.tipo AS tipo', 'companies.id AS id_company', 'user_relations.is_manager AS is_manager')
             ->first();
         
@@ -37,7 +37,7 @@ class DocumentsController extends Controller {
         if($company->tipo == 'Contratada') {
             $contratante = DB::table('companies')
                 ->where('companies.id', $company->id_contratante)
-                ->join('company_relations', function($join) {
+                ->leftjoin('company_relations', function($join) {
                     $join->on('companies.id', '=', 'company_relations.id_contratada')->orOn('companies.id', '=', 'company_relations.id_contratante');
                 })
                 ->leftJoin('user_relations', function($join) {
@@ -60,9 +60,9 @@ class DocumentsController extends Controller {
         $method = isset($_GET['method-companie']) ? $_GET['method-companie'] : 'asc';
 
         $documents = DB::table('documents')
-            ->join('companies', 'companies.id', '=', 'documents.id_company')
+            ->leftjoin('companies', 'companies.id', '=', 'documents.id_company')
             ->where('companies.id', $company_id)
-            ->join('company_relations', function($join) {
+            ->leftjoin('company_relations', function($join) {
                 $join
                     ->on('companies.id', '=', 'company_relations.id_contratada')
                     ->orOn('companies.id', '=', 'company_relations.id_contratante');
@@ -78,8 +78,8 @@ class DocumentsController extends Controller {
 
         $editor = DB::table('users')
             ->where('users.id', Auth::user()->id)
-            ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
-            ->join('companies', 'companies.id', '=', 'user_relations.id_company')
+            ->leftjoin('user_relations', 'users.id', '=', 'user_relations.id_user')
+            ->leftjoin('companies', 'companies.id', '=', 'user_relations.id_company')
             ->select('users.*', 'companies.name AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
             ->first();
         return view('documents.index', compact('editor', 'documents', 'company_id', 'busca', 'method', 'orderby'));
@@ -90,8 +90,8 @@ class DocumentsController extends Controller {
 
         $editor = DB::table('users')
             ->where('users.id', Auth::user()->id)
-            ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
-            ->join('companies', 'companies.id', '=', 'user_relations.id_company')
+            ->leftjoin('user_relations', 'users.id', '=', 'user_relations.id_user')
+            ->leftjoin('companies', 'companies.id', '=', 'user_relations.id_company')
             ->select('users.*', 'companies.name AS company', 'companies.tipo AS tipo', 'companies.id AS id_company', 'user_relations.is_manager AS is_manager')
             ->first();
         if(!($editor->type == 'Administrador' || $editor->type == 'Cliente' || $editor->type == 'Prestador')) abort(404, 'Access denied');
@@ -113,7 +113,7 @@ class DocumentsController extends Controller {
         if($company->tipo == 'Contratada') {
             $contratante = DB::table('companies')
                 ->where('companies.id', $company->id_contratante)
-                ->join('company_relations', function($join) {
+                ->leftjoin('company_relations', function($join) {
                     $join->on('companies.id', '=', 'company_relations.id_contratada')->orOn('companies.id', '=', 'company_relations.id_contratante');
                 })
                 ->leftJoin('user_relations', function($join) {
@@ -132,15 +132,15 @@ class DocumentsController extends Controller {
         }
         $editor = DB::table('users')
             ->where('users.id', Auth::user()->id)
-            ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
-            ->join('companies', 'companies.id', '=', 'user_relations.id_company')
+            ->leftjoin('user_relations', 'users.id', '=', 'user_relations.id_user')
+            ->leftjoin('companies', 'companies.id', '=', 'user_relations.id_company')
             ->select('users.*', 'companies.name AS company', 'companies.tipo AS tipo', 'user_relations.is_manager AS is_manager', 'companies.id as id_company')
             ->first();
         
         $documents = DB::table('documents')
-            ->join('companies', 'companies.id', '=', 'documents.id_company')
+            ->leftjoin('companies', 'companies.id', '=', 'documents.id_company')
             ->where('companies.id', $company_id)
-            ->join('company_relations', function($join) {
+            ->leftjoin('company_relations', function($join) {
                 $join
                     ->on('companies.id', '=', 'company_relations.id_contratada')
                     ->orOn('companies.id', '=', 'company_relations.id_contratante');
@@ -150,7 +150,7 @@ class DocumentsController extends Controller {
 
         $companies = DB::table('companies')
             ->where('companies.id', $company_id)
-            ->join('company_relations', function($join) {
+            ->leftjoin('company_relations', function($join) {
                 $join
                     ->on('companies.id', '=', 'company_relations.id_contratada')
                     ->orOn('companies.id', '=', 'company_relations.id_contratante');
@@ -162,6 +162,7 @@ class DocumentsController extends Controller {
             ->leftJoin('users', 'user_relations.id_user', '=', 'users.id')
             ->select('companies.*', 'users.id AS id_manager', 'company_relations.id_contratante')
             ->paginate(9)->unique();
+            
         return view('documents.create', compact('companies', 'documents', 'company_id'));
 
     }
@@ -169,8 +170,8 @@ class DocumentsController extends Controller {
     public function store(Int $company_id, StoreDocumentRequest $request) {
         $editor = DB::table('users')
             ->where('users.id', Auth::user()->id)
-            ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
-            ->join('companies', 'companies.id', '=', 'user_relations.id_company')
+            ->leftjoin('user_relations', 'users.id', '=', 'user_relations.id_user')
+            ->leftjoin('companies', 'companies.id', '=', 'user_relations.id_company')
             ->select('users.*', 'companies.name AS company', 'companies.tipo AS tipo', 'companies.id AS id_company', 'user_relations.is_manager AS is_manager')
             ->first();
         
@@ -193,7 +194,7 @@ class DocumentsController extends Controller {
         if($company->tipo == 'Contratada') {
             $contratante = DB::table('companies')
                 ->where('companies.id', $company->id_contratante)
-                ->join('company_relations', function($join) {
+                ->leftjoin('company_relations', function($join) {
                     $join->on('companies.id', '=', 'company_relations.id_contratada')->orOn('companies.id', '=', 'company_relations.id_contratante');
                 })
                 ->leftJoin('user_relations', function($join) {
@@ -220,8 +221,8 @@ class DocumentsController extends Controller {
     public function show(Int $company_id, Document $document) {
         $editor = DB::table('users')
             ->where('users.id', Auth::user()->id)
-            ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
-            ->join('companies', 'companies.id', '=', 'user_relations.id_company')
+            ->leftjoin('user_relations', 'users.id', '=', 'user_relations.id_user')
+            ->leftjoin('companies', 'companies.id', '=', 'user_relations.id_company')
             ->select('users.*', 'companies.name AS company', 'companies.tipo AS tipo', 'companies.id AS id_company', 'user_relations.is_manager AS is_manager')
             ->first();
         
@@ -243,7 +244,7 @@ class DocumentsController extends Controller {
         if($company->tipo == 'Contratada') {
             $contratante = DB::table('companies')
                 ->where('companies.id', $company->id_contratante)
-                ->join('company_relations', function($join) {
+                ->leftjoin('company_relations', function($join) {
                     $join->on('companies.id', '=', 'company_relations.id_contratada')->orOn('companies.id', '=', 'company_relations.id_contratante');
                 })
                 ->leftJoin('user_relations', function($join) {
@@ -273,8 +274,8 @@ class DocumentsController extends Controller {
     public function edit(Int $company_id, Document $document) {
         $editor = DB::table('users')
             ->where('users.id', Auth::user()->id)
-            ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
-            ->join('companies', 'companies.id', '=', 'user_relations.id_company')
+            ->leftjoin('user_relations', 'users.id', '=', 'user_relations.id_user')
+            ->leftjoin('companies', 'companies.id', '=', 'user_relations.id_company')
             ->select('users.*', 'companies.name AS company', 'companies.tipo AS tipo', 'companies.id AS id_company', 'user_relations.is_manager AS is_manager')
             ->first();
         if(!($editor->type == 'Administrador' || $editor->type == 'Cliente' || $editor->type == 'Prestador')) abort(404, 'Access denied');
@@ -297,7 +298,7 @@ class DocumentsController extends Controller {
         if($company->tipo == 'Contratada') {
             $contratante = DB::table('companies')
                 ->where('companies.id', $company->id_contratante)
-                ->join('company_relations', function($join) {
+                ->leftjoin('company_relations', function($join) {
                     $join->on('companies.id', '=', 'company_relations.id_contratada')->orOn('companies.id', '=', 'company_relations.id_contratante');
                 })
                 ->leftJoin('user_relations', function($join) {
@@ -324,7 +325,7 @@ class DocumentsController extends Controller {
         
         $companies = DB::table('companies')
             ->where('companies.id', $company_id)
-            ->join('company_relations', function($join) {
+            ->leftjoin('company_relations', function($join) {
                 $join
                     ->on('companies.id', '=', 'company_relations.id_contratada')
                     ->orOn('companies.id', '=', 'company_relations.id_contratante');
@@ -342,8 +343,8 @@ class DocumentsController extends Controller {
     public function update(Int $company_id, UpdateDocumentRequest $request, Document $document) {
         $editor = DB::table('users')
             ->where('users.id', Auth::user()->id)
-            ->join('user_relations', 'users.id', '=', 'user_relations.id_user')
-            ->join('companies', 'companies.id', '=', 'user_relations.id_company')
+            ->leftjoin('user_relations', 'users.id', '=', 'user_relations.id_user')
+            ->leftjoin('companies', 'companies.id', '=', 'user_relations.id_company')
             ->select('users.*', 'companies.name AS company', 'companies.tipo AS tipo', 'companies.id AS id_company', 'user_relations.is_manager AS is_manager')
             ->first();
         if(!($editor->type == 'Administrador' || $editor->type == 'Cliente' || $editor->type == 'Prestador')) abort(404, 'Access denied');
@@ -366,7 +367,7 @@ class DocumentsController extends Controller {
         if($company->tipo == 'Contratada') {
             $contratante = DB::table('companies')
                 ->where('companies.id', $company->id_contratante)
-                ->join('company_relations', function($join) {
+                ->leftjoin('company_relations', function($join) {
                     $join->on('companies.id', '=', 'company_relations.id_contratada')->orOn('companies.id', '=', 'company_relations.id_contratante');
                 })
                 ->leftJoin('user_relations', function($join) {
