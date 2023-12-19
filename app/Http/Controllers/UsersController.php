@@ -382,7 +382,7 @@ class UsersController extends Controller {
             }
         }
 
-        if(!($editor->company == $user->company || $editor->id_company == $user->id_contratante)) abort(403, 'Access denied');
+        if(!($editor->company == $user->company || $editor->id_company == $user->id_contratante) && !($editor->type == 'Administrador')) abort(403, 'Access denied');
         
         return view('users.edit', compact('user', 'companies', 'editor'));
     }
@@ -458,8 +458,12 @@ class UsersController extends Controller {
 
             if($user_check->type == 'Administrador') throw ValidationException::withMessages(['erro' => 'Você não tem permissão para isso!']);
         }
-        
-        $req["password"] = $req["password"] == null ? $user->password : Hash::make($req["password"]);
+        if(isset($req["password"])) {
+            $req["password"] = $req["password"] == null ? $user->password : Hash::make($req["password"]);
+            if(!(Auth::user()->type == 'Cliente' || Auth::user()->type == 'Administrador') || $user_check->type == 'Administrador' || $user_check->id == $editor->id) {
+                if(!(Hash::check($request->currentPassword, $user->password))) throw ValidationException::withMessages(['curr' => 'Senha inválida!']);
+            }
+        }
 
         if($editor->tipo == 'Contratante') {
             $companies = DB::table('companies')

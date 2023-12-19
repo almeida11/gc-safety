@@ -260,7 +260,7 @@ function limpaString($string) {
                                                 Data de Vencimento
                                             </th> 
                                             <td class="td200  py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
-                                                    <input type="date" name="old_due_date" id="old_due_date" 
+                                                    <input type="date" name="old_due_date" id="old_due_date" min="{{ date('Y-m-d') }}" max="{{ date('Y-m-d', strtotime(date('Y-m-d') . ' +2 year')) }}" 
                                                         class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full"
                                                         wire:model.defer="state.old_due_date" autocomplete="old_due_date" value="" onchange="allowUpdate()" />
                                                 <div>
@@ -358,12 +358,12 @@ function limpaString($string) {
                                                 </div>
                                             </td>
                                         </tr>
-                                        <tr class="border-b hidden" id="modal_date_create">
+                                        <tr class="border-b" id="modal_date_create">
                                             <th scope="col" class=" py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-white">
                                                 Data de Vencimento
                                             </th> 
                                             <td class="td200  py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
-                                                    <input type="date" name="new_due_date" id="new_due_date" 
+                                                    <input type="date" name="new_due_date" id="new_due_date" min="{{ date('Y-m-d') }}" max="{{ date('Y-m-d', strtotime(date('Y-m-d') . ' +2 year')) }}" 
                                                         class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full"
                                                         wire:model.defer="state.new_due_date" autocomplete="new_due_date" value="" onchange="allowCreate()"  />
                                                 <div>
@@ -548,9 +548,6 @@ $document_path_display = $document_path->path; ?>
                 }
 
                 const openModal2 = (title, path_par = false) => {
-                    if(modal_date_create) {
-                        modal_date_create.classList.add("hidden");
-                    }
 
                     let button_update = document.getElementById('modal_save_update');
                     if(button_update) {
@@ -961,7 +958,7 @@ $document_path_display = $document_path->path; ?>
                                     Admissão
                                 </th>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
-                                    <input type="date" name="admission" id="admission" 
+                                    <input type="date" name="admission" id="admission" min="{{ date('Y-m-d', strtotime(date('Y-m-d') . ' -50 year')) }}" max="{{ date('Y-m-d', strtotime(date('Y-m-d') . ' +1 year')) }}" 
                                     class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full"
                                     wire:model.defer="state.admission" autocomplete="new-admission"
                                         value="{{ old('admission', $employee->admission) }}"/>
