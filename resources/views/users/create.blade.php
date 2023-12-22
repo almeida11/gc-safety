@@ -35,7 +35,7 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
                                     <input type="email" name="email" id="email"
                                     class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full"
-                                    wire:model.defer="state.email" autocomplete="username"/>
+                                    wire:model.defer="state.email" autocomplete="email"/>
                                     @error('email')
                                         <p class="text-sm text-red-600">{{ $message }}</p>
                                     @enderror

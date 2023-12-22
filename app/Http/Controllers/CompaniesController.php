@@ -13,7 +13,9 @@ use App\Helpers\PaginationHelper;
 use App\Models\Company_relation;
 use App\Models\User_relation;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use App\Models\Company;
+use App\Models\Invite;
 use App\Models\User;
 
 class CompaniesController extends Controller {
@@ -145,7 +147,13 @@ class CompaniesController extends Controller {
                 }
             }
         }
-        return view('companies.index', compact('companies', 'users', 'editor', 'companies_doc_status', 'busca', 'orderby', 'method'));
+
+        $invites = DB::table('invites')
+            ->where('invites.id_company', $editor->id_company)
+            ->paginate(9,['*'],'invites');
+
+
+        return view('companies.index', compact('companies', 'users', 'editor', 'companies_doc_status', 'busca', 'orderby', 'method', 'invites'));
     }
     
     public function create() {
@@ -235,6 +243,9 @@ class CompaniesController extends Controller {
 
         if($editor->company == null) {
             $req['tipo'] = 'Contratante';
+            $invite = DB::table('invites')
+                ->where('invites.used_by_user', $editor->id)
+                ->first();
         }
         
         if (!(ValidationsHelper::is_cnpj($req["cnpj"]))) throw ValidationException::withMessages(['cnpj' => 'O campo cnpj tem um formato inválido.!']);
@@ -278,6 +289,12 @@ class CompaniesController extends Controller {
                 $relation->id_company = $new_company->id;
                 $relation->update();
             }
+        }
+
+        if(isset($invite)) {
+            $affected = DB::table('invites')
+                ->where('id', $invite->id)
+                ->update(['used_by_company' => $new_company->id]);
         }
 
         return redirect()->route('companies.index');
@@ -645,5 +662,35 @@ class CompaniesController extends Controller {
         $new_company->update();
 
         return redirect()->route('companies.index');
+    }
+    
+    public function createInvite(Int $company_id, Request $request) {
+        $company = DB::table('companies')
+            ->where('companies.id', $company_id)
+            ->leftJoin('company_relations', function($join) {
+                $join->on('companies.id', '=', 'company_relations.id_contratada')->orOn('companies.id', '=', 'company_relations.id_contratante');
+            })
+            ->leftJoin('user_relations', function($join) {
+                $join->on('user_relations.id_company', '=', 'companies.id')
+                ->where('user_relations.is_manager', 1);
+            })
+            ->leftJoin('users', 'user_relations.id_user', '=', 'users.id')
+            ->select('companies.*', 'users.id AS id_manager', 'company_relations.id_contratante as id_contratante')
+            ->first();
+            
+        $editor = DB::table('users')
+            ->where('users.id', Auth::user()->id)
+            ->leftjoin('user_relations', 'users.id', '=', 'user_relations.id_user')
+            ->leftjoin('companies', 'companies.id', '=', 'user_relations.id_company')
+            ->select('users.*', 'companies.name AS company', 'companies.tipo AS tipo', 'companies.id AS id_company', 'user_relations.is_manager AS is_manager')
+            ->first();
+        $invite_model = array(
+            'id_owner' => $editor->id,
+            'id_company' => $company->id,
+            'invite_code' => Str::random(20),
+            'status' => 'Não utilizado',
+        );
+        $new_invite = Invite::create($invite_model);
+        return redirect()->route('companies.index', 'new_invite=yes');
     }
 }

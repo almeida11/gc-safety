@@ -8,14 +8,23 @@
 
     <div>
         <div class="max-w-7xl mx-auto py-10 sm:px-6 lg:px-8">
-            @if(Auth::user()->type == 'Cliente' || Auth::user()->type == 'Administrador')
-            @if ($editor->tipo == 'Contratante' || $editor->company == null)
+            @if(Auth::user()->type == 'Cliente' || Auth::user()->type == 'Administrador' || $editor->company == null)
             <div class="block mb-8 mb-4">
                 <a href="{{ route('companies.create') }}"
                     class="bg-gray-200 hover:bg-gray-300 text-black  py-2 px-4 rounded">Cadastrar Empresa</a>
+                @if ($editor->tipo == 'Contratante')
+                <a href="#" onclick="openModal()" 
+                    class="bg-gray-200 hover:bg-gray-300 text-black  py-2 px-4 rounded">Convites</a>
+                @endif
             </div>
             @endif
-            @endif
+
+            <style>
+                .td200 {
+                    width:200px;
+                }
+            </style>
+
             <!--Search Bar-->
             <div class="relative">
                 <form method="GET" action="{{ route('companies.index') }}">
@@ -356,11 +365,150 @@
                             </table>
                         </div>
                         @if(isset($companies))
-                        {{ $companies->links() }}
+                            {{ $companies->links() }}
                         @endif
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    @if(Auth::user()->type == 'Cliente' || Auth::user()->type == 'Administrador')
+    @if ($editor->tipo == 'Contratante' || $editor->company == null || Auth::user()->type == 'Administrador')
+        <div class="main-modal fixed w-full h-100 inset-0 z-50 overflow-hidden flex justify-center items-center animated fadeIn faster"
+                    style="background: rgba(0,0,0,.7);">
+            <div
+                class="border border-teal-500 shadow-lg modal-container bg-white   mx-auto rounded shadow-lg z-50 overflow-y-auto">
+                <div class="div500 modal-content py-4 text-left px-6">
+                    <!--Title-->
+                    <div class="flex justify-between items-center pb-3">
+                        <p class="text-2xl font-bold mr-3">Convites</p>
+                        <div class="modal-close cursor-pointer z-50 ml-3">
+                            <svg class="fill-current text-black" xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                                viewBox="0 0 18 18">
+                                <path
+                                    d="M14.53 4.53l-1.06-1.06L9 7.94 4.53 3.47 3.47 4.53 7.94 9l-4.47 4.47 1.06 1.06L9 10.06l4.47 4.47 1.06-1.06L10.06 9z">
+                                </path>
+                            </svg>
+                        </div>
+                    </div>
+                    <!--Body-->
+                    <div class="my-5">
+                        <form method="post" action="{{ route('createInvite', [$editor->id_company]) }}">
+                            @csrf
+                            <table id="modal-table" class="min-w-full divide-gray-200 w-full">
+                                <tr class="border-b">
+                                    <th colspan='1' scope="col" class="mr-2 ml-2 py-3 bg-gray-50 text-center text-xs font-medium text-gray-500 uppercase tracking-wider bg-white">
+                                        ID
+                                    </th> 
+                                    <th colspan='1' scope="col" class="mr-2 ml-2 py-3 bg-gray-50 text-center text-xs font-medium text-gray-500 uppercase tracking-wider bg-white">
+                                        Criado por
+                                    </th> 
+                                    <th colspan='1' scope="col" class="mr-2 ml-2 py-3 bg-gray-50 text-center text-xs font-medium text-gray-500 uppercase tracking-wider bg-white">
+                                        Usado pelo usuário
+                                    </th> 
+                                    <th colspan='1' scope="col" class="mr-2 ml-2 py-3 bg-gray-50 text-center text-xs font-medium text-gray-500 uppercase tracking-wider bg-white">
+                                        Usado pela empresa
+                                    </th> 
+                                    <th colspan='1' scope="col" class="mr-2 ml-2 py-3 bg-gray-50 text-center text-xs font-medium text-gray-500 uppercase tracking-wider bg-white">
+                                        Código de convite
+                                    </th> 
+                                    <th colspan='1' scope="col" class="mr-2 ml-2 py-3 bg-gray-50 text-center text-xs font-medium text-gray-500 uppercase tracking-wider bg-white">
+                                        Status
+                                    </th> 
+                                </tr>
+                                @foreach ($invites as $invite)
+                                    <tr class="border-b">
+                                        <td class="td200 text-center py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-gray-200">
+                                            <p>{{ $invite->id }}</p>
+                                        </td>
+                                        <td class="td200 text-center py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-gray-200">
+                                            @foreach($users as $user)
+                                                @if($user->id == $invite->id_owner)
+                                                    <p>{{ mb_strimwidth($user->name, 0, 20, "...") }}</p>
+                                                @endif
+                                            @endforeach
+                                        </td>
+                                        <td class="td200 text-center py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-gray-200"> 
+                                            <?php $utilized_by_user = false; ?>
+                                            @foreach($users as $user)
+                                                @if($user->id == $invite->used_by_user)
+                                                    <?php $utilized_by_user = true; ?>
+                                                    <p>{{ mb_strimwidth($user->name, 0, 20, "...") }}</p>
+                                                @endif
+                                            @endforeach
+                                            @if(!$utilized_by_user)
+                                                <p>Não utilizado.</p>
+                                            @endif
+                                        </td>
+                                        <td class="td200 text-center py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-gray-200">
+                                            <?php $utilized_by_company = false; ?>
+                                            @foreach($companies as $company)
+                                                @if($company->id == $invite->used_by_company)
+                                                    <?php $utilized_by_company = true; ?>
+                                                    <p>{{ mb_strimwidth($company->name, 0, 20, "...") }}</p>
+                                                @endif
+                                            @endforeach
+                                            @if(!$utilized_by_company)
+                                                <p>Não utilizado.</p>
+                                            @endif
+                                        </td>
+                                        <td class="td200 text-center py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-gray-200">
+                                            <p>{{ $invite->invite_code }}</p>
+                                        </td>
+                                        <td class="td200 text-center py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-gray-200">
+                                            <p>{{ $invite->status }}</p>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </table>
+                        </div>
+                        <!--Footer-->
+                        <div class="flex justify-end pt-2">
+                            @if(isset($invites))
+                                {{ $invites->links() }}
+                            @endif
+                            @error('document_manager')
+                                <p class="text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                            <button
+                                class="focus:outline-none modal-close px-4 bg-gray-400 p-3 rounded-lg text-black hover:bg-gray-300 inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:shadow-outline-gray disabled:opacity-25 transition ease-in-out duration-150">
+                                Criar novo
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    @endif
+    @endif
+    <script>
+        const modal = document.querySelector('.main-modal');
+        const closeButton = document.querySelectorAll('.modal-close');
+        
+        const modalClose = () => {
+            modal.classList.remove('fadeIn');
+            modal.classList.add('fadeOut');
+            setTimeout(() => {
+                modal.style.display = 'none';
+            }, 500);
+        }
+
+        const openModal = () => {
+            modal.classList.remove('fadeOut');
+            modal.classList.add('fadeIn');
+            modal.style.display = 'flex';
+        }
+
+        for (let i = 0; i < closeButton.length; i++) {
+            const elements = closeButton[i];
+            elements.onclick = (e) => modalClose();
+            modal.style.display = 'none';
+            window.onclick = function (event) {
+                if (event.target == modal) modalClose();
+            }
+        }
+        @if(isset($_GET['new_invite']) || isset($_GET['invites']))
+            openModal();
+        @endif
+    </script>
 </x-app-layout>

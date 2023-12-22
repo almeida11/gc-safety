@@ -36,6 +36,8 @@ Route::middleware([
     
     Route::resource('companies', \App\Http\Controllers\CompaniesController::class);
 
+    Route::post('{company_id}/companies/createInvite/', [\App\Http\Controllers\CompaniesController::class, 'createInvite'])->name('createInvite');
+
     Route::resource('{company_id}/employees', \App\Http\Controllers\EmployeesController::class);
 
     Route::post('{company_id}/employees/editdoc/{employee_id}', [\App\Http\Controllers\EmployeesController::class, 'editdoc'])->name('editdoc');
