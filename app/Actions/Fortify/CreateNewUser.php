@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Fortify\Contracts\CreatesNewUsers;
 use Laravel\Jetstream\Jetstream;
+use Illuminate\Validation\ValidationException;
 
 class CreateNewUser implements CreatesNewUsers
 {
@@ -33,11 +34,11 @@ class CreateNewUser implements CreatesNewUsers
             ->first();
 
         if($invite == null) {
-            abort(403, 'Invalid invite code');
+            throw ValidationException::withMessages(['email' => 'Invalid invite code']);
         }
 
         if($invite->status == 'Utilizado') {
-            abort(403, 'Invite code already used');
+            throw ValidationException::withMessages(['email' => 'Invite code already used']);
         }
         
         $affected_user = User::create([
