@@ -373,7 +373,7 @@
         </div>
     </div>
     @if(Auth::user()->type == 'Cliente' || Auth::user()->type == 'Administrador')
-    @if ($editor->tipo == 'Contratante' || $editor->company == null || Auth::user()->type == 'Administrador')
+    @if (($editor->tipo == 'Contratante' || Auth::user()->type == 'Administrador') && $editor->company != null)
         <div class="main-modal fixed w-full h-100 inset-0 z-50 overflow-hidden flex justify-center items-center animated fadeIn faster"
                     style="background: rgba(0,0,0,.7);">
             <div
