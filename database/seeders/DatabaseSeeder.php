@@ -13,18 +13,18 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
 
-        \DB::table('companies')->insert([
-            [
-                'razao_social' => 'GC Sistemas S/A',
-                'name' => 'GC Sistemas',
-                'tipo' => "Contratante",
-            ],
-            [
-                'razao_social' => 'GC Safety S/A',
-                'name' => 'GC Safety',
-                'tipo' => 'Contratada',
-            ]
-        ]);
+        // \DB::table('companies')->insert([
+        //     [
+        //         'razao_social' => 'GC Sistemas S/A',
+        //         'name' => 'GC Sistemas',
+        //         'tipo' => "Contratante",
+        //     ],
+        //     [
+        //         'razao_social' => 'GC Safety S/A',
+        //         'name' => 'GC Safety',
+        //         'tipo' => 'Contratada',
+        //     ]
+        // ]);
         \DB::table('users')->insert([
             [
                 'name' => 'Pedro Gabriel Gigante Roseno Lima',
@@ -55,34 +55,34 @@ class DatabaseSeeder extends Seeder
                 'active' => true,
             ]
         ]);
-        \DB::table('user_relations')->insert([
-            [
-                'id_company' => 1,
-                'id_user' => 1,
-                'is_manager' => 1,
-            ],
-            [
-                'id_company' => 2,
-                'id_user' => 2,
-                'is_manager' => 1,
-            ],
-            [
-                'id_company' => 1,
-                'id_user' => 3,
-                'is_manager' => 0,
-            ],
-            [
-                'id_company' => 1,
-                'id_user' => 4,
-                'is_manager' => 0,
-            ]
-        ]);
+        // \DB::table('user_relations')->insert([
+        //     [
+        //         'id_company' => 1,
+        //         'id_user' => 1,
+        //         'is_manager' => 1,
+        //     ],
+        //     [
+        //         'id_company' => 2,
+        //         'id_user' => 2,
+        //         'is_manager' => 1,
+        //     ],
+        //     [
+        //         'id_company' => 1,
+        //         'id_user' => 3,
+        //         'is_manager' => 0,
+        //     ],
+        //     [
+        //         'id_company' => 1,
+        //         'id_user' => 4,
+        //         'is_manager' => 0,
+        //     ]
+        // ]);
         
-        \DB::table('company_relations')->insert([
-            [
-                'id_contratante' => 1,
-                'id_contratada' => 2,
-            ]
-        ]);
+        // \DB::table('company_relations')->insert([
+        //     [
+        //         'id_contratante' => 1,
+        //         'id_contratada' => 2,
+        //     ]
+        // ]);
     }
 }
