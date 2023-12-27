@@ -393,7 +393,7 @@
                     </div>
                     <!--Body-->
                     <div class="my-5">
-                        <form method="post" action="{{ route('createInvite', [$editor->company_id]) }}">
+                        <form method="post" action="{{ route('createInvite', [$editor->id_company]) }}">
                             @csrf
                             <table id="modal-table" class="min-w-full divide-gray-200 w-full">
                                 <tr class="border-b">
