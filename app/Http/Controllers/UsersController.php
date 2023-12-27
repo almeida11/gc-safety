@@ -147,16 +147,6 @@ class UsersController extends Controller {
             ->leftjoin('companies', 'companies.id', '=', 'user_relations.id_company')
             ->select('users.*', 'companies.name AS company', 'user_relations.is_manager AS is_manager')
             ->first();
-            
-        if (Auth::user()->type == 'Administrador') {
-            $users = DB::table('users')
-                ->where('users.name', 'LIKE', '%' . $busca . '%')
-                ->leftjoin('user_relations', 'users.id', '=', 'user_relations.id_user')
-                ->leftjoin('companies', 'companies.id', '=', 'user_relations.id_company')
-                ->select('users.*', 'companies.name AS company', 'user_relations.is_manager AS is_manager')
-                ->orderBy($orderby, $method)
-                ->paginate(9)->unique();
-        }
 
         $editor = DB::table('users')
             ->where('users.id', Auth::user()->id)
@@ -173,6 +163,16 @@ class UsersController extends Controller {
                 ->select('users.*', 'companies.name AS company', 'user_relations.is_manager AS is_manager')
                 ->orderBy($orderby, $method)
                 ->where('users.id', $editor->id)
+                ->paginate(9)->unique();
+        }
+            
+        if (Auth::user()->type == 'Administrador') {
+            $users = DB::table('users')
+                ->where('users.name', 'LIKE', '%' . $busca . '%')
+                ->leftjoin('user_relations', 'users.id', '=', 'user_relations.id_user')
+                ->leftjoin('companies', 'companies.id', '=', 'user_relations.id_company')
+                ->select('users.*', 'companies.name AS company', 'user_relations.is_manager AS is_manager')
+                ->orderBy($orderby, $method)
                 ->paginate(9)->unique();
         }
 
