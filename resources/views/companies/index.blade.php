@@ -12,10 +12,10 @@
             <div class="block mb-8 mb-4">
                 <a href="{{ route('companies.create') }}"
                     class="bg-gray-200 hover:bg-gray-300 text-black  py-2 px-4 rounded">Cadastrar Empresa</a>
-                @if ($editor->tipo == 'Contratante')
+                <!-- @if ($editor->tipo == 'Contratante')
                 <a href="#" onclick="openModal()" 
                     class="bg-gray-200 hover:bg-gray-300 text-black  py-2 px-4 rounded">Convites</a>
-                @endif
+                @endif -->
             </div>
             @endif
 
