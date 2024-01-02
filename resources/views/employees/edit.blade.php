@@ -1028,47 +1028,6 @@ $document_path_display = $document_path->path; ?>
                                     </tr>
                                 @endforeach
                             @endif
-                            
-                            <!-- @if($employee->documents)
-                                @foreach(json_decode($employee->documents) as $document)
-                                    @foreach(json_decode($documents) as $db_document)
-                                        @if($db_document->name == $document)
-                                            <?php $document_name = $db_document->name;
-                                                $check_doc = false; ?>
-                                        @endif
-                                    @endforeach
-                                    <tr class="border-b">
-                                        <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            {{ $document_name }}
-                                        </th>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
-                                        <button type="button" id="{{ limpaString($document_name).'btn' }}" class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150 mt-2 mr-2"
-                                            onclick="getDocument('{{ limpaString($document_name).'btn' }}', '{{ limpaString($document_name).'fl' }}')">
-                                            <?php $document_name_display = 'Enviar!' ?>
-                                            @if($document_paths->first())
-                                                @foreach($document_paths as $document_path)
-                                                    @if(limpaString($document_path->type))
-                                                        @if(limpaString($document_path->type) == limpaString($document_name))
-                                                            <?php $document_name_display = $document_path->name;
-                                                                $check_doc = true;  ?>
-                                                            @break
-                                                        @endif
-                                                    @endif
-                                                @endforeach
-                                            @endif
-                                            {{ $document_name_display }}
-                                        </button>
-                                                <input type="file" name="{{ $document_name }}" id="{{ limpaString($document_name).'fl' }}" class="hidden" onchange="changeName(this, '{{ limpaString($document_name).'btn' }}', '{{ limpaString($document_name).'fl' }}')"
-                                                {{ $document_name }}
-                                                class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-ful"
-                                                />
-                                            @error('document'.$document_name)
-                                                <p class="text-sm text-red-600">{{ $message }}</p>
-                                            @enderror
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            @endif -->
                             <tr class="border-b">
                                 <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Setor
