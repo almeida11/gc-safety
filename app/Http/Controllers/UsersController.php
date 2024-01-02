@@ -458,8 +458,10 @@ class UsersController extends Controller {
 
             if($user_check->type == 'Administrador') throw ValidationException::withMessages(['erro' => 'Você não tem permissão para isso!']);
         }
+
+        $req["password"] = $req["password"] == null ? $user->password : Hash::make($req["password"]);
+        
         if(isset($req["password"])) {
-            $req["password"] = $req["password"] == null ? $user->password : Hash::make($req["password"]);
             if(!(Auth::user()->type == 'Cliente' || Auth::user()->type == 'Administrador') || $user_check->type == 'Administrador' || $user_check->id == $editor->id) {
                 if(!(Hash::check($request->currentPassword, $user->password))) throw ValidationException::withMessages(['curr' => 'Senha inválida!']);
             }
