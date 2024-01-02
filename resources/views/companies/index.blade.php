@@ -342,7 +342,7 @@
                                         <td class=" py-4 whitespace-nowrap text-sm font-medium">
                                             <a href="{{ route('companies.show', $company->id) }}"
                                                 class="mb-2 mr-2 bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-2 rounded">Verificar</a>
-                                            @if(Auth::user()->type != 'Fiscal')
+                                            @if(Auth::user()->type != 'Fiscal' && Auth::user()->type != 'Analista')
                                             <a href="{{ route('companies.edit', $company->id) }}"
                                                 class="mb-2 mr-2 bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-2 rounded">Editar</a>
                                             @if ($editor->tipo == 'Contratante' || $editor->type == 'Administrador')

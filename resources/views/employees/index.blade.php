@@ -11,7 +11,7 @@
             <div class="block mb-8 mb-4">
                 <a href="{{ route('companies.show', $company_id) }}"
                     class="bg-gray-200 hover:bg-gray-300 text-black  py-2 px-4 rounded">Voltar a Empresa</a>
-                @if(Auth::user()->type != 'Fiscal')
+                @if(Auth::user()->type != 'Fiscal' && Auth::user()->type != 'Analista')
                 <a href="{{ route('employees.create', $company_id) }}"
                     class="bg-gray-200 hover:bg-gray-300 text-black  py-2 px-4 rounded">Cadastrar Funcionário</a>
                 @endif
@@ -322,7 +322,7 @@
                                     <td class=" py-4 whitespace-nowrap text-sm font-medium">
                                         <a href="{{ route('employees.show', ['company_id' => $company_id, 'employee' => $employee->id]) }}"
                                             class="mb-2 mr-2 bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-2 rounded">Verificar</a>
-                                        @if(Auth::user()->type != 'Fiscal')
+                                        @if(Auth::user()->type != 'Fiscal' && Auth::user()->type != 'Analista')
                                         <a href="{{ route('employees.edit', [$company_id, $employee->id]) }}"
                                             class="mb-2 mr-2 bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-2 rounded">Editar</a>
                                         <form class="inline-block"

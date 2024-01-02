@@ -9,7 +9,7 @@
         <div class="max-w-7xl mx-auto py-10 sm:px-6 lg:px-8">
             <div class="block mb-8 mb-4">
                 <a href="{{ route('companies.show', $company_id) }}" class="bg-gray-200 hover:bg-gray-300 text-black  py-2 px-4 rounded">Voltar a Empresa</a>
-                @if(Auth::user()->type != 'Fiscal')
+                @if(Auth::user()->type != 'Fiscal' && Auth::user()->type != 'Analista')
                     <a href="{{ route('responsibilities.create', $company_id) }}" class="bg-gray-200 hover:bg-gray-300 text-black  py-2 px-4 rounded">Cadastrar Cargo</a>
                 @endif
             </div>
@@ -158,7 +158,7 @@
                                         </td>
                                         <td class=" py-4 whitespace-nowrap text-sm font-medium">
                                             <a href="{{ route('responsibilities.show', [$company_id, $responsibility->id]) }}" class="mb-2 mr-2 bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-2 rounded">Verificar</a>
-                                            @if(Auth::user()->type != 'Fiscal')
+                                            @if(Auth::user()->type != 'Fiscal' && Auth::user()->type != 'Analista')
                                                 <a href="{{ route('responsibilities.edit', [$company_id, $responsibility->id]) }}" class="mb-2 mr-2 bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-2 rounded">Editar</a>
                                                 
                                                     <form class="inline-block" action="{{ route('responsibilities.destroy', [$company_id, $responsibility->id]) }}" method="POST" onsubmit="return confirm('Você tem certeza?');">

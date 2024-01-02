@@ -335,7 +335,7 @@
                                         @endif
                                         <td class=" py-4 whitespace-nowrap text-sm font-medium">
                                             <a href="{{ route('users.show', $user->id) }}" class="mb-2 mr-2 bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-2 rounded">Verificar</a>
-                                            @if(Auth::user()->type != 'Fiscal')
+                                            @if(Auth::user()->type != 'Fiscal' && Auth::user()->type != 'Analista')
                                                 <a href="{{ route('users.edit', $user->id) }}" class="mb-2 mr-2 bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-2 rounded">Editar</a>
                                                 <form class="inline-block" action="{{ route('users.destroy', $user->id) }}" method="POST" onsubmit="return confirm('Você tem certeza?');">
                                                     <input type="hidden" name="_method" value="DELETE" >
