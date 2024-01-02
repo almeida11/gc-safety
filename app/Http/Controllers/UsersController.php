@@ -409,7 +409,7 @@ class UsersController extends Controller {
         
         if(!($editor->company == $user_check->company || $editor->id_company == $user_check->id_contratante || $editor->id == $user->id)) abort(403, 'Access denied');
 
-        if(!(Auth::user()->type == 'Cliente' || Auth::user()->type == 'Administrador' || $editor->id == $user->id)) abort(403, 'Access denied');
+        if(!(Auth::user()->type == 'Prestador' || Auth::user()->type == 'Cliente' || Auth::user()->type == 'Administrador' || $editor->id == $user->id)) abort(403, 'Access denied');
 
 
         if($request->profile_photo_path) {
@@ -462,7 +462,7 @@ class UsersController extends Controller {
         $req["password"] = $req["password"] == null ? $user->password : Hash::make($req["password"]);
         
         if(isset($req["password"])) {
-            if(!(Auth::user()->type == 'Cliente' || Auth::user()->type == 'Administrador') || $user_check->type == 'Administrador' || $user_check->id == $editor->id) {
+            if(!(Auth::user()->type == 'Prestador' || Auth::user()->type == 'Cliente' || Auth::user()->type == 'Administrador') || $user_check->type == 'Administrador' || $user_check->id == $editor->id) {
                 if(!(Hash::check($request->currentPassword, $user->password))) throw ValidationException::withMessages(['curr' => 'Senha inválida!']);
             }
         }
