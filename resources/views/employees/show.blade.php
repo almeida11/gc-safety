@@ -236,13 +236,15 @@ function limpaString($string) {
                                                         <?php $document_name_display = 'Enviar!' ?>
                                                         @if($document_paths->first())
                                                             @foreach($document_paths as $document_path)
-                                                                @if(limpaString($document_path->type))
-                                                                    @if(limpaString($document_path->type) == limpaString($document_name))
-                                                                        <?php $document_name_display = $document_path->name;
-                                                                            $document_path_display = $document_path->path;
-                                                                            $check_doc = true;  ?>
-                                                                            
-                                                                        @break
+                                                                @if($document_path->actual == 1)
+                                                                    @if(limpaString($document_path->type))
+                                                                        @if(limpaString($document_path->type) == limpaString($document_name))
+                                                                            <?php $document_name_display = $document_path->name;
+                                                                                $document_path_display = $document_path->path;
+                                                                                $check_doc = true;  ?>
+                                                                                
+                                                                            @break
+                                                                        @endif
                                                                     @endif
                                                                 @endif
                                                             @endforeach
@@ -672,6 +674,9 @@ if (modal_tr_list) {
 var modalType = document.getElementById("modal_type");
 modalType.value = title;
 
+const approve_input = document.getElementById("approve");
+approve_input.name = 'approve'.concat(title);
+
 var OldElement = document.getElementById("modal-object");
 if(OldElement) {
     OldElement.remove();
@@ -836,7 +841,6 @@ if(!(path_par)){
     var modal_button2 = document.getElementById(title.concat('bt'));
     modal_button2.disabled = true;
     var elementMainButtonOldPDFViewer = document.getElementById("main-modal-btn");
-    elementMainButtonOldPDFViewer.disabled = false;
     old_due_date.value = path_par.due_date;
     modal_status.innerText = path_par.status;
     old_due_date.disabled = true;
@@ -942,17 +946,33 @@ for (let index = old_paths.length -1; index >= 0 ; index--){
             }
         }
 
-for (let i = 0; i < closeButton3.length; i++) {
+    for (let i = 0; i < closeButton3.length; i++) {
 
-    const elements3 = closeButton3[i];
+        const elements3 = closeButton3[i];
 
-    elements3.onclick = (e) => modalClose3();
+        elements3.onclick = (e) => modalClose3();
 
-    modal3.style.display = 'none';
+        modal3.style.display = 'none';
 
-    window.onclick = function (event) {
-        if (event.target == modal3) modalClose3();
+        window.onclick = function (event) {
+            if (event.target == modal3) modalClose3();
+        }
     }
-}
+
+    @error('document_manager') 
+        openModal()
+        let button_update = document.getElementById('modal_save_update');
+        if(button_update) {
+            button_update.classList.add("hidden");
+        }
+    @enderror
+
+    @error('document_uploader_type')
+        openModal2('{{ $message }}')
+        let button_update = document.getElementById('modal_save_update');
+        if(button_update) {
+            button_update.classList.add("hidden");
+        }
+    @enderror
     </script>
 </x-app-layout>
