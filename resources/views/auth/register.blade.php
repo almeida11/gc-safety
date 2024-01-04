@@ -1,3 +1,5 @@
+<?php $inviteCode = isset($_GET['code']) ? $_GET['code'] : ''; ?>
+
 <x-guest-layout>
     <x-authentication-card>
         <x-slot name="logo">
@@ -19,9 +21,9 @@
                 <x-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autocomplete="username" />
             </div>
 
-            <div class="mt-4">
+            <div class="mt-4 @if($inviteCode) hidden @endif" >
                 <x-label for="inviteCode" value="{{ __('Código de Convite') }}" />
-                <x-input id="inviteCode" class="block mt-1 w-full" type="text" name="inviteCode" :value="old('inviteCode')" required autocomplete="username" />
+                <x-input id="inviteCode" class="block mt-1 w-full" type="text" name="inviteCode" value="{{ $inviteCode }}" required autocomplete="username"/>
             </div>
 
             <div class="mt-4">
