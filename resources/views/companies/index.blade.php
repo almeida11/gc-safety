@@ -578,8 +578,9 @@
             tooltip.innerHTML = "Copy to clipboard";
         }
 
-        @if(isset($_GET['new_invite']) || isset($_GET['invites']))
+        @if(session('new_invite') == 'yes' || isset($_GET['invites']))
             openModal();
         @endif
     </script>
 </x-app-layout>
+<?php session()->forget('new_invite');?>
