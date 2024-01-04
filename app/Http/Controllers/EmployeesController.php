@@ -442,7 +442,7 @@ class EmployeesController extends Controller {
         return redirect()->route('employees.edit', [$company_id, $employee_id]);
     }
 
-    public function updatedoc(Int $company_id, Int $employee_id, Request $request) { // Envio de documentos
+    public function updatedoc(Int $company_id, Int $employee_id, Request $request) {
         // dd($request);
         $editor = DB::table('users')
             ->where('users.id', Auth::user()->id)
@@ -458,6 +458,7 @@ class EmployeesController extends Controller {
                 $old_document = DB::table('document_paths')
                     ->where('id_employee', $employee->id)
                     ->where('type', $document)
+                    ->where('actual', 1)
                     ->first();
                 if($request->{$document}) {
                     if(!(isset($request->new_due_date))) throw ValidationException::withMessages(['document_uploader' => 'Você deve enviar uma data de vencimento válida.', 'document_uploader_type'  => $document]);
@@ -483,61 +484,53 @@ class EmployeesController extends Controller {
 
                     $document_name = $document . '_' . $employee->id. "_" . $employee->name . ".{$extension}";
                     $document_name = preg_replace('/[ -]+/' , '_' , strtolower( preg_replace("[^a-zA-Z0-9-]", "-", strtr(utf8_decode(trim($document_name)), utf8_decode("áàãâéêíóôõúüñçÁÀÃÂÉÊÍÓÔÕÚÜÑÇ"), "aaaaeeiooouuncAAAAEEIOOOUUNC-")) ));
-                    
+
+                    if((String) count($files = Storage::files($path)) == 0){
+                        $document_name = '1_'.$document_name;
+                    } else {
+                        $document_name = (String) (count(Storage::files($path)) + 1).'_'.$document_name;
+                    }
+
                     if($old_document){
                         if (Storage::exists($old_document->path . "/" . $old_document->name)) {
-                            $path_to_old = $old_document->path . "/old/";
-                            $name_to_old = (String) (count($files = Storage::files($old_document->path . "/old")) + 1). "_" . $old_document->name;
-                            Storage::move($old_document->path . "/" . $old_document->name, $path_to_old . $name_to_old);
-                            $document_path_model = array(
-                                'path' => $path_to_old,
-                                'due_date' => $old_document->due_date,
-                                'name' => $name_to_old,
-                                'status' => 'Substituído',
-                                'actual' => 0,
-                                'type' => $old_document->type,
-                                'sended_by' => $old_document->sended_by,
-                                'created_at' => $old_document->updated_at,
-                                'id_employee' => $old_document->id_employee,
-                            );
-                            $document_path_old = Document_path::create($document_path_model);
-                            Storage::delete($old_document->name);
+                            // $path_to_old = $old_document->path . "/old/";
+                            // $name_to_old = (String) (count($files = Storage::files($old_document->path . "/old")) + 1). "_" . $old_document->name;
+                            // dump($old_document->path . "/" . $old_document->name);
+                            // dump($path_to_old . $name_to_old);
+                            // dd($this);
+                            // Storage::move($old_document->path . "/" . $old_document->name, $path_to_old . $name_to_old);
+                            // dd($this);
+                            $old_document = Document_path::findOrFail($old_document->id);
+                            // $old_document->path = $path_to_old;
+                            // $old_document->name = $name_to_old;
+                            $old_document->status = 'Substituído';
+                            $old_document->actual = 0;
+                            $old_document->update();
                         }
-                        $request->{$document}->storeAs($path, $document_name);
-
-                        $old_document = Document_path::findOrFail($old_document->id);
-                        $old_document->name = $document_name;
-                        $old_document->path = $path;
-                        $old_document->status = 'Pendente';
-                        $old_document->sended_by = $editor->name;
-                        $old_document->due_date = $request->new_due_date;
-                        $old_document->created_at = $old_document->updated_at;
-                        $old_document->update();
-                    } else {
-                        $resultStore = $request->{$document}->storeAs($path, $document_name);
-                        $document_path_model = array(
-                            'path' => $path,
-                            'due_date' => $request->new_due_date,
-                            'name' => $document_name,
-                            'type' => $document,
-                            'status' => 'Pendente',
-                            'sended_by' => $editor->name,
-                            'actual' => 1,
-                            'id_employee' => $employee->id,
-                        );
-                        $document_path = Document_path::create($document_path_model);
                     }
+                    $resultStore = $request->{$document}->storeAs($path, $document_name);
+                    $document_path_model = array(
+                        'path' => $path,
+                        'due_date' => $request->new_due_date,
+                        'name' => $document_name,
+                        'type' => $document,
+                        'status' => 'Pendente',
+                        'sended_by' => $editor->name,
+                        'actual' => 1,
+                        'id_employee' => $employee->id,
+                    );
+                    $document_path = Document_path::create($document_path_model);
                     break;
                 } else {
-                    if($request->approve) {
-                        if($request->approve == 'yes') {
+                    if($request->{'approve'.$document}) {
+                        if($request->{'approve'.$document} == 'yes') {
                             $old_document = Document_path::findOrFail($old_document->id);
                             $old_document->status = 'Aprovado';
                             $old_document->aproved_by = $editor->name;
                             $old_document->update();
                             break;
                         } else {
-                            if($request->approve == 'no') {
+                            if($request->{'approve'.$document} == 'no') {
                                 $old_document = Document_path::findOrFail($old_document->id);
                                 $old_document->status = 'Reprovado';
                                 $old_document->aproved_by = $editor->name;
@@ -547,19 +540,31 @@ class EmployeesController extends Controller {
                             }
                         }
                     } else {
-                        if($old_document) {
-                            if($old_document->type == $request->modal_type) {
-                                if($request->old_due_date) {
-                                    if($request->old_due_date != $old_document->due_date) {
-                                        $old_document = Document_path::findOrFail($old_document->id);
-                                        $old_document->due_date = $request->old_due_date;
-                                        $old_document->update();
-                                        break;
-                                    }
+                        if($request->{'remove'.$document}) {
+                            if($request->{'remove'.$document} == 'yes') {
+                                if (Storage::exists($old_document->path . "/" . $old_document->name)) {
+                                    $old_document = Document_path::findOrFail($old_document->id);
+                                    $old_document->status = 'Excluído';
+                                    $old_document->actual = 0;
+                                    $old_document->update();
+                                    break;
                                 }
                             }
                         } else {
-                            throw ValidationException::withMessages(['document_uploader' => 'Você deve enviar um arquivo!', 'document_uploader_type'  => $request->modal_type]);
+                            if($old_document) {
+                                if($old_document->type == $request->modal_type) {
+                                    if($request->old_due_date) {
+                                        if($request->old_due_date != $old_document->due_date) {
+                                            $old_document = Document_path::findOrFail($old_document->id);
+                                            $old_document->due_date = $request->old_due_date;
+                                            $old_document->update();
+                                            break;
+                                        }
+                                    }
+                                }
+                            } else {
+                                throw ValidationException::withMessages(['document_uploader' => 'Você deve enviar um arquivo!', 'document_uploader_type'  => $request->modal_type]);
+                            }
                         }
                     }
                 }

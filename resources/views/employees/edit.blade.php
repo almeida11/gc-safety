@@ -326,6 +326,7 @@ function limpaString($string) {
                                                 </button>
                                                 <div>
                                                     <input type="text" name="approve" id="approve" value="" class="hidden"/>
+                                                    <input type="text" name="remove" id="remove" value="" class="hidden"/>
                                                     <textarea id="disapproveDescription" name="disapproveDescription" class="hidden"></textarea>
                                                 </div>
                                             </th>
@@ -516,7 +517,20 @@ $document_path_display = $document_path->path; ?>
                     }
                 }
 
-                @error('document_manager') openModal() @enderror
+                @error('document_manager') 
+                    openModal()
+                    let button_update = document.getElementById('modal_save_update');
+                    if(button_update) {
+                        button_update.classList.add("hidden");
+                    }
+                @enderror
+
+                const removeDoc = (e, title) => {
+                    const remove_input = document.getElementById("remove");
+                    remove_input.name = 'remove'.concat(title);
+                    remove_input.value = 'yes';
+                    save_button.click();
+                }
 
                 const approveDoc = (e) => {
                     const approve_input = document.getElementById("approve");
@@ -563,6 +577,9 @@ $document_path_display = $document_path->path; ?>
                     }
                     var modalType = document.getElementById("modal_type");
                     modalType.value = title;
+
+                    const approve_input = document.getElementById("approve");
+                    approve_input.name = 'approve'.concat(title);
 
                     var OldElement = document.getElementById("modal-object");
                     if(OldElement) {
@@ -728,7 +745,6 @@ $document_path_display = $document_path->path; ?>
                         var modal_button2 = document.getElementById(title.concat('bt'));
                         modal_button2.disabled = true;
                         var elementMainButtonOldPDFViewer = document.getElementById("main-modal-btn");
-                        elementMainButtonOldPDFViewer.disabled = false;
                         old_due_date.value = path_par.due_date;
                         modal_status.innerText = path_par.status;
                         old_due_date.disabled = true;
@@ -850,7 +866,13 @@ $document_path_display = $document_path->path; ?>
                     }
                 }
                 
-                @error('document_uploader_type') openModal2('{{ $message }}') @enderror
+                @error('document_uploader_type')
+                    openModal2('{{ $message }}')
+                    let button_update = document.getElementById('modal_save_update');
+                    if(button_update) {
+                        button_update.classList.add("hidden");
+                    }
+                @enderror
             </script>
             
             <div class="mt-5 md:mt-0 md:col-span-2">
@@ -1007,20 +1029,25 @@ $document_path_display = $document_path->path; ?>
                                             <?php $document_name_display = 'Enviar!' ?>
                                             @if($document_paths->first())
                                                 @foreach($document_paths as $document_path)
-                                                    @if(limpaString($document_path->type))
-                                                        @if(limpaString($document_path->type) == limpaString($document_name))
-                                                            <?php $document_name_display = $document_path->name;
-                                                                $document_path_display = $document_path->path;
-                                                                $check_doc = true;  ?>
-                                                                
-                                                            @break
+                                                    @if($document_path->actual == 1)
+                                                        @if(limpaString($document_path->type))
+                                                            @if(limpaString($document_path->type) == limpaString($document_name))
+                                                                <?php $document_name_display = $document_path->name;
+                                                                    $document_path_display = $document_path->path;
+                                                                    $check_doc = true;  ?>
+                                                                @break
+                                                            @endif
                                                         @endif
                                                     @endif
                                                 @endforeach
                                             @endif
-                                            
                                             {{ $document_name_display }}
                                         </button>
+                                        @if($check_doc)
+                                        <button onclick="removeDoc(this, '{{ $document_name }}')" type="button" class="mb-2 mr-2 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-2 rounded">
+                                            Remover!
+                                        </button>
+                                        @endif
                                             @error('document'.$document_name)
                                                 <p class="text-sm text-red-600">{{ $message }}</p>
                                             @enderror
