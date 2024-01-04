@@ -322,16 +322,10 @@
                                             {{ $user->type }}
                                         </td>
 
-                                        @if ($editor->type == 'Cliente')
+                                        @if ($editor->type == 'Cliente' || $editor->type == 'Prestador' || $editor->type == 'Administrador')
                                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                                 {{ $user->active ? 'Ativo' : 'Inativo' }}
                                             </td>
-                                        @else
-                                            @if ($editor->type == 'Prestador')
-                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                    {{ $user->active ? 'Ativo' : 'Inativo' }}
-                                                </td>
-                                            @endif
                                         @endif
                                         <td class=" py-4 whitespace-nowrap text-sm font-medium">
                                             <a href="{{ route('users.show', $user->id) }}" class="mb-2 mr-2 bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-2 rounded">Verificar</a>
