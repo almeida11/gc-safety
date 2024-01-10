@@ -326,6 +326,7 @@ function limpaString($string) {
                                                 </button>
                                                 <div>
                                                     <input type="text" name="approve" id="approve" value="" class="hidden"/>
+                                                    <input type="text" name="remove" id="remove" value="" class="hidden"/>
                                                     <textarea id="disapproveDescription" name="disapproveDescription" class="hidden"></textarea>
                                                 </div>
                                             </th>
@@ -516,7 +517,20 @@ $document_path_display = $document_path->path; ?>
                     }
                 }
 
-                @error('document_manager') openModal() @enderror
+                @error('document_manager') 
+                    openModal()
+                    let button_update = document.getElementById('modal_save_update');
+                    if(button_update) {
+                        button_update.classList.add("hidden");
+                    }
+                @enderror
+
+                const removeDoc = (e, title) => {
+                    const remove_input = document.getElementById("remove");
+                    remove_input.name = 'remove'.concat(title);
+                    remove_input.value = 'yes';
+                    save_button.click();
+                }
 
                 const approveDoc = (e) => {
                     const approve_input = document.getElementById("approve");
@@ -563,6 +577,9 @@ $document_path_display = $document_path->path; ?>
                     }
                     var modalType = document.getElementById("modal_type");
                     modalType.value = title;
+
+                    const approve_input = document.getElementById("approve");
+                    approve_input.name = 'approve'.concat(title);
 
                     var OldElement = document.getElementById("modal-object");
                     if(OldElement) {
@@ -728,7 +745,6 @@ $document_path_display = $document_path->path; ?>
                         var modal_button2 = document.getElementById(title.concat('bt'));
                         modal_button2.disabled = true;
                         var elementMainButtonOldPDFViewer = document.getElementById("main-modal-btn");
-                        elementMainButtonOldPDFViewer.disabled = false;
                         old_due_date.value = path_par.due_date;
                         modal_status.innerText = path_par.status;
                         old_due_date.disabled = true;
@@ -850,7 +866,13 @@ $document_path_display = $document_path->path; ?>
                     }
                 }
                 
-                @error('document_uploader_type') openModal2('{{ $message }}') @enderror
+                @error('document_uploader_type')
+                    openModal2('{{ $message }}')
+                    let button_update = document.getElementById('modal_save_update');
+                    if(button_update) {
+                        button_update.classList.add("hidden");
+                    }
+                @enderror
             </script>
             
             <div class="mt-5 md:mt-0 md:col-span-2">
@@ -1007,20 +1029,25 @@ $document_path_display = $document_path->path; ?>
                                             <?php $document_name_display = 'Enviar!' ?>
                                             @if($document_paths->first())
                                                 @foreach($document_paths as $document_path)
-                                                    @if(limpaString($document_path->type))
-                                                        @if(limpaString($document_path->type) == limpaString($document_name))
-                                                            <?php $document_name_display = $document_path->name;
-                                                                $document_path_display = $document_path->path;
-                                                                $check_doc = true;  ?>
-                                                                
-                                                            @break
+                                                    @if($document_path->actual == 1)
+                                                        @if(limpaString($document_path->type))
+                                                            @if(limpaString($document_path->type) == limpaString($document_name))
+                                                                <?php $document_name_display = $document_path->name;
+                                                                    $document_path_display = $document_path->path;
+                                                                    $check_doc = true;  ?>
+                                                                @break
+                                                            @endif
                                                         @endif
                                                     @endif
                                                 @endforeach
                                             @endif
-                                            
                                             {{ $document_name_display }}
                                         </button>
+                                        @if($check_doc)
+                                        <button onclick="removeDoc(this, '{{ $document_name }}')" type="button" class="mb-2 mr-2 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-2 rounded">
+                                            Remover!
+                                        </button>
+                                        @endif
                                             @error('document'.$document_name)
                                                 <p class="text-sm text-red-600">{{ $message }}</p>
                                             @enderror
@@ -1028,47 +1055,6 @@ $document_path_display = $document_path->path; ?>
                                     </tr>
                                 @endforeach
                             @endif
-                            
-                            <!-- @if($employee->documents)
-                                @foreach(json_decode($employee->documents) as $document)
-                                    @foreach(json_decode($documents) as $db_document)
-                                        @if($db_document->name == $document)
-                                            <?php $document_name = $db_document->name;
-                                                $check_doc = false; ?>
-                                        @endif
-                                    @endforeach
-                                    <tr class="border-b">
-                                        <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            {{ $document_name }}
-                                        </th>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
-                                        <button type="button" id="{{ limpaString($document_name).'btn' }}" class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150 mt-2 mr-2"
-                                            onclick="getDocument('{{ limpaString($document_name).'btn' }}', '{{ limpaString($document_name).'fl' }}')">
-                                            <?php $document_name_display = 'Enviar!' ?>
-                                            @if($document_paths->first())
-                                                @foreach($document_paths as $document_path)
-                                                    @if(limpaString($document_path->type))
-                                                        @if(limpaString($document_path->type) == limpaString($document_name))
-                                                            <?php $document_name_display = $document_path->name;
-                                                                $check_doc = true;  ?>
-                                                            @break
-                                                        @endif
-                                                    @endif
-                                                @endforeach
-                                            @endif
-                                            {{ $document_name_display }}
-                                        </button>
-                                                <input type="file" name="{{ $document_name }}" id="{{ limpaString($document_name).'fl' }}" class="hidden" onchange="changeName(this, '{{ limpaString($document_name).'btn' }}', '{{ limpaString($document_name).'fl' }}')"
-                                                {{ $document_name }}
-                                                class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-ful"
-                                                />
-                                            @error('document'.$document_name)
-                                                <p class="text-sm text-red-600">{{ $message }}</p>
-                                            @enderror
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            @endif -->
                             <tr class="border-b">
                                 <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Setor

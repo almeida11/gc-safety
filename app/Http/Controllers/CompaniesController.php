@@ -691,6 +691,10 @@ class CompaniesController extends Controller {
             'status' => 'Não utilizado',
         );
         $new_invite = Invite::create($invite_model);
-        return redirect()->route('companies.index', 'new_invite=yes');
+
+        $request->session()->put('new_invite', 'yes');
+        $value = session('new_invite');
+
+        return redirect()->route('companies.index');
     }
 }

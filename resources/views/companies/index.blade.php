@@ -20,8 +20,53 @@
             @endif
 
             <style>
+                .tooltip {
+                    position: relative;
+                    display: inline-block;
+                }
+
+                .tooltip .tooltiptext {
+                    visibility: hidden;
+                    width: 140px;
+                    background-color: #555;
+                    color: #fff;
+                    text-align: center;
+                    border-radius: 6px;
+                    padding: 5px;
+                    position: absolute;
+                    z-index: 1;
+                    bottom: 150%;
+                    left: 50%;
+                    margin-left: -75px;
+                    opacity: 0;
+                    transition: opacity 0.3s;
+                }
+
+                .tooltip .tooltiptext::after {
+                    content: "";
+                    position: absolute;
+                    top: 100%;
+                    left: 50%;
+                    margin-left: -5px;
+                    border-width: 5px;
+                    border-style: solid;
+                    border-color: #555 transparent transparent transparent;
+                }
+
+                .tooltip:hover .tooltiptext {
+                    width:250px;
+                    visibility: visible;
+                    opacity: 1;
+                }
                 .td200 {
                     width:200px;
+                }
+
+                .alignCode {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    width:300px;
                 }
             </style>
 
@@ -342,7 +387,7 @@
                                         <td class=" py-4 whitespace-nowrap text-sm font-medium">
                                             <a href="{{ route('companies.show', $company->id) }}"
                                                 class="mb-2 mr-2 bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-2 rounded">Verificar</a>
-                                            @if(Auth::user()->type != 'Fiscal')
+                                            @if(Auth::user()->type != 'Fiscal' && Auth::user()->type != 'Analista')
                                             <a href="{{ route('companies.edit', $company->id) }}"
                                                 class="mb-2 mr-2 bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-2 rounded">Editar</a>
                                             @if ($editor->tipo == 'Contratante' || $editor->type == 'Administrador')
@@ -452,8 +497,15 @@
                                                 <p>Não utilizado.</p>
                                             @endif
                                         </td>
-                                        <td class="td200 text-center py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-gray-200">
+                                        <td class="alignCode td200 text-center py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-gray-200">
                                             <p>{{ $invite->invite_code }}</p>
+                                            <div class="tooltip">
+                                                <button type="button" onclick="copyCode('{{ $invite->invite_code }}')" onmouseout="copied('{{ $invite->invite_code }}')"
+                                                    class="ml-2 focus:outline-none modal-close2 px-4 bg-gray-400 p-3 rounded-lg text-black hover:bg-gray-300 inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:shadow-outline-gray disabled:opacity-25 transition ease-in-out duration-150">
+                                                    Copiar
+                                                    <span class="tooltiptext" id="myTooltip{{ $invite->invite_code }}">Copy to clipboard</span>
+                                                </button>
+                                            </div>
                                         </td>
                                         <td class="td200 text-center py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-gray-200">
                                             <p>{{ $invite->status }}</p>
@@ -507,8 +559,28 @@
                 if (event.target == modal) modalClose();
             }
         }
-        @if(isset($_GET['new_invite']) || isset($_GET['invites']))
+
+        function copyCode(code) {
+            var clipboard = navigator.clipboard;
+            if (clipboard != undefined) {
+                clipboard.writeText('http://192.168.65.130/register?code='.concat(code)).then(function() {
+                }, function() {
+                    console.error('Unable to write to clipboard. :-(');
+                });
+            }
+            
+            var tooltip = document.getElementById("myTooltip".concat(code));
+            tooltip.innerHTML = "Copied: " + code;
+        }
+
+        function copied(code) {
+            var tooltip = document.getElementById("myTooltip".concat(code));
+            tooltip.innerHTML = "Copy to clipboard";
+        }
+
+        @if(session('new_invite') == 'yes' || isset($_GET['invites']))
             openModal();
         @endif
     </script>
 </x-app-layout>
+<?php session()->forget('new_invite');?>

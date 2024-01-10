@@ -11,7 +11,7 @@
             <div class="block mb-8 mb-4">
                 <a href="{{ route('companies.show', $company_id) }}"
                     class="bg-gray-200 hover:bg-gray-300 text-black  py-2 px-4 rounded">Voltar a Empresa</a>
-                @if(Auth::user()->type != 'Fiscal')
+                @if(Auth::user()->type != 'Fiscal' && Auth::user()->type != 'Analista')
                 @if ($editor->tipo == 'Contratante')
                 <a href="{{ route('documents.create', $company_id) }}"
                     class="bg-gray-200 hover:bg-gray-300 text-black  py-2 px-4 rounded">Cadastrar Documentos</a>
@@ -173,7 +173,7 @@
                                     <td class=" py-4 whitespace-nowrap text-sm font-medium">
                                         <a href="{{ route('documents.show', [$company_id, $document->id]) }}"
                                             class="mb-2 mr-2 bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-2 rounded">Verificar</a>
-                                        @if(Auth::user()->type != 'Fiscal')
+                                        @if(Auth::user()->type != 'Fiscal' && Auth::user()->type != 'Analista')
                                         <a href="{{ route('documents.edit', [$company_id, $document->id]) }}"
                                             class="mb-2 mr-2 bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-2 rounded">Editar</a>
 

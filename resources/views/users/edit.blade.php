@@ -107,7 +107,7 @@
                                     @enderror
                                 </td>
                             </tr>
-                            @if($editor->type != 'Administrador' && $editor->type != 'Cliente' || $editor->id == $user->id || $user->type == 'Administrador')
+                            @if($editor->type != 'Administrador' && $editor->type != 'Prestador' && $editor->type != 'Cliente' || $editor->id == $user->id || $user->type == 'Administrador')
                             <tr class="border-b">
                                 <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Senha Atual
@@ -189,15 +189,20 @@
                                         <select id="type" name="type"
                                         class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-ful"
                                         wire:model="type">
-                                            @if (Auth::user()->type == 'Cliente')
-                                                <option value="Cliente">
-                                                    Cliente
-                                                </option>
-                                            @endif
-                                            <option value="Prestador" {{ $user->type == 'Prestador' ? 'selected' : '' }}>
+                                            <option value="Administrador" @if($user->type == 'Administrador') selected @endif @if (!($editor->type == 'Administrador')) hidden @endif >
+                                                Administrador
+                                            </option>
+                                            <option value="Cliente" 
+                                                @if($user->type == 'Cliente') selected @endif @if (!($editor->type == 'Administrador' || $editor->type == 'Cliente')) disabled @endif >
+                                                Cliente
+                                            </option>
+                                            <option value="Prestador" @if($user->type == 'Prestador') selected @endif @if (!($editor->type == 'Administrador' || $editor->type == 'Cliente' || $editor->type == 'Prestador')) disabled @endif >
                                                 Prestador
                                             </option>
-                                            <option value="Fiscal" {{ $user->type == 'Fiscal' ? 'selected' : '' }}>
+                                            <option value="Analista" @if($user->type == 'Analista') selected @endif @if (!($editor->type == 'Administrador' || $editor->type == 'Cliente' || $editor->type == 'Prestador')) disabled @endif >
+                                                Analista
+                                            </option>
+                                            <option value="Fiscal" @if($user->type == 'Fiscal') selected @endif @if (!($editor->type == 'Administrador' || $editor->type == 'Cliente' || $editor->type == 'Prestador')) disabled @endif >
                                                 Fiscal
                                             </option>
                                         </select>

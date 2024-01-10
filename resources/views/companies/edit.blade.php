@@ -277,7 +277,7 @@
                                     @enderror
                                 </td>
                             </tr>
-                            @if (($editor->type == 'Cliente' && $editor->tipo == 'Contratante' && $company->tipo == 'Contratada') || $editor->type == 'Administrador')
+                            @if (($editor->type == 'Cliente' && $editor->tipo == 'Contratante') || $editor->type == 'Administrador')
                             <tr class="border-b">
                                 <th scope="col"
                                     class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">

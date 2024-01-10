@@ -34,11 +34,11 @@ class CreateNewUser implements CreatesNewUsers
             ->first();
 
         if($invite == null) {
-            throw ValidationException::withMessages(['email' => 'Invalid invite code']);
+            throw ValidationException::withMessages(['email' => 'Código de convite inválido!']);
         }
 
         if($invite->status == 'Utilizado') {
-            throw ValidationException::withMessages(['email' => 'Invite code already used']);
+            throw ValidationException::withMessages(['email' => 'Código de Convite já está em uso!']);
         }
         
         $affected_user = User::create([
