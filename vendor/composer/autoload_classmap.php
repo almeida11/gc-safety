@@ -53,6 +53,7 @@ return array(
     'App\\Models\\Document' => $baseDir . '/app/Models/Document.php',
     'App\\Models\\Document_path' => $baseDir . '/app/Models/Document_path.php',
     'App\\Models\\Employee' => $baseDir . '/app/Models/Employee.php',
+    'App\\Models\\Invite' => $baseDir . '/app/Models/Invite.php',
     'App\\Models\\Responsibility' => $baseDir . '/app/Models/Responsibility.php',
     'App\\Models\\Sector' => $baseDir . '/app/Models/Sector.php',
     'App\\Models\\User' => $baseDir . '/app/Models/User.php',

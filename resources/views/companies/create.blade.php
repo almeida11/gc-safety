@@ -23,7 +23,7 @@
 
                                 <td
                                     class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
-                                    <input type="text" name="razao_social" id="razao_social"
+                                    <input type="text" name="razao_social" id="razao_social" value="{{ old('razao_social') }}"
                                         class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full"
                                         wire:model.defer="state.razao_social" autocomplete="razao_social" />
                                     @error('razao_social')
@@ -38,7 +38,7 @@
                                 </th>
                                 <td
                                     class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
-                                    <input type="text" name="name" id="name"
+                                    <input type="text" name="name" id="name" value="{{ old('name') }}"
                                         class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full"
                                         wire:model.defer="state.name" autocomplete="name" />
                                     @error('name')
@@ -53,7 +53,7 @@
                                 </th>
                                 <td
                                     class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
-                                    <input type="text" name="atividade_principal" id="atividade_principal"
+                                    <input type="text" name="atividade_principal" id="atividade_principal" value="{{ old('atividade_principal') }}"
                                         class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full"
                                         wire:model.defer="state.atividade_principal"
                                         autocomplete="new-atividade_principal" />
@@ -69,7 +69,7 @@
                                 </th>
                                 <td
                                     class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
-                                    <input type="text" name="cnae" id="cnae"
+                                    <input type="text" name="cnae" id="cnae" value="{{ old('cnae') }}"
                                         class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full"
                                         wire:model.defer="state.cnae" autocomplete="new-cnae" />
                                     @error('cnae')
@@ -84,7 +84,7 @@
                                 </th>
                                 <td
                                     class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
-                                    <input type="text" name="cnpj" id="cnpj"
+                                    <input type="text" name="cnpj" id="cnpj" value="{{ old('cnpj') }}"
                                         class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full"
                                         wire:model.defer="state.cnpj" autocomplete="new-cnpj" />
                                     @error('cnpj')
@@ -99,7 +99,7 @@
                                 </th>
                                 <td
                                     class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
-                                    <input type="text" name="endereco" id="endereco"
+                                    <input type="text" name="endereco" id="endereco" value="{{ old('endereco') }}"
                                         class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full"
                                         wire:model.defer="state.endereco" autocomplete="new-endereco" />
                                     @error('endereco')
@@ -114,7 +114,7 @@
                                 </th>
                                 <td
                                     class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
-                                    <input type="text" name="bairro" id="bairro"
+                                    <input type="text" name="bairro" id="bairro" value="{{ old('bairro') }}"
                                         class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full"
                                         wire:model.defer="state.bairro" autocomplete="new-bairro" />
                                     @error('bairro')
@@ -129,7 +129,7 @@
                                 </th>
                                 <td
                                     class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
-                                    <input type="text" name="cep" id="cep"
+                                    <input type="text" name="cep" id="cep" value="{{ old('cep') }}"
                                         class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full"
                                         wire:model.defer="state.cep" autocomplete="new-cep"
                                         onkeypress="$(this).mask('00.000-000')" onkeypress="return onlyNumberKey(event)"
@@ -146,7 +146,7 @@
                                 </th>
                                 <td
                                     class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
-                                    <input type="text" name="cidade" id="cidade"
+                                    <input type="text" name="cidade" id="cidade" value="{{ old('cidade') }}"
                                         class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full"
                                         wire:model.defer="state.cidade" autocomplete="new-cidade" />
                                     @error('cidade')
@@ -161,10 +161,10 @@
                                 </th>
                                 <td
                                     class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
-                                    <input type="text" name="telefone" id="telefone"
+                                    <input type="text" name="telefone" id="telefone" value="{{ old('telefone') }}"
                                         class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full"
                                         wire:model.defer="state.telefone" autocomplete="new-telefone"
-                                        onkeypress="$(this).mask('(00)0000-00009')"
+                                        onkeypress="$(this).mask('(00)0000-0000')"
                                         onkeypress="return onlyNumberKey(event)"
                                         pattern="\([0-9]{2}\)[0-9]{4}-[0-9]{4,5}" />
                                     @error('telefone')
@@ -188,7 +188,7 @@
                                                 Selecione um Gerente!
                                             </option>
                                             @foreach ($users as $user)
-                                            <option value="{{ $user->id }}" @if($editor->company == null) selected @endif>
+                                            <option value="{{ $user->id }}" {{ old('id_manager') == $user->id ? 'selected' : '' }} @if($editor->company == null) selected @endif>
                                                 {{ $user->name }}
                                             </option>
                                             @endforeach
@@ -211,10 +211,10 @@
                                         <select id="ativo" name="ativo"
                                             class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-ful"
                                             wire:model="ativo">
-                                            <option value='1' selected>
+                                            <option value='1' {{ old('ativo') == 1 ? 'selected' : '' }} selected>
                                                 Ativa
                                             </option>
-                                            <option value='0'>
+                                            <option value='0' {{ old('ativo') == 0 ? 'selected' : '' }}>
                                                 Inativa
                                             </option>
                                         </select>
@@ -237,10 +237,10 @@
                                         <select id="tipo" name="tipo"
                                             class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-ful"
                                             wire:model="tipo">
-                                            <option value='Contratante' selected>
+                                            <option value='Contratante' {{ old('tipo') == 'Contratante' ? 'selected' : '' }} selected>
                                                 Contratante
                                             </option>
-                                            <option value='Contratada'>
+                                            <option value='Contratada' {{ old('tipo') == 'Contratada' ? 'selected' : '' }}>
                                                 Contratada
                                             </option>
                                         </select>

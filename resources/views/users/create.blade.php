@@ -20,7 +20,7 @@
                                 </th>
                                 
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
-                                    <input type="text" name="name" id="name"
+                                    <input type="text" name="name" id="name"  value="{{ old("name") }}"
                                     class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full"
                                     wire:model.defer="state.name" autocomplete="name"/>
                                     @error('name')
@@ -33,7 +33,7 @@
                                     E-mail
                                 </th>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
-                                    <input type="email" name="email" id="email"
+                                    <input type="email" name="email" id="email"  value="{{ old("email") }}"
                                     class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full"
                                     wire:model.defer="state.email" autocomplete="email"/>
                                     @error('email')
@@ -46,7 +46,7 @@
                                     Senha
                                 </th>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
-                                    <input type="password" name="password" id="password" 
+                                    <input type="password" name="password" id="password"
                                     class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full"
                                     wire:model.defer="state.password" autocomplete="new-password" />
                                     @error('password')
@@ -59,7 +59,7 @@
                                     Confirmar Senha
                                 </th>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
-                                    <input type="password" name="password_confirmation" id="password_confirmation" 
+                                    <input type="password" name="password_confirmation" id="password_confirmation"
                                     class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full"
                                     wire:model.defer="state.password" autocomplete="new-password" />
                                     @error('password')
@@ -77,7 +77,7 @@
                                         class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-ful"
                                         wire:model="company">
                                             @foreach($companies as $company)
-                                                <option value="{{ $company->id }}" @if ($editor->company == $company->name) selected @endif>
+                                                <option value="{{ $company->id }}" {{ old('company') == $company->id ? 'selected' : '' }} @if ($editor->company == $company->name) selected @endif>
                                                     {{ $company->name }}
                                                 </option>
                                             @endforeach

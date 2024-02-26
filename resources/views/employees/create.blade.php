@@ -23,7 +23,7 @@
 
                                 <td
                                     class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
-                                    <input type="text" name="name" id="name"
+                                    <input type="text" name="name" id="name" value="{{ old("name") }}"
                                         class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full"
                                         wire:model.defer="state.name" autocomplete="name" />
                                     @error('name')
@@ -38,7 +38,7 @@
                                 </th>
                                 <td
                                     class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
-                                    <input type="text" name="cpf" id="cpf"
+                                    <input type="text" name="cpf" id="cpf" value="{{ old("cpf") }}"
                                         class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full"
                                         wire:model.defer="state.cpf" autocomplete="username"
                                         onkeypress="$(this).mask('000.000.000-00')"
@@ -56,7 +56,7 @@
                                 </th>
                                 <td
                                     class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
-                                    <input type="date" name="admission" id="admission" min="{{ date('Y-m-d', strtotime(date('Y-m-d') . ' -50 year')) }}" max="{{ date('Y-m-d', strtotime(date('Y-m-d') . ' +1 year')) }}" 
+                                    <input type="date" name="admission" id="admission" value="{{ old("admission") }}" min="{{ date('Y-m-d', strtotime(date('Y-m-d') . ' -50 year')) }}" max="{{ date('Y-m-d', strtotime(date('Y-m-d') . ' +1 year')) }}" 
                                         class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full"
                                         wire:model.defer="state.admission" autocomplete="new-admission" />
                                     @error('admission')
@@ -76,7 +76,7 @@
                                             class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-ful"
                                             wire:model="id_responsibility">
                                             @foreach($responsibilities as $responsibility)
-                                            <option value="{{ $responsibility->id }}">
+                                            <option value="{{ $responsibility->id }}"  {{ old('id_responsibility') == $responsibility->id ? 'selected' : '' }}>
                                                 {{ $responsibility->name }}
                                             </option>
                                             @endforeach
@@ -100,7 +100,7 @@
                                             class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-ful"
                                             wire:model="id_sector">
                                             @foreach($sectors as $sector)
-                                            <option value="{{ $sector->id }}">
+                                            <option value="{{ $sector->id }}"  {{ old('id_sector') == $sector->id ? 'selected' : '' }}>
                                                 {{ $sector->name }}
                                             </option>
                                             @endforeach
@@ -124,7 +124,7 @@
                                             class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-ful"
                                             wire:model="id_company">
                                             @foreach($companies as $company)
-                                            <option value="{{ $company->id }}">
+                                            <option value="{{ $company->id }}"  {{ old('id_company') == $company->id ? 'selected' : '' }}>
                                                 {{ $company->name }}
                                             </option>
                                             @endforeach
@@ -147,10 +147,10 @@
                                         <select id="active" name="active"
                                             class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-ful"
                                             wire:model="active">
-                                            <option value='1' selected>
+                                            <option value='1' {{ old('active') == 1 ? 'selected' : '' }}>
                                                 Ativo
                                             </option>
-                                            <option value='0'>
+                                            <option value='0' {{ old('active') == 0 ? 'selected' : '' }}>
                                                 Inativo
                                             </option>
                                         </select>

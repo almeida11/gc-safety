@@ -11,18 +11,18 @@
             <div class="block mb-8 mb-4">
                 <a href="{{ route('companies.index') }}"
                     class="bg-gray-200 hover:bg-gray-300 text-black  py-2 px-4 rounded">Voltar a Lista</a>
-                <a href="{{ route('employees.index', $company->id) }}"
-                    class="bg-gray-200 hover:bg-gray-300 text-black  py-2 px-4 rounded">Funcionários</a>
-                <a href="{{ route('responsibilities.index', $company_id) }}"
-                    class="bg-gray-200 hover:bg-gray-300 text-black  py-2 px-4 rounded">Cargos</a>
                 <a href="{{ route('sectors.index', $company_id) }}"
                     class="bg-gray-200 hover:bg-gray-300 text-black  py-2 px-4 rounded">Setores</a>
+                <a href="{{ route('responsibilities.index', $company_id) }}"
+                    class="bg-gray-200 hover:bg-gray-300 text-black  py-2 px-4 rounded">Cargos</a>
                 @if(Auth::user()->type != 'Usuário')
                 @if ($editor->tipo == 'Contratante')
                 <a href="{{ route('documents.index', $company_id) }}"
                     class="bg-gray-200 hover:bg-gray-300 text-black  py-2 px-4 rounded">Tipos de Documentos</a>
                 @endif
                 @endif
+                <a href="{{ route('employees.index', $company->id) }}"
+                    class="bg-gray-200 hover:bg-gray-300 text-black  py-2 px-4 rounded">Funcionários</a>
             </div>
             <div class="mt-5 md:mt-0 md:col-span-2">
                 <form method="post" action="{{ route('companies.update', $company->id) }}"
@@ -117,7 +117,7 @@
 
                                 <td
                                     class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 bg-white divide-y divide-gray-200">
-                                    <input type="text" name="razao_social" id="razao_social"
+                                    <input type="text" name="razao_social" id="razao_social" 
                                         class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full"
                                         wire:model.defer="state.razao_social" autocomplete="razao_social"
                                         value="{{ old('razao_social', $company->razao_social) }}" />
